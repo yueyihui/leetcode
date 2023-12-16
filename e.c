@@ -191,6 +191,103 @@ struct ListNode *reverseBetween(struct ListNode *head, int left, int right)
     return head;
 }
 
+struct ListNode *removeNthFromEnd(struct ListNode *head, int n)
+{
+    struct ListNode *p = head, *q = head;
+    for (int i = 0; i <= n; i++)
+    {
+        q = q->next;
+    }
+
+    while (q != NULL)
+    {
+        q = q->next;
+        p = p->next;
+    }
+
+    struct ListNode *tmp = p->next;
+    p->next = tmp->next;
+    return tmp;
+}
+
+struct ListNode *deleteDuplicates(struct ListNode *head)
+{
+    if (head == NULL || head->next == NULL)
+        return head;
+
+    struct ListNode *p = deleteDuplicates(head->next);
+    if (head->val != p->val)
+    {
+        head->next = p;
+    }
+    else
+    {
+        head->next = p->next;
+        free(p);
+    }
+
+    return head;
+}
+
+//linklist rotation is different with array
+//array is value move
+//linklist is change tail node as head node
+//example:
+//1 2 3 4 5 -> 5 1 2 3 4 -> 4 5 1 2 3
+struct ListNode *rotateRight(struct ListNode *head, int k)
+{
+    if (head == NULL)
+        return NULL;
+
+    for (int i = 0; i < k; i++)
+    {
+        struct ListNode *pre = NULL, *cur = head;
+        //find last node
+        while (cur->next != NULL)
+        {
+            pre = cur;
+            cur = cur->next;
+        }
+        pre->next = NULL;
+        cur->next = head;
+        head = cur;
+    }
+    return head;
+}
+
+struct ListNode *get_reversed_tail(struct ListNode *head, struct ListNode *tail)
+{
+    struct ListNode *end = tail->next;
+    struct ListNode *pre = NULL;
+    while (head != end)
+    {
+        struct ListNode *next = head->next;
+        head->next = pre;
+        pre = head;
+        head = next;
+    }
+    return end;
+}
+
+//1 2 3 NULL
+struct ListNode *reverseKGroup(struct ListNode *head, int k)
+{
+    if (head == NULL)
+        return head;
+
+    struct ListNode *sub_head = head, *sub_tail = head;
+    for (int i = 0; i < k - 1; i++)
+    {
+        if (sub_tail->next != NULL)
+            sub_tail = sub_tail->next;
+        else
+            return head;
+    }
+    //after reverse, head and tail be Swapped
+    sub_head->next = reverseKGroup(get_reversed_tail(sub_head, sub_tail), k);
+    return sub_tail;
+}
+
 int main(int argc, char *argv[])
 {
     struct ListNode *head = addToList(NULL, 0);
@@ -241,6 +338,58 @@ int main(int argc, char *argv[])
     addToList(rb, 6);
     addToList(rb, 7);
     rb = reverseBetween(rb, 2, 7);
+    printList(rb);
+
+    rb = addToList(NULL, 0);
+    addToList(rb, 1);
+    addToList(rb, 2);
+    addToList(rb, 3);
+    addToList(rb, 4);
+    addToList(rb, 5);
+    addToList(rb, 6);
+    addToList(rb, 7);
+    struct ListNode *rm = removeNthFromEnd(rb, 3);
+    printf("rm node val:%d\n", rm->val);
+    printList(rb);
+
+    rb = addToList(NULL, 0);
+    addToList(rb, 1);
+    addToList(rb, 1);
+    addToList(rb, 1);
+    addToList(rb, 2);
+    addToList(rb, 2);
+    addToList(rb, 3);
+    addToList(rb, 4);
+    addToList(rb, 4);
+    printf("before:");
+    printList(rb);
+    deleteDuplicates(rb);
+    printf("after:");
+    printList(rb);
+
+    rb = addToList(NULL, 0);
+    addToList(rb, 1);
+    addToList(rb, 2);
+    addToList(rb, 3);
+    addToList(rb, 4);
+    addToList(rb, 5);
+    printf("before rotate:");
+    printList(rb);
+    rb = rotateRight(rb, 3);
+    printf("after rotate:");
+    printList(rb);
+
+
+    rb = addToList(NULL, 0);
+    addToList(rb, 1);
+    addToList(rb, 2);
+    addToList(rb, 3);
+    addToList(rb, 4);
+    addToList(rb, 5);
+    printf("before rotate:");
+    printList(rb);
+    rb = reverseKGroup(rb, 5);
+    printf("after rotate:");
     printList(rb);
     return 0;
 }

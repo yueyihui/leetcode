@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef _Bool bool;
+#define true 1
+#define false 0
+
 int lengthOfLongestSubstring(char *s)
 {
     int max = 0;
@@ -185,6 +189,52 @@ char *longestCommonPrefix(char **strs, int strsSize)
     return prefix;
 }
 
+bool isSubsequence(char *s, char *t)
+{
+    if (s == NULL || t == NULL)
+        return false;
+
+    while (*s != '\0' && *t != '\0')
+    {
+        if (*s == *t)
+        {
+            s++;
+        }
+        t++;
+    }
+    return *s == '\0' ? true : false;
+}
+
+bool isPalindrome(char *s)
+{
+    char *p = s, *q = s;
+    while (*q != '\0')
+    {
+        if (('0' <= *q && *q <= '9') || ('A' <= *q && *q <= 'Z') || ('a' <= *q && *q <= 'z'))
+        {
+            *p++ = *q;
+        }
+        q++;
+    }
+    memset(p, 0, q - p);
+
+    char *left = s, *right = p - 1;
+    while (left < right)
+    {
+        if (*left == *right)
+        {
+            left++;
+            right--;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -223,6 +273,15 @@ int main(int argc, char *argv[])
     char *b = "Hell ddddd";
     char *strs[] = {a, b, w};
     printf("longestCommonPrefix:%s\n", longestCommonPrefix(strs, sizeof(strs) / sizeof(char *)));
+
+    printf("isSubsequence:%d\n", isSubsequence("acb", "bbaaacccb"));
+    printf("isSubsequence:%d\n", isSubsequence("bcc", "bbaaacccb"));
+    printf("isSubsequence:%d\n", isSubsequence("bcd", "bbaaacccb"));
+
+    char p0[] = "aaabb<ba?aca$";
+    printf("isPalindrome:%d\n", isPalindrome(p0));
+    char p1[] = "abbczcbba";
+    printf("isPalindrome:%d\n", isPalindrome(p1));
 
     return 0;
 }
