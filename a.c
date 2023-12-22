@@ -1,5 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+void shellSort(int arr[], int n)
+{
+    for (int gap = n / 2; gap > 0; gap /= 2)
+    {
+        for (int i = gap; i < n; i++)
+        {
+            int j = i;
+            int tmp = arr[j];
+            //why j>=gap?
+            //because j is decreased by gap
+            while (j >= gap && arr[j - gap] > tmp)
+            {
+                arr[j] = arr[j - gap];
+                j -= gap;
+            }
+            arr[j] = tmp;
+        }
+    }
+}
 
 int removeDuplicates(int *nums, int numsSize)
 {
@@ -106,6 +127,110 @@ int **threeSum(int *nums, int numsSize, int *returnSize, int **returnColumnSizes
     return NULL;
 }
 
+void swap(int *x, int *y)
+{
+    int tmp = *y;
+    *y = *x;
+    *x = tmp;
+}
+
+void permute(int *nums, int left, int right)
+{
+    if (left == right)
+    {
+        printf("[");
+        for (int *i = nums; i <= nums + right; i++)
+        {
+            printf("%d ", *i);
+        }
+        printf("]\n");
+        return;
+    }
+    else
+    {
+        for (int i = left; i <= right; i++)
+        {
+            //will have changed nums
+            swap(nums + left, nums + i);
+            permute(nums, left + 1, right);
+            //change back
+            swap(nums + left, nums + i);
+        }
+    }
+}
+
+//[0][1][2][3][4]
+//[0][1][2][3]
+int searchInsert(int *nums, int numsSize, int target)
+{
+    int l = 0;
+    int r = numsSize - 1;
+    //why include ==?
+    //because of l==r are find out the right pos
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (nums[mid] < target)
+        {
+            l = mid + 1;
+        }
+        else if (nums[mid] > target)
+        {
+            r = mid - 1;
+        }
+        else
+            return mid;
+    }
+    return l;
+}
+
+_Bool search(int *arr, int *right, int target)
+{
+    if (arr > right)
+        return 0;
+
+    int *mid = arr + (right - arr) / 2;
+    if (target < *mid)
+    {
+        return search(arr, mid - 1, target);
+    }
+    else if (*mid < target)
+    {
+        return search(mid + 1, right, target);
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+//why binary search haven't make use of mid instead of mid+/-1?
+//because of in the last case [x][x+1], now, left=mid, if mid < target then left will no progress 
+_Bool searchMatrix(int **matrix, int matrixSize, int matrixColSize, int target)
+{
+    int **top = matrix;
+    int **bottom = matrix + matrixSize - 1;
+    while (top <= bottom)
+    {
+        int **mid = top + (bottom - top) / 2;
+        if (target < **mid)
+        {
+            bottom = mid - 1;
+        }
+        else if (*(*mid + matrixColSize - 1) < target)
+        {
+            top = mid + 1;
+        }
+        else
+        {
+            //printf("[%d,%d]\n", **mid, *(*mid + matrixColSize - 1));
+            return search(*mid, *mid + matrixColSize - 1, target);
+        }
+    }
+    //printf("not found\n");
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -117,6 +242,34 @@ int main(int argc, char *argv[])
     printf("twoSum:");
     twoSum(nums1, sizeof(nums1) / sizeof(int));
     printf("\n");
+
+    shellSort(nums, sizeof(nums) / sizeof(int));
+    for (int i = 0; i < sizeof(nums) / sizeof(int); i++)
+    {
+        printf("%d ", nums[i]);
+    }
+    printf("\n");
+
+    printf("permute:\n");
+    int nums2[] = {1, 2, 3};
+    permute(nums2, 0, 2);
+
+    int nums3[5] = {0, 1, 5, 6};
+    printf("index:%d\n", searchInsert(nums3, 4, 0));
+
+    int a1[] = {1, 3, 5, 7};
+    int a2[] = {10, 11, 16, 20};
+    int a3[] = {23, 30, 34, 40};
+    int a4[] = {41, 42, 45, 48};
+    int a5[] = {50, 55, 56, 59};
+    int a6[] = {63, 64, 70, 71};
+    int a7[] = {72, 79, 81, 88};
+    int a8[] = {92, 95, 100, 112};
+    int *a[] = {a1, a2, a3, a3, a4, a5, a6, a7, a8};
+    for (int i = 0; i < 115; i++) {
+        if (searchMatrix(a, sizeof(a) / sizeof(int *), sizeof(a1) / sizeof(int), i))
+            printf("searchMatrix %d\n", i);
+    }
 
     return 0;
 }

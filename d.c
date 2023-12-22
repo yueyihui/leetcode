@@ -127,6 +127,29 @@ void flatten(struct TreeNode *root)
     }
 }
 
+void flatten1(struct TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    if (root->left == NULL && root->right == NULL)
+        return;
+
+    flatten1(root->left);
+
+    struct TreeNode *tmp = root->right;
+    root->right = root->left;
+    root->left = NULL;
+
+    struct TreeNode *i = root;
+    for (; i->right != NULL; i = i->right)
+        ;
+
+    i->right = tmp;
+
+    flatten1(root->right);
+}
+
 _Bool hasPathSum(struct TreeNode *root, int targetSum)
 {
     if (root == NULL || targetSum <= 0) //is not leaf
@@ -162,7 +185,7 @@ int main(int argc, char *argv[])
     levelOrder(root, &returnSize, &returnColumnSizes);
     printf("\n");
 
-    flatten(root);
+    flatten1(root);
     for (struct TreeNode *i = root; i != NULL; i = i->right)
     {
         printf("%d ", i->val);

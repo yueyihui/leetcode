@@ -22,6 +22,9 @@ int lengthOfLongestSubstring(char *s)
             else
             {
                 max = max > q - p ? max : q - p;
+                //why i+1?
+                //becase we stop at i, if set p at i
+                //it would stuck at i when invoke for
                 p = i + 1;
                 break;
             }

@@ -1,3 +1,5 @@
+CFLAGS+= -g -O3
+
 a:a.c
 b:b.c
 c:c.c
