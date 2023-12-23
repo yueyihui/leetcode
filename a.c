@@ -22,6 +22,21 @@ void shellSort(int arr[], int n)
     }
 }
 
+void insertSort(int arr[], int n)
+{
+    for (int i = 1; i < n; i++)
+    {
+        int j = i;
+        int tmp = arr[j];
+        while (j >= 1 && arr[j - 1] > tmp)
+        {
+            arr[j] = arr[j - 1];
+            j -= 1;
+        }
+        arr[j] = tmp;
+    }
+}
+
 int removeDuplicates(int *nums, int numsSize)
 {
     int *a = nums;
@@ -174,7 +189,7 @@ int searchInsert(int *nums, int numsSize, int target)
         {
             l = mid + 1;
         }
-        else if (nums[mid] > target)
+        else if (target < nums[mid])
         {
             r = mid - 1;
         }
@@ -184,15 +199,15 @@ int searchInsert(int *nums, int numsSize, int target)
     return l;
 }
 
-_Bool search(int *arr, int *right, int target)
+_Bool search(int *left, int *right, int target)
 {
-    if (arr > right)
+    if (left > right)
         return 0;
 
-    int *mid = arr + (right - arr) / 2;
+    int *mid = left + (right - left) / 2;
     if (target < *mid)
     {
-        return search(arr, mid - 1, target);
+        return search(left, mid - 1, target);
     }
     else if (*mid < target)
     {
@@ -231,6 +246,126 @@ _Bool searchMatrix(int **matrix, int matrixSize, int matrixColSize, int target)
     return 0;
 }
 
+int *searchRange(int *nums, int numsSize, int target)
+{
+    int l = 0;
+    int r = numsSize - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (target < nums[mid])
+            r = mid - 1;
+        else if (nums[mid] < target)
+            l = mid + 1;
+        else
+        {
+            int *left = &nums[mid];
+            int *right = left;
+            while (left - 1 >= nums && *(left - 1) == target)
+            {
+                left--;
+            }
+            while (right + 1 <= nums + numsSize - 1 && *(right + 1) == target)
+            {
+                right++;
+            }
+            printf("[%ld,%ld]\n", left - nums, right - nums);
+            return NULL;
+        }
+    }
+    printf("[-1,-1]\n");
+    return NULL;
+}
+
+int hammingWeight(unsigned int n)
+{
+    unsigned int b = 1;
+    int counter = 0;
+    for (int i = 0; i < 32; i++)
+    {
+        if ((b & n) != 0)
+            counter++;
+        b <<= 1;
+    }
+    return counter;
+}
+
+int singleNumber(int *nums, int numsSize)
+{
+    int bundle = 0;
+    for (int i = 0; i < numsSize; i++)
+    {
+        bundle ^= nums[i];
+    }
+    return bundle;
+}
+
+char *addBinary(char *a, char *b)
+{
+    int len_a = strlen(a), len_b = strlen(b);
+    //2=MSB+'\0'
+    int size = (len_a > len_b ? len_a : len_b) + 2;
+    char *add = a + len_a - 1;
+    char *added = b + len_b - 1;
+
+    char *s = (char *)malloc(size);
+    memset(s, 0, size);
+
+    //start before '\0'
+    char *res = s + size - 2;
+    char carry = 0;
+    while (res >= s)
+    {
+        char adding;
+        if (add >= a && added >= b)
+            adding = carry + (*add - '0') + (*added - '0');
+        else if (add >= a)
+            adding = carry + (*add - '0');
+        else if (added >= b)
+            adding = carry + (*added - '0');
+        else
+            adding = carry;
+
+        if (adding == 3)
+        {
+            carry = 1;
+            *res = '0' + 1;
+        }
+        else if (adding == 2)
+        {
+            carry = 1;
+            *res = '0';
+        }
+        else if (adding == 1)
+        {
+            carry = 0;
+            *res = '1';
+        }
+        else
+        {
+            carry = 0;
+            *res = '0';
+        }
+        res--;
+        add--;
+        added--;
+    }
+    //remove '0' at head
+    if (*s == '0')
+    {
+        res = s;
+        while (*res == '0')
+        {
+            res++;
+        }
+        for (char *i = s; res < s + size; i++, res++)
+        {
+            *i = *res;
+        }
+    }
+    return s;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -254,8 +389,8 @@ int main(int argc, char *argv[])
     int nums2[] = {1, 2, 3};
     permute(nums2, 0, 2);
 
-    int nums3[5] = {0, 1, 5, 6};
-    printf("index:%d\n", searchInsert(nums3, 4, 0));
+    int nums3[5] = {0, 2, 5, 6};
+    printf("index:%d\n", searchInsert(nums3, 4, 1));
 
     int a1[] = {1, 3, 5, 7};
     int a2[] = {10, 11, 16, 20};
@@ -270,6 +405,25 @@ int main(int argc, char *argv[])
         if (searchMatrix(a, sizeof(a) / sizeof(int *), sizeof(a1) / sizeof(int), i))
             printf("searchMatrix %d\n", i);
     }
+
+    int range[] = {3, 4, 5, 7, 7, 7, 7, 10};
+    searchRange(range, sizeof(range) / sizeof(int), 5);
+    searchRange(range, sizeof(range) / sizeof(int), 7);
+
+    printf("hammingWeight:%d\n", hammingWeight(432));
+
+    int sing[] = {1, 2, 2, 1, 4};
+    printf("singleNumber:%d\n", singleNumber(sing, sizeof(sing) / sizeof(int)));
+
+    printf("add:%s\n", addBinary("1010", "01011"));
+
+    int is[] = {4, -1, -10, 0, 9, 4, 23, 1, 9, -5, 3};
+    insertSort(is, sizeof(is) / sizeof(int));
+    for (int i = 0; i < sizeof(is) / sizeof(int); i++)
+    {
+        printf("%d ", is[i]);
+    }
+    printf("\n");
 
     return 0;
 }
