@@ -2,6 +2,34 @@
 #include <stdlib.h>
 #include <string.h>
 
+char *longestCommonPrefix(char **strs, int strsSize)
+{
+    int max = 0;
+    char **last = strs + strsSize - 1;
+    for (int i = 1; i < strsSize; i++)
+    {
+        char *a = strs[i - 1];
+        char *b = strs[i];
+        while (*a == *b)
+        {
+            a++;
+            b++;
+        }
+        if (i == 1)
+        {
+            max = b - *strs;
+            if (max == 0)
+                return "";
+        }
+        else
+            max = max < b - strs[i] ? max : b - strs[i];
+    }
+    char *rv = (char *)malloc(max + 1);
+    memset(rv, 0, max + 1);
+    strncpy(rv, *last, max);
+    return rv;
+}
+
 void shellSort(int arr[], int n)
 {
     for (int gap = n / 2; gap > 0; gap /= 2)
@@ -302,68 +330,50 @@ int singleNumber(int *nums, int numsSize)
 
 char *addBinary(char *a, char *b)
 {
-    int len_a = strlen(a), len_b = strlen(b);
-    //2=MSB+'\0'
-    int size = (len_a > len_b ? len_a : len_b) + 2;
-    char *add = a + len_a - 1;
-    char *added = b + len_b - 1;
-
-    char *s = (char *)malloc(size);
-    memset(s, 0, size);
-
-    //start before '\0'
-    char *res = s + size - 2;
-    char carry = 0;
-    while (res >= s)
+    char *ra = a + strlen(a) - 1;
+    char *rb = b + strlen(b) - 1;
+    unsigned int ia = 0;
+    unsigned int ib = 0;
+    for (char *i = a; i <= ra; i++)
     {
-        char adding;
-        if (add >= a && added >= b)
-            adding = carry + (*add - '0') + (*added - '0');
-        else if (add >= a)
-            adding = carry + (*add - '0');
-        else if (added >= b)
-            adding = carry + (*added - '0');
-        else
-            adding = carry;
+        if (*i == '1')
+            ia |= 1 << (ra - i);
+    }
+    for (char *i = b; i <= rb; i++)
+    {
+        if (*i == '1')
+            ib |= 1 << (rb - i);
+    }
 
-        if (adding == 3)
+#define BITS 8
+    char *rv = (char *)malloc(BITS);
+    memset(rv, 0, BITS);
+
+    unsigned int flag = 1;
+    for (int i = BITS - 1; i >= 0; i--, flag <<= 1)
+    {
+        if ((flag & (ia + ib)) > 0)
         {
-            carry = 1;
-            *res = '0' + 1;
-        }
-        else if (adding == 2)
-        {
-            carry = 1;
-            *res = '0';
-        }
-        else if (adding == 1)
-        {
-            carry = 0;
-            *res = '1';
+            rv[i] = '1';
         }
         else
-        {
-            carry = 0;
-            *res = '0';
-        }
-        res--;
-        add--;
-        added--;
+            rv[i] = '0';
     }
-    //remove '0' at head
-    if (*s == '0')
+    return rv;
+}
+
+unsigned int reverseBits(unsigned int n)
+{
+    unsigned int flag = 1;
+    unsigned int reverse = 0;
+    for (int i = 0; i < 32; i++, flag <<= 1)
     {
-        res = s;
-        while (*res == '0')
+        if ((n & flag) > 0)
         {
-            res++;
-        }
-        for (char *i = s; res < s + size; i++, res++)
-        {
-            *i = *res;
+            reverse |= 1 << (31 - i);
         }
     }
-    return s;
+    return reverse;
 }
 
 int main(int argc, char *argv[])
@@ -415,7 +425,7 @@ int main(int argc, char *argv[])
     int sing[] = {1, 2, 2, 1, 4};
     printf("singleNumber:%d\n", singleNumber(sing, sizeof(sing) / sizeof(int)));
 
-    printf("add:%s\n", addBinary("1010", "01011"));
+    printf("add:%s\n", addBinary("1010", "0011"));
 
     int is[] = {4, -1, -10, 0, 9, 4, 23, 1, 9, -5, 3};
     insertSort(is, sizeof(is) / sizeof(int));
@@ -424,6 +434,14 @@ int main(int argc, char *argv[])
         printf("%d ", is[i]);
     }
     printf("\n");
+
+    char *flower = "flower";
+    char *flow = "flow";
+    char *flight = "flight";
+    char *strs[] = {flower, flow, flight};
+    printf("longestCommonPrefix:%s\n", longestCommonPrefix(strs, sizeof(strs) / sizeof(char *)));
+
+    printf("reverseBits:%u\n", reverseBits(234));
 
     return 0;
 }

@@ -52,9 +52,6 @@ struct ListNode *addToList(struct ListNode *head, int val)
     return p->next;
 }
 
-//L1:1 2 3 10 11 NULL
-//L2:4 15 NULL
-//when 3->next=merge(3->next,4), 3->next= want to L2 as return
 struct ListNode *mergeTwoLists(struct ListNode *list1, struct ListNode *list2)
 {
     if (list1 == NULL)
@@ -191,23 +188,29 @@ struct ListNode *reverseBetween(struct ListNode *head, int left, int right)
     return head;
 }
 
+struct ListNode *removeNth(struct ListNode *head, int *n)
+{
+    if (head == NULL)
+    {
+        return NULL;
+    }
+    struct ListNode *i = removeNth(head->next, n);
+    (*n)--;
+    if (*n == 0)
+    {
+        free(head);
+        return i;
+    }
+    else
+    {
+        head->next = i;
+        return head;
+    }
+}
+
 struct ListNode *removeNthFromEnd(struct ListNode *head, int n)
 {
-    struct ListNode *p = head, *q = head;
-    for (int i = 0; i <= n; i++)
-    {
-        q = q->next;
-    }
-
-    while (q != NULL)
-    {
-        q = q->next;
-        p = p->next;
-    }
-
-    struct ListNode *tmp = p->next;
-    p->next = tmp->next;
-    return tmp;
+    return removeNth(head, &n);
 }
 
 struct ListNode *deleteDuplicates(struct ListNode *head)
@@ -225,7 +228,6 @@ struct ListNode *deleteDuplicates(struct ListNode *head)
         head->next = p->next;
         free(p);
     }
-
     return head;
 }
 
@@ -288,6 +290,25 @@ struct ListNode *reverseKGroup(struct ListNode *head, int k)
     return sub_tail;
 }
 
+struct ListNode *sortList(struct ListNode *head)
+{
+    if (head == NULL)
+        return NULL;
+
+    struct ListNode *i = sortList(head->next);
+    if (i != NULL && head->val > i->val)
+    {
+        head->next = i->next;
+        i->next = sortList(head);
+        return i;
+    }
+    else
+    {
+        head->next = i;
+        return head;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     struct ListNode *head = addToList(NULL, 0);
@@ -348,9 +369,9 @@ int main(int argc, char *argv[])
     addToList(rb, 5);
     addToList(rb, 6);
     addToList(rb, 7);
-    struct ListNode *rm = removeNthFromEnd(rb, 3);
-    printf("rm node val:%d\n", rm->val);
-    printList(rb);
+    struct ListNode *rm = removeNthFromEnd(rb, 2);
+    printf("remove from end:");
+    printList(rm);
 
     rb = addToList(NULL, 0);
     addToList(rb, 1);
@@ -388,8 +409,26 @@ int main(int argc, char *argv[])
     addToList(rb, 5);
     printf("before rotate:");
     printList(rb);
-    rb = reverseKGroup(rb, 5);
+    rb = reverseKGroup(rb, 2);
     printf("after rotate:");
     printList(rb);
+
+
+    head = addToList(NULL, -1);
+    addToList(head, 11);
+    addToList(head, 34);
+    addToList(head, 5);
+    addToList(head, 1);
+    addToList(head, 82);
+    addToList(head, 4);
+    addToList(head, 0);
+    addToList(head, 10);
+    addToList(head, 11);
+    addToList(head, 20);
+    addToList(head, -5);
+    addToList(head, -15);
+    addToList(head, 15);
+    head = sortList(head);
+    printList(head);
     return 0;
 }

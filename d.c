@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct TreeNode
 {
@@ -74,6 +75,7 @@ void onlevel(struct TreeNode *root, int level)
     //is for the tree is not a full binary tree
     if (root == NULL)
     {
+        printf("null ");
         return;
     }
     else if (level == 0)
@@ -95,6 +97,14 @@ int **levelOrder(struct TreeNode *root, int *returnSize, int **returnColumnSizes
         onlevel(root, i);
     }
     return NULL;
+}
+
+void levelPrint(struct TreeNode *root, int depth)
+{
+    for (int i = 0; i < depth; i++)
+    {
+        onlevel(root, i);
+    }
 }
 
 void flatten(struct TreeNode *root)
@@ -169,6 +179,53 @@ _Bool hasPathSum(struct TreeNode *root, int targetSum)
     }
 }
 
+struct TreeNode *sortedArrayToBST(int *nums, int numsSize)
+{
+    if (numsSize == 0)
+        return NULL;
+
+    int l = 0;
+    int r = numsSize - 1;
+    int mid = l + (r - l) / 2;
+    struct TreeNode *n = newNode(nums[mid]);
+    n->left = sortedArrayToBST(nums, mid);
+    n->right = sortedArrayToBST(nums + mid + 1, numsSize - mid - 1);
+    return n;
+}
+
+int *rightSideView(struct TreeNode *root, int *returnSize)
+{
+    if (root == NULL)
+    {
+        *returnSize = 0;
+        return NULL;
+    }
+
+    int r_size = 0;
+    int *r = rightSideView(root->right, &r_size);
+    int l_size = 0;
+    int *l = rightSideView(root->left, &l_size);
+    if (r_size >= l_size)
+    {
+        *returnSize = r_size + 1;
+        int *new = (int *)malloc(*returnSize);
+        memset(new, 0, *returnSize);
+        new[0] = root->val;
+        memcpy(new + 1, r, r_size * sizeof(int));
+        return new;
+    }
+    else
+    {
+        *returnSize = r_size + (l_size - r_size) + 1;
+        int *new = (int *)malloc(*returnSize);
+        memset(new, 0, *returnSize);
+        new[0] = root->val;
+        memcpy(new + 1, r, r_size * sizeof(int));
+        memcpy(new + 1 + r_size, l + r_size, (l_size - r_size) * sizeof(int));
+        return new;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int preorder[] = {3, 9, 20, 15, 7};
@@ -196,5 +253,26 @@ int main(int argc, char *argv[])
     int in_a[] = {7, 11, 2, 4, 5, 13, 8, 4, 1};
     root = buildTree(pre_a, sizeof(pre_a) / sizeof(int), in_a, sizeof(in_a) / sizeof(int));
     printf("%d\n", hasPathSum(root, 18));
+
+    int b_nums[] = {-10, -3, 0, 5, 9};
+    struct TreeNode *bst = sortedArrayToBST(b_nums, sizeof(b_nums) / sizeof(int));
+    levelPrint(bst, 3);
+    printf("\n");
+
+    int rts = 0;
+    root = newNode(1);
+    root->left = newNode(2);
+    root->left->right = newNode(5);
+    root->left->right->right = newNode(10);
+    root->left->right->left = newNode(6);
+    root->right = newNode(3);
+    root->right->right = newNode(4);
+    int *right_view = rightSideView(root, &rts);
+    printf("rightSideView:");
+    for (int i = 0; i < rts; i++)
+    {
+        printf("%d ", right_view[i]);
+    }
+    printf("\n");
     return 0;
 }
