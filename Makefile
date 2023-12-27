@@ -1,14 +1,12 @@
 CFLAGS+= -g -O3
+CC:=gcc
+CXXFLAGS+= -g -O3
 
-a:a.c
-b:b.c
-c:c.c
-d:d.c
-e:e.c
+TARGET:= $(basename $(wildcard *.c), $(wildcard *.cpp))
 
-all: a b c d e
+all: $(TARGET)
 
 clean:
-	rm -f a b c d e
+	rm -f $(TARGET)
 
-.DEFAULT_GOAL=all
+#.DEFAULT_GOAL=all

@@ -309,6 +309,32 @@ struct ListNode *sortList(struct ListNode *head)
     }
 }
 
+struct ListNode *deleteMiddle(struct ListNode *head)
+{
+    struct ListNode *fast = head;
+    struct ListNode *slow = head;
+    struct ListNode *pre = NULL;
+    int i = 0;
+    while (fast != NULL)
+    {
+        fast = fast->next;
+        if (i == 1)
+        {
+            pre = slow;
+            slow = slow->next;
+            i = 0;
+        }
+        else
+        {
+            i++;
+        }
+    }
+    printf("mid val %d\n", slow->val);
+    printf("pre val %d\n", pre->val);
+    pre->next = slow->next;
+    return slow;
+}
+
 int main(int argc, char *argv[])
 {
     struct ListNode *head = addToList(NULL, 0);
@@ -430,5 +456,23 @@ int main(int argc, char *argv[])
     addToList(head, 15);
     head = sortList(head);
     printList(head);
+
+    head = newNode(0);
+    tail = addToList(head, 1);
+    for (int i = 2; i < 25; i++)
+    {
+        tail = addToList(tail, i);
+    }
+    for (struct ListNode *i = head; i != NULL; i = i->next)
+    {
+        printf("%d ", i->val);
+    }
+    printf("\n");
+    deleteMiddle(head);
+    for (struct ListNode *i = head; i != NULL; i = i->next)
+    {
+        printf("%d ", i->val);
+    }
+    printf("\n");
     return 0;
 }

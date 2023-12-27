@@ -101,32 +101,23 @@ void twoSum(int *nums, int numsSize)
     }
     printf("\n");
 
-    for (int i = 0; i < numsSize; i++)
+    int *left = &nums[0];
+    int *right = nums + numsSize - 1;
+    while (left < right)
     {
-        //we need to check previous, why?
-        //as previous is no result, then i am no result
-        //because we are the same
-        if (i > 0 && nums[i] == nums[i - 1])
+        if (*left + *right == 0)
         {
-            continue;
+            printf("[%d,%d] ", *left, *right);
+            for (left++; left < right && *left == *(left - 1); left++)
+                ;
         }
-        int *left = &nums[i];
-        int *right = nums + numsSize - 1;
-        while (left < right)
+        else if (*left + *right > 0)
         {
-            if (*left + *right == 0)
-            {
-                printf("[%d,%d] ", *left, *right);
-                break;
-            }
-            else if (*left + *right > 0)
-            {
-                right--;
-            }
-            else
-            {
-                left++;
-            }
+            right--;
+        }
+        else
+        {
+            left++;
         }
     }
 }
@@ -376,6 +367,46 @@ unsigned int reverseBits(unsigned int n)
     return reverse;
 }
 
+int majorityElement(int *nums, int numsSize)
+{
+    //shellsort
+    for (int gap = numsSize / 2; gap > 0; gap /= 2)
+    {
+        for (int i = gap; i < numsSize; i++)
+        {
+            int j = i;
+            int tmp = nums[j];
+            while (j >= gap && nums[j - gap] > tmp)
+            {
+                nums[j] = nums[j - gap];
+                j -= gap;
+            }
+            nums[j] = tmp;
+        }
+    }
+
+    return nums[numsSize / 2];
+}
+
+int removeElement(int *nums, int numsSize, int val)
+{
+    int *q = nums;
+    int *p = nums;
+    while (p < nums + numsSize)
+    {
+        if (*p == val)
+        {
+
+        }
+        else
+        {
+            *q++ = *p;
+        }
+        p++;
+    }
+    return q - nums;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -383,7 +414,7 @@ int main(int argc, char *argv[])
     threeSum(nums, sizeof(nums) / sizeof(int), NULL, NULL);
     printf("\n");
 
-    int nums1[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
+    int nums1[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 9, 1, 0, 2, -2, 3, -2, 4, 2, -5};
     printf("twoSum:");
     twoSum(nums1, sizeof(nums1) / sizeof(int));
     printf("\n");
@@ -442,6 +473,19 @@ int main(int argc, char *argv[])
     printf("longestCommonPrefix:%s\n", longestCommonPrefix(strs, sizeof(strs) / sizeof(char *)));
 
     printf("reverseBits:%u\n", reverseBits(234));
+
+    int major[] = {2, 21, 2, 2, 2, 1, 2, 4, 2, 2, 0, 6, 7, 2, 4, 2, 2, 2, 1, 2, 2, 4, 2, 5, 2, 12, 18, 2, 14, 2, 9, 2, 11, 2, 1, 0};
+    printf("majorityElement:%d\n", majorityElement(major, sizeof(major) / sizeof(int)));
+
+    int len = removeElement(major, sizeof(major) / sizeof(int), 2);
+    len = removeElement(major, len, 1);
+    len = removeElement(major, len, 0);
+    len = removeElement(major, len, 4);
+    printf("after removeElement:");
+    for (int i = 0; i < len; i++) {
+        printf("%d ", major[i]);
+    }
+    printf("\n");
 
     return 0;
 }
