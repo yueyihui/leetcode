@@ -1,10 +1,14 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <uthash.h>
 
-typedef _Bool bool;
-#define true 1
-#define false 0
+struct HashTable
+{
+    char key[8];
+    UT_hash_handle hh;
+};
 
 int lengthOfLongestSubstring(char *s)
 {
@@ -238,6 +242,149 @@ bool isPalindrome(char *s)
     return true;
 }
 
+void shellsort(char *str)
+{
+    for (int gap = strlen(str) / 2; gap > 0; gap /= 2)
+    {
+        for (int i = gap; i < strlen(str); i++)
+        {
+            int j = i;
+            int val = str[j];
+            for (; j >= gap; j -= gap)
+            {
+                if (val < str[j - gap])
+                {
+                    str[j] = str[j - gap];
+                }
+                else
+                {
+                    break;
+                }
+            }
+            str[j] = val;
+        }
+    }
+}
+
+char ***groupAnagrams(char strs[][4], int strsSize)
+{
+    struct HashTable *table = NULL;
+
+    for (int i = 0; i < strsSize; i++)
+    {
+        char *word = (char *)malloc(strlen(strs[i] + 1));
+        strcpy(word, strs[i]);
+        shellsort(word);
+        struct HashTable *rv;
+        HASH_FIND_INT(table, word, rv);
+        if (rv != NULL)
+        {
+            printf("get hash:%s\n", strs[i]);
+        }
+        else
+        {
+            struct HashTable *s = (struct HashTable *)malloc(sizeof(struct HashTable));
+            strcpy(s->key, word);
+            HASH_ADD_INT(table, key, s);
+            printf("add hash:%s\n", strs[i]);
+        }
+    }
+    return NULL;
+}
+
+char *mergeAlternately(char *word1, char *word2)
+{
+    int len1 = strlen(word1);
+    int len2 = strlen(word2);
+    int size = len1 + len2 + 2;
+    char *merge = (char *)malloc(size);
+    memset(merge, 0, size);
+
+    int i = 0, j1 = 0, j2 = 0;
+    while (j1 < len1 && j2 < len2)
+    {
+        if (i % 2 == 0)
+        {
+            merge[i++] = word1[j1++];
+        }
+        else
+        {
+            merge[i++] = word2[j2++];
+        }
+    }
+    while (j1 < len1)
+    {
+        merge[i++] = word1[j1++];
+    }
+    while (j2 < len2)
+    {
+        merge[i++] = word2[j2++];
+    }
+    return merge;
+}
+
+void shellsort_int(int *arr, int size)
+{
+    for (int gap = size / 2; gap > 0; gap /= 2)
+    {
+        for (int i = gap; i < size; i++)
+        {
+            int j = i;
+            int val = arr[j];
+            while (j >= gap && arr[j - gap] > val)
+            {
+                arr[j] = arr[j - gap];
+                j -= gap;
+            }
+            arr[j] = val;
+        }
+    }
+}
+
+//Input: spells = [5,1,3], potions = [1,2,3,4,5], success = 7
+//Output: [4,0,3]
+//Explanation:
+//- 0th spell: 5 * [1,2,3,4,5] = [5,10,15,20,25]. 4 pairs are successful.
+//- 1st spell: 1 * [1,2,3,4,5] = [1,2,3,4,5]. 0 pairs are successful.
+//- 2nd spell: 3 * [1,2,3,4,5] = [3,6,9,12,15]. 3 pairs are successful.
+int *successfulPairs(int *spells, int spellsSize, int *potions, int potionsSize, long long success, int *returnSize)
+{
+    //don't sort spells, we traverse it
+    //shellsort_int(spells, spellsSize);
+    shellsort_int(potions, potionsSize);
+    *returnSize = spellsSize;
+    int *rv = (int *)malloc(sizeof(int) * spellsSize);
+    memset(rv, 0, spellsSize);
+    for (int i = 0; i < spellsSize; i++)
+    {
+        int l = 0;
+        int r = potionsSize - 1;
+        int start = -1;
+        while (l <= r)
+        {
+            int mid = l + (r - l) / 2;
+            if (spells[i] * potions[mid] >= success)
+            {
+                start = mid;
+                r = mid - 1;
+            }
+            else
+            {
+                l = mid + 1;
+            }
+        }
+        if (start >= 0)
+        {
+            rv[i] = potionsSize - start;
+        }
+        else
+        {
+            rv[i] = 0;
+        }
+    }
+    return rv;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -247,7 +394,7 @@ int main(int argc, char *argv[])
     printf("lengthOfLongestSubstring:%d\n", lengthOfLongestSubstring(s));
 
     int dup[] = {5, 1, 2, 4, 3, 4, 3, 5};
-    printf("%d\n", removeDuplicates(dup, sizeof(dup) / sizeof(int)));
+    printf("removeDuplicates:%d\n", removeDuplicates(dup, sizeof(dup) / sizeof(int)));
 
     int r[] = {1, 2, 3, 4, 5};
     rotate(r, sizeof(r) / sizeof(int), 3);
@@ -285,6 +432,21 @@ int main(int argc, char *argv[])
     printf("isPalindrome:%d\n", isPalindrome(p0));
     char p1[] = "abbczcbba";
     printf("isPalindrome:%d\n", isPalindrome(p1));
+
+    char gr[][4] = {"eat", "tea", "tan", "ate", "nat", "bat"};
+    groupAnagrams(gr, sizeof(gr) / sizeof(char[4]));
+
+    printf("mergeAlternately:%s\n", mergeAlternately("abc", "defgh"));
+
+    int spells[] = {5,1,3};
+    int potions[] = {1, 2, 3, 4, 5};
+    rv = successfulPairs(spells, sizeof(spells) / sizeof(int), potions, sizeof(potions) / sizeof(int), 7, &returnSize);
+    printf("successfulPairs:");
+    for (int i = 0; i < returnSize; i++)
+    {
+        printf("%d ", rv[i]);
+    }
+    printf("\n");
 
     return 0;
 }

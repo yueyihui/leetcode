@@ -1,4 +1,4 @@
-CFLAGS+= -g -O3
+CFLAGS+= -g -O3 -I./uthash/include
 CC:=gcc
 CXXFLAGS+= -g -O3
 

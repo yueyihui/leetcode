@@ -226,6 +226,66 @@ int *rightSideView(struct TreeNode *root, int *returnSize)
     }
 }
 
+struct TreeNode *searchBST(struct TreeNode *root, int val)
+{
+    if (root == NULL)
+        return NULL;
+    if (root->val == val)
+    {
+        return root;
+    }
+    struct TreeNode *l = searchBST(root->left, val);
+    return l != NULL ? l : searchBST(root->right, val);
+}
+
+struct TreeNode *insert(struct TreeNode *root, struct TreeNode *sub_tree)
+{
+    if (root == NULL)
+        return sub_tree;
+
+    if (sub_tree == NULL)
+        return root;
+
+    if (sub_tree->val < root->val)
+    {
+        root->left = insert(root->left, sub_tree);
+        return root;
+    }
+    else if (root->val < sub_tree->val)
+    {
+        root->right = insert(root->right, sub_tree);
+        return root;
+    }
+    else
+    {
+        root->left = insert(root->left, sub_tree->left);
+        root->right = insert(root->right, sub_tree->right);
+        return root;
+    }
+}
+
+struct TreeNode *deleteNode(struct TreeNode *root, int key)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (root->val == key)
+    {
+        struct TreeNode *new = insert(root->right, root->left);
+        free(root);
+        return new;
+    }
+    else if (root->val < key)
+    {
+        root->right = deleteNode(root->right, key);
+    }
+    else
+    {
+        root->left = deleteNode(root->left, key);
+    }
+    return root;
+}
+
 int main(int argc, char *argv[])
 {
     int preorder[] = {3, 9, 20, 15, 7};
@@ -273,6 +333,21 @@ int main(int argc, char *argv[])
     {
         printf("%d ", right_view[i]);
     }
+    printf("\n");
+
+    preorderPrint(searchBST(root, 5));
+    printf("\n");
+
+    root = newNode(5);
+    root->left = newNode(3);
+    root->left->left = newNode(2);
+    root->left->right = newNode(4);
+    root->right = newNode(6);
+    root->right->right = newNode(7);
+    struct TreeNode *after = deleteNode(root, 5);
+    preorderPrint(after);
+    printf("\n");
+    inorderPrint(after);
     printf("\n");
     return 0;
 }

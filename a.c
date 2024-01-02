@@ -407,6 +407,128 @@ int removeElement(int *nums, int numsSize, int val)
     return q - nums;
 }
 
+void rotate(int *nums, int numsSize, int k)
+{
+    for (int i = 0; i < k; i++)
+    {
+        int pre = nums[numsSize - 1];
+        for (int j = 0; j < numsSize; j++)
+        {
+            int tmp = nums[j];
+            nums[j] = pre;
+            pre = tmp;
+        }
+    }
+}
+
+int lengthOfLastWord(char *s)
+{
+    int size = strlen(s);
+    char *a = s + size - 1;
+    while (a >= s && *a == ' ')
+    {
+        a--;
+    }
+    char *b = a;
+    while (a >= s && *a != ' ')
+    {
+        a--;
+    }
+    return b - a;
+}
+
+void reverse_chars(char *a, char *b)
+{
+    while (a < b)
+    {
+        char tmp = *a;
+        *a = *b;
+        *b = tmp;
+        a++;
+        b--;
+    }
+}
+
+//1. build up slip window, left and i
+//2. carry is sperate of slip window
+//3. if we use i and i-1, it would lead the last word or range words loss process in loop
+//
+//why chars[write++] = chars[i]?
+//[0][1]......[write][x][x][x][x][x][l]....[i][i+1].....[size-1]
+//                                   a......a   b?......
+//l and i are determine the slip window, [write] is compose position
+int compress(char *chars, int charsSize)
+{
+    int left = 0;
+    int write = 0;
+    for (int i = 0; i < charsSize; i++)
+    {
+        //i==charSize-1 is used for the last word or range
+        if (i == charsSize - 1 || chars[i] != chars[i + 1])
+        {
+            chars[write++] = chars[i];
+            int nums = i - left + 1;
+            if (nums > 1)
+            {
+                int start_position = write;
+                while (nums > 0)
+                {
+                    chars[write++] = nums % 10 + '0';
+                    nums /= 10;
+                }
+                reverse_chars(&chars[start_position], &chars[write - 1]);
+            }
+            left = i + 1;
+        }
+    }
+    return write;
+}
+
+char *reverseWords(char *s)
+{
+    char *l = s;
+    char *r = s + strlen(s) - 1;
+    reverse_chars(l, r);
+    r = s;
+    l = s;
+    char *r_bound = s + strlen(s);
+    while (l < r_bound)
+    {
+        while (*l == ' ')
+        {
+            l++;
+        }
+        r = l;
+        while (*r != ' ' && r < r_bound)
+        {
+            r++;
+        }
+        char *bound = r - 1;
+        reverse_chars(l, bound);
+        l = r;
+    }
+
+    l = s;
+    r = r_bound;
+    while (*l == ' ')
+    {
+        l++;
+    }
+    while (*r == ' ' || *r == '\0')
+    {
+        r--;
+    }
+
+    char *p = s;
+    while (l <= r)
+    {
+        *p++ = *l++;
+    }
+    *(p + 1) = '\0';
+
+    return s;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -442,7 +564,8 @@ int main(int argc, char *argv[])
     int a7[] = {72, 79, 81, 88};
     int a8[] = {92, 95, 100, 112};
     int *a[] = {a1, a2, a3, a3, a4, a5, a6, a7, a8};
-    for (int i = 0; i < 115; i++) {
+    for (int i = 0; i < 20; i++)
+    {
         if (searchMatrix(a, sizeof(a) / sizeof(int *), sizeof(a1) / sizeof(int), i))
             printf("searchMatrix %d\n", i);
     }
@@ -482,10 +605,33 @@ int main(int argc, char *argv[])
     len = removeElement(major, len, 0);
     len = removeElement(major, len, 4);
     printf("after removeElement:");
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++)
+    {
         printf("%d ", major[i]);
     }
     printf("\n");
+
+    //a1[] = {1, 3, 5, 7};
+    rotate(a1, sizeof(a1) / sizeof(int), 3);
+    for (int i = 0; i < sizeof(a1) / sizeof(int); i++)
+    {
+        printf("%d ", a1[i]);
+    }
+    printf("\n");
+
+    char www[] = "   fly me   to   the 444fmoon   aoaaaabc  ?????";
+    printf("lengthOfLastWord:%d\n", lengthOfLastWord(www));
+
+    len = compress(www, sizeof(www) / sizeof(char));
+    printf("len:%d\n", len);
+    char *buf = (char *)malloc(len + 1);
+    memset(buf, 0, len + 1);
+    snprintf(buf, len, "%s", www);
+    printf("%s\n", buf);
+
+    char words[] = "  the sky is blue ";
+    printf("before:|%s|\n", words);
+    printf("reverseWords:|%s|\n", reverseWords(words));
 
     return 0;
 }
