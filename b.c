@@ -385,6 +385,54 @@ int *successfulPairs(int *spells, int spellsSize, int *potions, int potionsSize,
     return rv;
 }
 
+long long fast_pow(int x, int n)
+{
+    if (n == 0)
+        return 1;
+    if (n == 1)
+        return x;
+    if (n % 2 == 0)
+        return fast_pow(x * x, n / 2);
+    else
+        return fast_pow(x * x, n / 2) * x;
+}
+
+//prime 0~9: 2 3 5 7 --- 4 nums
+//even 0~9: 0,2,4,6,8 --- 5 nums
+//for any array of length n, it has (n+1)/2 even index and n/2 odd index
+int countGoodNumbers(long long n)
+{
+    return fast_pow(5, (n + 1) / 2) * fast_pow(4, n / 2);
+}
+
+int maxSubsequence(int arr[], int size)
+{
+    int max = 0;
+    int thisSum = 0;
+    int l = 0;
+    int r = 0;
+    for (int i = 0; i < size; i++)
+    {
+        thisSum += arr[i];
+        if (thisSum > max)
+        {
+            r = i;
+            max = thisSum;
+        }
+        else if (thisSum < 0)
+        {
+            //why it is i+1 instead i?
+            //i-1 didn't make thisSum<0, but i
+            //that i it must be a negative
+            l = i + 1;
+            r = l;
+            thisSum = 0;
+        }
+    }
+    printf("%s range:[%d]~[%d]\n", __func__, l, r);
+    return max;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -448,5 +496,11 @@ int main(int argc, char *argv[])
     }
     printf("\n");
 
+    printf("fast_pow:%lld\n", fast_pow(2, 10));
+    printf("countGoodNumbers:%d\n",countGoodNumbers(1));
+    printf("countGoodNumbers:%d\n",countGoodNumbers(4));
+
+    int m[] = {-1, 4, 12, -8, 3, -1, -3, 4, -3, 4, 6 - 5};
+    printf("maxSubsequence:%d\n", maxSubsequence(m, sizeof(m) / sizeof(int)));
     return 0;
 }

@@ -286,6 +286,25 @@ struct TreeNode *deleteNode(struct TreeNode *root, int key)
     return root;
 }
 
+int goodNodes(struct TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int l = goodNodes(root->left);
+    if (l != 0 && root->val > root->left->val)
+    {
+        l--;
+    }
+
+    int r = goodNodes(root->right);
+    if (r != 0 && root->val > root->right->val)
+    {
+        r--;
+    }
+    return r + l + 1;
+}
+
 int main(int argc, char *argv[])
 {
     int preorder[] = {3, 9, 20, 15, 7};
@@ -349,5 +368,15 @@ int main(int argc, char *argv[])
     printf("\n");
     inorderPrint(after);
     printf("\n");
+
+    int preorder1[] = {3, 1, 3, 4, 1, 5};
+    int inorder1[] = {3, 1, 3, 1, 4, 5};
+    root = buildTree(preorder1, sizeof(preorder1) / sizeof(int), inorder1, sizeof(inorder1) / sizeof(int));
+    printf("goodNodes:%d\n", goodNodes(root));
+
+    int preorder2[] = {3, 1, 4};
+    int inorder2[] = {1, 3, 4};
+    root = buildTree(preorder2, sizeof(preorder2) / sizeof(int), inorder2, sizeof(inorder2) / sizeof(int));
+    printf("goodNodes:%d\n", goodNodes(root));
     return 0;
 }

@@ -120,6 +120,42 @@ struct TreeNode *invertTree(struct TreeNode *root)
     }
 }
 
+void swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void heapify(int arr[], int N, int i)
+{
+    int sel = i;
+    int left = i * 2 + 1;
+    int right = i * 2 + 2;
+    if (left < N && arr[left] > arr[sel])
+        sel = left;
+    if (right < N && arr[right] > arr[sel])
+        sel = right;
+    if (sel != i)
+    {
+        swap(&arr[i], &arr[sel]);
+        heapify(arr, N, sel);
+    }
+}
+
+void heapSort(int arr[], int N)
+{
+    for (int i = N / 2 - 1; i >= 0; i--)
+    {
+        heapify(arr, N, i);
+    }
+    for (int i = N - 1; i > 0; i--)
+    {
+        swap(&arr[0], &arr[i]);
+        heapify(arr, i, 0);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     MinStack *st = minStackCreate();
@@ -147,7 +183,7 @@ int main(int argc, char *argv[])
     struct TreeNode root;
     root.left = &l1;
     root.right = &r1;
-    printf("%d\n", maxDepth(&root));
+    printf("maxDepth:%d\n", maxDepth(&root));
 
     struct TreeNode i2;
     i2.left = NULL;
@@ -158,6 +194,15 @@ int main(int argc, char *argv[])
     i1.right = NULL;
     i1.val = 1;
     invertTree(&i1);
+
+    int arr[] = {1, 15, 12, 11, 13, 5, 22, 6, 7, 27, 0, 10, 0, 2, 25, 4, 3};
+    int N = sizeof(arr) / sizeof(arr[0]);
+    heapSort(arr, N);
+    for (int i = 0; i < N; i++)
+    {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
 
     return 0;
 }
