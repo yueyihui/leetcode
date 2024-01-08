@@ -1,71 +1,106 @@
+#include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#define CAPABILITY 8
-typedef struct
+struct stack
 {
-    int stack[CAPABILITY];
+    int *mem;
     int *min;
-    int size;
-} MinStack;
+    int top;
+    unsigned int capability;
+};
 
-MinStack *minStackCreate()
+struct stack *createStack(int capability)
 {
-    MinStack *s = (MinStack*)malloc(sizeof(MinStack));
-    s->min = s->stack;
-    s->size = 0;
+    struct stack *s = (struct stack *)malloc(sizeof(struct stack));
+    s->mem = (int *)malloc(sizeof(int) * capability);
+    s->top = -1;
+    s->min = NULL;
+    s->capability = capability;
     return s;
 }
 
-void minStackPush(MinStack *obj, int val)
+bool is_empty(struct stack *s)
 {
-    if (obj->size == CAPABILITY)
+    return s->top < 0;
+}
+
+bool is_full(struct stack *s)
+{
+    return s->capability - 1 == s->top;
+}
+
+void push(struct stack *s, int val)
+{
+    if (is_full(s))
         return;
 
-    for (int i = obj->size - 1; i >= 0; i--)
+    s->mem[++s->top] = val;
+    if (s->min == NULL || *s->min > val)
     {
-        obj->stack[i + 1] = obj->stack[i];
-    }
-    obj->min++;
-    obj->size++;
-    obj->stack[0] = val;
-    if (val < *obj->min)
-    {
-        obj->min = obj->stack;
+        s->min = &s->mem[s->top];
     }
 }
 
-void minStackPop(MinStack *obj)
+int min(struct stack *s)
 {
-    if (obj->size == 0)
+    return is_empty(s) ? INT_MIN : *s->min;
+}
+
+int pop(struct stack *s)
+{
+    return is_empty(s) ? INT_MIN : s->mem[s->top--];
+}
+
+int top(struct stack *s)
+{
+    return is_empty(s) ? INT_MIN : s->mem[s->top];
+}
+
+void stackInsert(struct stack *s, int val)
+{
+    if (val < top(s))
+    {
+        int tmp = pop(s);
+        stackInsert(s, val);
+        val = tmp;
+    }
+    push(s, val);
+}
+
+void sortStack(struct stack *s)
+{
+    if (is_empty(s))
         return;
+    int val = pop(s);
+    sortStack(s);
+    stackInsert(s, val);
+}
 
-    obj->min = obj->stack;
-
-    for (int i = 1; i < obj->size; i++)
+void push_back(struct stack *s, int my)
+{
+    if (is_empty(s))
     {
-        obj->stack[i - 1] = obj->stack[i];
-        if (*obj->min >= obj->stack[i - 1])
-        {
-            obj->min = &obj->stack[i - 1];
-        }
+        push(s, my);
     }
-    obj->size--;
+    else
+    {
+        int tmp = pop(s);
+        push_back(s, my);
+        push(s, tmp);
+    }
 }
 
-int minStackTop(MinStack *obj)
+void reverseStack(struct stack *s)
 {
-    return obj->stack[0];
-}
-
-int minStackGetMin(MinStack *obj)
-{
-    return *obj->min;
-}
-
-void minStackFree(MinStack *obj)
-{
-    free(obj);
+    if (is_empty(s))
+    {
+        return;
+    }
+    int my = pop(s);
+    reverseStack(s);
+    push_back(s, my);
 }
 
 struct TreeNode
@@ -158,16 +193,6 @@ void heapSort(int arr[], int N)
 
 int main(int argc, char *argv[])
 {
-    MinStack *st = minStackCreate();
-    minStackPush(st, 1);
-    minStackPush(st, 0);
-    minStackPush(st, -3);
-    printf("min:%d\n", minStackGetMin(st));
-    printf("top:%d\n", minStackTop(st));
-    minStackPop(st);
-    printf("min:%d\n", minStackGetMin(st));
-    printf("top:%d\n", minStackTop(st));
-
     struct TreeNode r3;
     r3.left = NULL;
     r3.right = NULL;
@@ -201,6 +226,39 @@ int main(int argc, char *argv[])
     for (int i = 0; i < N; i++)
     {
         printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    struct stack *st = createStack(16);
+    push(st, 5);
+    push(st, -3);
+    push(st, 3);
+    push(st, 1);
+    push(st, 5);
+    push(st, -2);
+    push(st, -5);
+    push(st, 8);
+    push(st, 4);
+    push(st, 0);
+    push(st, -6);
+    printf("min:%d\n", min(st));
+    sortStack(st);
+    while (!is_empty(st))
+    {
+        printf("%d ", pop(st));
+    }
+    printf("\n");
+
+    st = createStack(5);
+    push(st, 5);
+    push(st, 4);
+    push(st, 3);
+    push(st, 2);
+    push(st, 1);
+    reverseStack(st);
+    while (!is_empty(st))
+    {
+        printf("%d ", pop(st));
     }
     printf("\n");
 

@@ -433,6 +433,41 @@ int maxSubsequence(int arr[], int size)
     return max;
 }
 
+int *goodIndices(int *nums, int numsSize, int k, int *returnSize)
+{
+    int *left = (int *)malloc(numsSize * sizeof(int));
+    int *right = (int *)malloc(numsSize * sizeof(int));
+    for (int i = 0; i < numsSize; i++)
+    {
+        left[i] = right[i] = 1;
+    }
+
+    for (int i = 1; i < numsSize; i++)
+    {
+        if (nums[i - 1] >= nums[i])
+        {
+            left[i] += left[i - 1];
+        }
+        if (nums[numsSize - i - 1] <= nums[numsSize - i])
+        {
+            right[numsSize - i - 1] += right[numsSize - i];
+        }
+    }
+
+    int *rv = (int *)malloc(numsSize * sizeof(int));
+    memset(rv, 0, numsSize * sizeof(int));
+    *returnSize = 0;
+    for (int i = k; i < numsSize - k; i++)
+    {
+        if (left[i] > k && right[i] > k)
+        {
+            rv[*returnSize] = i;
+            *returnSize += 1;
+        }
+    }
+    return rv;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -502,5 +537,15 @@ int main(int argc, char *argv[])
 
     int m[] = {-1, 4, 12, -8, 3, -1, -3, 4, -3, 4, 6 - 5};
     printf("maxSubsequence:%d\n", maxSubsequence(m, sizeof(m) / sizeof(int)));
+
+    returnSize = 0;
+    int good[] = {2, 1, 1, 1, 3, 4, 1};
+    rv = goodIndices(good, sizeof(good) / sizeof(int), 2, &returnSize);
+    printf("goodIndices:");
+    for (int i = 0; i < returnSize; i++)
+    {
+        printf("%d ", rv[i]);
+    }
+    printf("\n");
     return 0;
 }

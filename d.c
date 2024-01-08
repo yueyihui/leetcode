@@ -305,6 +305,63 @@ int goodNodes(struct TreeNode *root)
     return r + l + 1;
 }
 
+struct TreeNode *lcaOf3Nodes(struct TreeNode *root, int nodes[3])
+{
+    if (root == NULL)
+        return NULL;
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (nodes[i] == root->val)
+            return root;
+    }
+
+    struct TreeNode *l = lcaOf3Nodes(root->left, nodes);
+    struct TreeNode *r = lcaOf3Nodes(root->right, nodes);
+    if (l != NULL && r != NULL)
+        return root;
+    else
+        return l != NULL ? l : r;
+}
+
+inline int max(int a, int b)
+{
+    return a > b ? a : b;
+}
+
+int longestPath(struct TreeNode *root, int *longest)
+{
+    if (root == NULL)
+    {
+        return 0;
+    }
+    int len_l = longestPath(root->left, longest);
+    int len_r = longestPath(root->right, longest);
+    //why can't use one variable instead two?
+    //if root->val==l->val and !=r->val then return l->val+1
+    //if root->val!=l->val and ==r->val then return r->val+1
+    //if root->val==l->val and ==r->val then return max(l->val+1,r->val+1)
+    //if root->val!=l->val and !=r->val then return 0
+    int r = 0, l = 0;
+    if (root->left && root->left->val == root->val)
+    {
+        l = len_l + 1;
+    }
+    if (root->right && root->right->val == root->val)
+    {
+        r = len_r + 1;
+    }
+    *longest = max(l + r, *longest);
+    return max(l, r);
+}
+
+int longestUnivaluePath(struct TreeNode *root)
+{
+    int longest = 0;
+    longestPath(root, &longest);
+    return longest;
+}
+
 int main(int argc, char *argv[])
 {
     int preorder[] = {3, 9, 20, 15, 7};
@@ -378,5 +435,15 @@ int main(int argc, char *argv[])
     int inorder2[] = {1, 3, 4};
     root = buildTree(preorder2, sizeof(preorder2) / sizeof(int), inorder2, sizeof(inorder2) / sizeof(int));
     printf("goodNodes:%d\n", goodNodes(root));
+
+    int preorder3[] = {1, 2, 4, 7, 8, 3, 5, 6, 9, 10};
+    int inorder3[] = {7, 4, 8, 2, 1, 5, 3, 9, 6, 10};
+    root = buildTree(preorder3, sizeof(preorder3) / sizeof(int), inorder3, sizeof(inorder3) / sizeof(int));
+    int nodes0[] = {7, 8, 2};
+    printf("lca:%d\n", lcaOf3Nodes(root, nodes0)->val);
+    int nodes1[] = {5, 6, 7};
+    printf("lca:%d\n", lcaOf3Nodes(root, nodes1)->val);
+    int nodes2[] = {4, 7, 8};
+    printf("lca:%d\n", lcaOf3Nodes(root, nodes2)->val);
     return 0;
 }
