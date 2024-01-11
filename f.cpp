@@ -1,4 +1,6 @@
 #include <iostream>
+#include <queue>
+#include <stack>
 #include <string.h>
 #include <unordered_map>
 #include <vector>
@@ -112,6 +114,108 @@ vector<vector<int>> findTriplets(vector<int> arr, int K)
     return rv;
 }
 
+void insertQ(queue<int> &q, int k)
+{
+    int my = q.front();
+    q.pop();
+    if (k > 1)
+    {
+        insertQ(q, k - 1);
+    }
+    q.push(my);
+}
+
+queue<int> reverseElements(queue<int> q, int k)
+{
+    if (k <= 0)
+        return q;
+
+    insertQ(q, k);
+    for (int i = 0; i < q.size() - k; i++)
+    {
+        q.push(q.front());
+        q.pop();
+    }
+    return q;
+}
+
+void reverseQueue(queue<int> &q)
+{
+    stack<int> s;
+    while (!q.empty())
+    {
+        s.push(q.front());
+        q.pop();
+    }
+    while (!s.empty())
+    {
+        q.push(s.top());
+        s.pop();
+    }
+}
+
+bool isPalin(const char *l, const char *r)
+{
+    while (l < r)
+    {
+        if (*l++ != *r--)
+            return false;
+    }
+    return true;
+}
+
+string longestPalinSubstring(string str)
+{
+    string rv;
+    for (int i = 0; i < str.length(); i++)
+    {
+        int l = i;
+        int r = str.length() - 1;
+        //why consider case of l==r?
+        //because abcd that the max palin is 1
+        while (l <= r)
+        {
+            if (str[l] == str[r] && isPalin(&str[l], &str[r]))
+            {
+                if (rv.length() < r - l + 1)
+                {
+                    //rv = str.substr(l, r - l + 1);
+                    rv.assign(str, l, r - l + 1);
+                }
+                break;
+            }
+            r--;
+        }
+    }
+    return rv;
+}
+
+void setZeros(vector<vector<int>> &matrix)
+{
+    vector<std::pair<int, int>> target;
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        for (int j = 0; j < matrix[i].size(); j++)
+        {
+            if (matrix[i][j] == 0)
+            {
+                target.push_back({i, j});
+            }
+        }
+    }
+    for (auto i = target.begin(); i != target.end(); i++)
+    {
+        for (auto j = matrix[i->first].begin(); j != matrix[i->first].end(); j++)
+        {
+            *j = 0;
+        }
+        for (auto j = matrix.begin(); j != matrix.end(); j++)
+        {
+            (*j)[i->second] = 0;
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;
@@ -138,6 +242,35 @@ int main(int argc, char *argv[])
         printf("[%d,%d,%d] ", i[0],i[1],i[2]);
     }
     printf("\n");
+
+    string testcase[] = {"abcd", "abcba", "abccbc", "qweeq", "babcbabcbaccba", "abacdfgdcaba", "codingninjas",
+                         "zzzzzzzzzzzzzzzzzzzzzzwwwwwwwwwwwwwwwwwyyyyyyyyyyyyyyyyyyydddddddddddddddddddddddddddddddddddddddddd"};
+    for (int i = 0; i < sizeof(testcase) / sizeof(string); i++)
+        std::cout << longestPalinSubstring(testcase[i]) << std::endl;
+
+    {
+        vector<vector<int>> testcase[] = {{{7, 19, 3},
+                                           {4, 21, 0}},
+                                          {{1, 0},
+                                           {2, 7},
+                                           {3, 0},
+                                           {4, 8}},
+                                          {{0, 2, 3},
+                                           {1, 0, 3},
+                                           {1, 2, 0}}};
+        for (int i = 0; i < 3; i++)
+        {
+            setZeros(testcase[i]);
+            for (auto j = testcase[i].begin(); j != testcase[i].end(); j++)
+            {
+                for (auto k = j->begin(); k != j->end(); k++)
+                {
+                    printf("%d ", *k);
+                }
+                printf("\n");
+            }
+        }
+    }
 
     return 0;
 }

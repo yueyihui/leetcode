@@ -7,6 +7,7 @@ struct TreeNode
     int val;
     struct TreeNode *left;
     struct TreeNode *right;
+    struct TreeNode *next;
 };
 
 int getIndexFromInOrder(int *inorder, int inorderSize, int val)
@@ -23,6 +24,9 @@ struct TreeNode *newNode(int val)
 {
     struct TreeNode *n = (struct TreeNode *)malloc(sizeof(struct TreeNode));
     n->val = val;
+    n->left = NULL;
+    n->right = NULL;
+    n->next = NULL;
     return n;
 }
 
@@ -360,6 +364,38 @@ int longestUnivaluePath(struct TreeNode *root)
     int longest = 0;
     longestPath(root, &longest);
     return longest;
+}
+
+void levelConnect(struct TreeNode *root, struct TreeNode **next, int level)
+{
+    if (root == NULL)
+        return;
+
+    if (level == 0)
+    {
+        if (*next == NULL)
+            *next = root;
+        else
+        {
+            root->next = *next;
+            *next = root;
+        }
+    }
+    else
+    {
+        levelConnect(root->right, next, level - 1);
+        levelConnect(root->left, next, level - 1);
+    }
+}
+
+void connectNodes(struct TreeNode *root)
+{
+    int level = maxDepth(root);
+    for (int i = 0; i < level; i++)
+    {
+        struct TreeNode *next = NULL;
+        levelConnect(root, &next, i);
+    }
 }
 
 int main(int argc, char *argv[])
