@@ -5,6 +5,7 @@ struct ListNode
 {
     int val;
     struct ListNode *next;
+    struct ListNode *child;
 };
 
 _Bool hasCycle(struct ListNode *head)
@@ -31,8 +32,9 @@ _Bool hasCycle(struct ListNode *head)
 struct ListNode * newNode(int val)
 {
     struct ListNode *n = (struct ListNode *)malloc(sizeof(struct ListNode));
-    n->val=val;
+    n->val = val;
     n->next = NULL;
+    n->child = NULL;
     return n;
 }
 
@@ -335,6 +337,39 @@ struct ListNode *deleteMiddle(struct ListNode *head)
     return slow;
 }
 
+struct ListNode *insert(struct ListNode *head, struct ListNode *n)
+{
+    if (head == NULL)
+        return n;
+    if (n == NULL)
+        return head;
+    if (head->val <= n->val)
+    {
+        head->next = insert(head->next, n);
+        return head;
+    }
+    else
+    {
+        n->next = insert(head, n->next);
+        return n;
+    }
+}
+
+struct ListNode *flattenLinkedList(struct ListNode *head)
+{
+    if (head == NULL)
+        return NULL;
+
+    struct ListNode *a = head->next;
+    head->next = NULL;
+    struct ListNode *ar = flattenLinkedList(a);
+
+    struct ListNode *b = head->child;
+    head->child = NULL;
+    struct ListNode *br = flattenLinkedList(b);
+    return insert(insert(ar, br), head);
+}
+
 int main(int argc, char *argv[])
 {
     struct ListNode *head = addToList(NULL, 0);
@@ -463,12 +498,36 @@ int main(int argc, char *argv[])
     {
         tail = addToList(tail, i);
     }
+    printf("original: ");
     for (struct ListNode *i = head; i != NULL; i = i->next)
     {
         printf("%d ", i->val);
     }
     printf("\n");
     deleteMiddle(head);
+    printf("after deleteMiddle: ");
+    for (struct ListNode *i = head; i != NULL; i = i->next)
+    {
+        printf("%d ", i->val);
+    }
+    printf("\n");
+
+    head = addToList(NULL, 1);
+    head->child = newNode(11);
+    head->child->child = newNode(3);
+    head->child->child->child = newNode(4);
+    head->child->child->child->child = newNode(19);
+    tail = addToList(head, 5);
+    tail->child = newNode(82);
+    tail->child->child = newNode(10);
+    tail = addToList(tail, 22);
+    tail->child = newNode(1);
+    tail->child->child = newNode(14);
+    tail = addToList(tail, 16);
+    tail = addToList(tail, 6);
+    tail->child = newNode(45);
+    flattenLinkedList(head);
+    printf("flattenLinkedList: ");
     for (struct ListNode *i = head; i != NULL; i = i->next)
     {
         printf("%d ", i->val);
