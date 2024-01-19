@@ -216,6 +216,34 @@ void setZeros(vector<vector<int>> &matrix)
     }
 }
 
+vector<int> countSort(vector<int> &a)
+{
+    int max = 0;
+    for (int i = 1; i < a.size(); i++)
+    {
+        if (a[max] < a[i])
+            max = i;
+    }
+    vector<int> count(a[max] + 1, 0);
+    for (int i = 0; i < a.size(); i++)
+    {
+        count[a[i]]++;
+    }
+
+    vector<int> rv(a.size());
+    for (int i = 0, p = 0; i < a.size(); )
+    {
+        if (count[p] == 0)
+            p++;
+        else
+        {
+            rv[i++] = p;
+            count[p]--;
+        }
+    }
+    return rv;
+}
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;
@@ -271,6 +299,15 @@ int main(int argc, char *argv[])
             }
         }
     }
+
+    vector<int> lar = {12, 1, 20, 1, 15, 5, 5, 8, 10, 0, 2, 3, 4, 11};
+    auto v = countSort(lar);
+    printf("countSort:");
+    for (auto i : v)
+    {
+        printf("%d ", i);
+    }
+    printf("\n");
 
     return 0;
 }

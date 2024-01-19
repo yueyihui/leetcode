@@ -529,6 +529,34 @@ char *reverseWords(char *s)
     return s;
 }
 
+//compress
+int compressDuplicates_sort(char *chars, int charsSize)
+{
+    int l = 0;
+    int r = l + 1;
+    int writer = l + 1;
+    while (r < charsSize)
+    {
+        while (chars[l] == chars[r])
+        {
+            r++;
+        }
+        if (r - l > 1)
+        {
+            int a = writer;
+            for (int nums = r - l; nums > 0; nums /= 10)
+            {
+                chars[writer++] = '0' + nums % 10;
+            }
+            int b = writer - 1;
+            reverse_chars(&chars[a], &chars[b]);
+        }
+        chars[writer++] = chars[r];
+        l = r++;
+    }
+    return writer;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -632,6 +660,22 @@ int main(int argc, char *argv[])
     char words[] = "  the sky is blue ";
     printf("before:|%s|\n", words);
     printf("reverseWords:|%s|\n", reverseWords(words));
+
+    char dup_sort[][64] = {"aaaaabbbbbccccdefghhhhh", "ijklmnopq",
+                           "123456aaabbbbddddd", "aaabbbbaaaapjkaaa   dfgwwww",
+                           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                           "aaaaaaaaaaaaaaaabbbbbbbbbbbbbbaa    wwww"};
+    for (int i = 0; i < sizeof(dup_sort) / sizeof(char[64]); i++)
+    {
+        printf("origin:%s\n", dup_sort[i]);
+        len = compressDuplicates_sort(dup_sort[i], strlen(dup_sort[i]));
+        printf("compress:");
+        for (int j = 0; j < len; j++)
+        {
+            printf("%c", dup_sort[i][j]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }

@@ -266,6 +266,28 @@ void shellsort(char *str)
     }
 }
 
+void swap(int* a,int*b)
+{
+    int x = *a;
+    *a = *b;
+    *b = x;
+}
+void selectSort(int *arr, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        int min = i;
+        for (int j = i + 1; j < n; j++)
+        {
+            if (arr[min] > arr[j])
+            {
+                min = j;
+            }
+        }
+        swap(&arr[i], &arr[min]);
+    }
+}
+
 char ***groupAnagrams(char strs[][4], int strsSize)
 {
     struct HashTable *table = NULL;
@@ -545,6 +567,15 @@ int main(int argc, char *argv[])
     for (int i = 0; i < returnSize; i++)
     {
         printf("%d ", rv[i]);
+    }
+    printf("\n");
+
+    int ss[] = {4, 1, 2, 3, -1, 0, 44, 2, 22, 31, 221, -14, -9, -11, 5, 6, 7, 4};
+    selectSort(ss, sizeof(ss) / sizeof(int));
+    printf("selectSort:");
+    for (int i = 0; i < sizeof(ss) / sizeof(int); i++)
+    {
+        printf("%d ", ss[i]);
     }
     printf("\n");
     return 0;

@@ -370,6 +370,152 @@ struct ListNode *flattenLinkedList(struct ListNode *head)
     return insert(insert(ar, br), head);
 }
 
+struct ListNode *split(struct ListNode *head)
+{
+    struct ListNode *fast = head, *slow = head, *pre = NULL;
+    while (fast)
+    {
+        fast = fast->next;
+        if (fast)
+        {
+            fast = fast->next;
+            pre = slow;
+            slow = slow->next;
+        }
+    }
+    if (pre)
+    {
+        pre->next = NULL;
+    }
+    return slow;
+}
+
+struct ListNode *mergeSort(struct ListNode *head)
+{
+    if (head == NULL)
+        return NULL;
+    if (head->next == NULL)
+        return head;
+    struct ListNode *half = split(head);
+    return insert(mergeSort(head), mergeSort(half));
+}
+
+struct ListNode *firstNode(struct ListNode *head)
+{
+    struct ListNode *fast = head, *slow = head;
+    while (fast)
+    {
+        fast = fast->next;
+        if (fast)
+        {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        if (fast == slow)
+        {
+            slow = head;
+            while (fast != slow)
+            {
+                fast = fast->next;
+                slow = slow->next;
+            }
+            return slow;
+        }
+    }
+    return NULL;
+}
+
+struct ListNode *removeLoop(struct ListNode *head)
+{
+    struct ListNode *fast = head, *slow = head;
+    struct ListNode *pre = NULL;
+    while (fast)
+    {
+        pre = fast;
+        fast = fast->next;
+        if (fast)
+        {
+            pre = fast;
+            fast = fast->next;
+            slow = slow->next;
+        }
+        if (fast == slow)
+        {
+            slow = head;
+            while (fast != slow)
+            {
+                pre = fast;
+                fast = fast->next;
+                slow = slow->next;
+            }
+            pre->next = NULL;
+            return head;
+        }
+    }
+    return head;
+}
+
+struct ListNode *reverse1(struct ListNode *head, struct ListNode *tail)
+{
+    struct ListNode *saved = tail->next;
+    struct ListNode *pre = NULL;
+    while (head != saved)
+    {
+        struct ListNode *cur = head;
+        head = head->next;
+        cur->next = pre;
+        pre = cur;
+    }
+    return saved;
+}
+
+struct ListNode *getListAfterReverseOperation(struct ListNode *head, int n, int b[])
+{
+    if (head == NULL)
+        return NULL;
+    if (n == 0)
+        return head;
+    if (*b == 0)
+        return getListAfterReverseOperation(head, n - 1, b + 1);
+
+    struct ListNode *l = head, *r = head;
+    for (int i = 1; i < b[0]; i++)
+    {
+        if (r->next)
+        {
+            r = r->next;
+        }
+        else
+            break;
+    }
+    l->next = getListAfterReverseOperation(reverse1(l, r), n - 1, b + 1);
+    return r;
+}
+
+struct ListNode* sortLL(struct ListNode* head)
+{
+    int count[3] = {0};
+    for (struct ListNode *i = head; i != NULL; i = i->next)
+    {
+        count[i->val]++;
+    }
+
+    int p = 0;
+    struct ListNode *i = head;
+    while (i != NULL)
+    {
+        if (count[p] == 0)
+            p++;
+        else
+        {
+            i->val = p;
+            i = i->next;
+            count[p]--;
+        }
+    }
+    return head;
+}
+
 int main(int argc, char *argv[])
 {
     struct ListNode *head = addToList(NULL, 0);
@@ -389,6 +535,7 @@ int main(int argc, char *argv[])
     addToList(head2, 3);
     addToList(head2, 9);
     struct ListNode *merge = mergeTwoLists(head1, head2);
+    printf("mergeTwoLists:");
     for (struct ListNode *i = merge; i != NULL; i = i->next)
     {
         printf("%d ", i->val);
@@ -533,5 +680,46 @@ int main(int argc, char *argv[])
         printf("%d ", i->val);
     }
     printf("\n");
+
+    head = newNode(51);
+    tail = addToList(head, 42);
+    tail = addToList(tail, 14);
+    tail = addToList(tail, 4);
+    tail = addToList(tail, 24);
+    head = mergeSort(head);
+    for (struct ListNode *i = head; i != NULL; i = i->next)
+    {
+        printf("%d ", i->val);
+    }
+    printf("\n");
+
+    head = newNode(0);
+    tail = addToList(head, 1);
+    tail = addToList(tail, 2);
+    tail = addToList(tail, 3);
+    tail = addToList(tail, 4);
+    tail->next = head->next;
+    printf("first cycle: %d\n", firstNode(head)->val);
+
+    head = newNode(2);
+    tail = addToList(head, 1);
+    tail = addToList(tail, 0);
+    tail = addToList(tail, 0);
+    tail = addToList(tail, 1);
+    tail = addToList(tail, 2);
+    tail = addToList(tail, 2);
+    tail = addToList(tail, 0);
+    tail = addToList(tail, 1);
+    tail = addToList(tail, 1);
+    tail = addToList(tail, 1);
+    tail = addToList(tail, 0);
+    printf("[0,2] linked list, sort:");
+    sortLL(head);
+    for (struct ListNode *i = head; i != NULL; i = i->next)
+    {
+        printf("%d ", i->val);
+    }
+    printf("\n");
+
     return 0;
 }
