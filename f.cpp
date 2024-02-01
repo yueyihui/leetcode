@@ -1,7 +1,9 @@
+#include <algorithm>
 #include <iostream>
 #include <queue>
 #include <stack>
 #include <string.h>
+#include <string>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -244,6 +246,397 @@ vector<int> countSort(vector<int> &a)
     return rv;
 }
 
+class Middle
+{
+#define COLUMN (m[0].size())
+#define ROW m.size()
+  public:
+    int partition(vector<vector<int>> &m, int low, int high);
+    int findMiddleValue(vector<vector<int>> &m, int low, int high, int mid);
+    int getMedian(vector<vector<int>> &m);
+};
+
+int Middle::partition(vector<vector<int>> &m, int low, int high)
+{
+    int pivot = m[high / COLUMN][high % COLUMN];
+    int i = low - 1;
+    for (int j = low; j <= high; j++)
+    {
+        if (m[j / COLUMN][j % COLUMN] <= pivot)
+        {
+            i++;
+            std::swap(m[i / COLUMN][i % COLUMN],
+                      m[j / COLUMN][j % COLUMN]);
+        }
+    }
+    return i;
+}
+
+int Middle::findMiddleValue(vector<vector<int>> &m, int low, int high, int mid)
+{
+    if (low == high)
+    {
+        return m[low / COLUMN][low % COLUMN];
+    }
+
+    int i = partition(m, low, high);
+    if (i == mid)
+        return m[i / COLUMN][i % COLUMN];
+    else if (i < mid)
+        return findMiddleValue(m, i + 1, high, mid);
+    else
+        return findMiddleValue(m, low, i - 1, mid);
+}
+
+int Middle::getMedian(vector<vector<int>> &m)
+{
+    int len = ROW * COLUMN;
+    int x = COLUMN / 2;
+    int y = ROW / 2;
+    int mid = x + y * COLUMN;
+    return findMiddleValue(m, 0, len - 1, mid);
+}
+
+int getMedian(vector<vector<int>> &m)
+{
+    int max = 0, min = 0;
+    int row = m.size();
+    int col = m[0].size();
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            if (m[i][j] > max)
+                max = m[i][j];
+            if (m[i][j] < min)
+                min = m[i][j];
+        }
+    }
+    while (min < max)
+    {
+        int equals = 0;
+        int greater = 0;
+        int smaller = 0;
+        int mid = min + (max - min) / 2;
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < col; j++)
+            {
+                if (m[i][j] > mid)
+                    greater++;
+                else if (m[i][j] < mid)
+                    smaller++;
+                else
+                    equals++;
+            }
+        }
+        if (greater > smaller && greater - smaller > equals)
+        {
+            min = mid + 1;
+        }
+        else if (greater < smaller && smaller - greater > equals)
+        {
+            max = mid - 1;
+        }
+        else
+        {
+            return mid;
+        }
+    }
+    return min;
+}
+
+#ifdef ROW
+#undef ROW
+#endif
+#define ROW arr.size()
+#ifdef COLUMN
+#undef COLUMN
+#endif
+#define COLUMN arr[0].size()
+#define L2M(i) arr[(i)/COLUMN][(i)%COLUMN]
+bool findInMatrix(int x, vector<vector<int>> &arr)
+{
+    int len = ROW * COLUMN;
+    int l = 0;
+    int r = len - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (x < L2M(mid))
+        {
+            r = mid - 1;
+        }
+        else if (x > L2M(mid))
+        {
+            l = mid + 1;
+        }
+        else
+            return true;
+    }
+    return false;
+}
+
+class MinHeap
+{
+  public:
+    void heapify(vector<int> &arr, int n, int root)
+    {
+        int min = root;
+        int left = 2 * root + 1;
+        int right = 2 * root + 2;
+
+        if (left < n && arr[left] < arr[min])
+            min = left;
+        if (right < n && arr[right] < arr[min])
+            min = right;
+        if (min != root)
+        {
+            std::swap(arr[min], arr[root]);
+            heapify(arr, n, min);
+        }
+    }
+    vector<int> buildMinHeap(vector<int> &arr)
+    {
+        for (int i = arr.size() / 2 - 1; i >= 0; i--)
+        {
+            heapify(arr, arr.size(), i);
+        }
+        for (auto i : arr)
+        {
+            printf("%d ", i);
+        }
+        printf("\n");
+        return arr;
+    }
+};
+
+class MinimumKproduct
+{
+  private:
+    void heapify(vector<int> &arr, int N, int root)
+    {
+        int max = root;
+        int l = 2 * root + 1;
+        int r = 2 * root + 2;
+        if (l < N && arr[l] > arr[max])
+            max = l;
+        if (r < N && arr[r] > arr[max])
+            max = r;
+        if (max != root)
+        {
+            std::swap(arr[root], arr[max]);
+            heapify(arr, N, max);
+        }
+    }
+
+  public:
+    int minProduct(vector<int> &arr, int n, int k)
+    {
+        for (int i = n / 2 - 1; i >= 0; i--)
+        {
+            heapify(arr, n, i);
+        }
+        for (int i = n - 1; i >= 0; i--)
+        {
+            std::swap(arr[0], arr[i]);
+            heapify(arr, i, 0);
+        }
+        const int M = (int)1e9 + 7;
+        int min = 1;
+        for (int i = 0; i < k; i++)
+        {
+            min = (min * (long long)arr[i]) % M;
+        }
+        return min;
+    }
+};
+
+class SubsetSum
+{
+  private:
+    void permute(vector<int> &result, vector<int> &num, int l, int r, int sum)
+    {
+        if (l > r)
+        {
+            result.push_back(sum);
+        }
+        else
+        {
+            permute(result, num, l + 1, r, sum + num[l]);
+            permute(result, num, l + 1, r, sum);
+        }
+    }
+
+  public:
+    vector<int> subsetSum(vector<int> &num)
+    {
+        vector<int> result;
+        permute(result, num, 0, num.size() - 1, 0);
+        std::sort(result.begin(), result.end());
+        return result;
+    }
+};
+
+class SubSequences
+{
+  private:
+    void loop(vector<string> &rv, string in, string out)
+    {
+        if (in.empty())
+        {
+            if (!out.empty())
+            {
+                rv.push_back(out);
+            }
+        }
+        else
+        {
+            loop(rv, in.substr(1), out + in[0]);
+            loop(rv, in.substr(1), out);
+        }
+    }
+
+  public:
+    vector<string> subsequences(string str)
+    {
+        vector<string> rv;
+        string out;
+        loop(rv, str, out);
+        return rv;
+    }
+};
+
+//pascal triangle
+//https://www.codingninjas.com/studio/problems/number-of-subsets_3952532?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=2
+int findWays(vector<int> &arr, int k)
+{
+    const int MOD = 1e9 + 7;
+    vector<int> dp(k + 1, 0);
+    dp[0] = 1;
+    for (int i : arr)
+    {
+        for (int j = k; j >= i; j--)
+        {
+            dp[j] = (dp[j] + dp[j - i]) % MOD;
+        }
+    }
+    return dp[k];
+}
+
+int longestIncreasingSubsequence(int arr[], int n)
+{
+    vector<int> count;
+    for (int i = 0; i < n; i++)
+    {
+        if (count.empty() || count.back() < arr[i])
+        {
+            count.push_back(arr[i]);
+        }
+        else
+        {
+            auto lb = std::lower_bound(count.begin(), count.end(), arr[i]);
+            *lb = arr[i];
+        }
+    }
+    return count.size();
+}
+
+int* lower_bound(int arr[], int n, int value)
+{
+    int distance = n - 1;
+    int *it = NULL;
+    int step = 0;
+    while (distance > 0)
+    {
+        it = arr;
+        step = distance / 2;
+        it += step;
+        if (*it < value)
+        {
+            arr = ++it;
+            distance -= step + 1;
+        }
+        else
+            distance = step;
+    }
+    return arr;
+}
+
+int lower_bound2(int arr[], int n, int x)
+{
+    int l = 0, r = n - 1;
+    while (l < r)
+    {
+        int mid = l + (r - l) / 2;
+        if (arr[mid] < x)
+        {
+            l = mid + 1;
+        }
+        else
+        {
+            r = mid;
+        }
+    }
+    return arr[l] < x ? -1 : l;
+}
+
+int upperBound(vector<int> &arr, int n, int x)
+{
+    int l = 0, r = n - 1;
+    while (l < r)
+    {
+        int mid = l + (r - l) / 2;
+        if (arr[mid] <= x)
+        {
+            l = mid + 1;
+        }
+        else
+        {
+            r = mid;
+        }
+    }
+    return arr[l] <= x ? -1 : l;
+}
+
+//https://www.codingninjas.com/studio/problems/minimum-elements_3843091?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=ATTEMPTED
+class MinElements
+{
+  private:
+    void loop(vector<int> &num, int x, vector<int> &assist, int &len, int i)
+    {
+        if (x == 0)
+        {
+            if (len == 0)
+                len = assist.size();
+            else
+                len = assist.size() < len ? assist.size() : len;
+        }
+        else if (x < 0)
+        {
+            return;
+        }
+        else
+        {
+            for (; i < num.size(); i++)
+            {
+                assist.push_back(num[i]);
+                loop(num, x - num[i], assist, len, i);
+                assist.pop_back();
+            }
+        }
+    }
+
+  public:
+    int minimumElements(vector<int> &num, int x)
+    {
+        int len = -1;
+        vector<int> assist;
+        loop(num, x, assist, len, 0);
+        return len;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;
@@ -309,5 +702,76 @@ int main(int argc, char *argv[])
     }
     printf("\n");
 
+    Middle m;
+    vector<vector<int>> matrix = {{1, 12, 3}, {6, 15, 2}, {7, 0, 9}};
+    printf("getMedian:%d\n", m.getMedian(matrix));
+    printf("getMedian:%d\n", getMedian(matrix));
+
+    vector<vector<int>> search_in_matrix = {{1, 2, 4, 5},
+                                            {8, 12, 14, 16},
+                                            {23, 25, 26, 29}};
+    std::cout << "findInMatrix:" << findInMatrix(26, search_in_matrix) << std::endl;
+    std::cout << "findInMatrix:" << findInMatrix(15, search_in_matrix) << std::endl;
+
+    vector<int> minheap = {9, 3, 2, 6, 7};
+    MinHeap minHeap;
+    minHeap.buildMinHeap(minheap);
+
+    MinimumKproduct minK;
+    vector<int> ar = {1, 2, 7, 2, 3, 2};
+    std::cout << "minProduct:" << minK.minProduct(ar, ar.size(), 3) << std::endl;
+
+    vector<int> subset = {1, 2, 7};
+    SubsetSum sss;
+    auto sub = sss.subsetSum(subset);
+    for (auto i : sub)
+    {
+        printf("%d ", i);
+    }
+    std::cout << std::endl;
+
+    {
+        vector<int> arr = {1, 1, 4, 5};
+        std::cout << "findWays: " << findWays(arr, 5) << std::endl;
+        arr = {16, 8, 2, 4, 2};
+        std::cout << "findWays: " << findWays(arr, 8) << std::endl;
+        arr = {3, 3, 3, 3};
+        std::cout << "findWays: " << findWays(arr, 5) << std::endl;
+        arr = {16, 8, 5, 2, 3, 6};
+        std::cout << "findWays: " << findWays(arr, 8) << std::endl;
+    }
+
+    {
+        SubSequences s;
+        auto rv = s.subsequences("abc");
+        for (auto i : rv)
+        {
+            std::cout << i << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    {
+        int arr[] = {1, 13, 24, 2, 3, 4};
+        std::cout << "longestIncreasingSubsequence:"
+                  << longestIncreasingSubsequence(arr, sizeof(arr) / sizeof(int))
+                  << std::endl;
+    }
+
+    {
+        printf("-------------\n");
+        int arr[] = {1, 1, 1, 3, 5, 5, 16, 28, 19};
+        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 12) << std::endl;
+        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 2) << std::endl;
+        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 5) << std::endl;
+        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 7) << std::endl;
+        int arr1[] = {1,5,5,5,5,5};
+        std::cout << lower_bound2(arr1, sizeof(arr1) / sizeof(int), 2) << std::endl;
+        int arr2[] = {1, 5};
+        std::cout << lower_bound2(arr2, sizeof(arr2) / sizeof(int), 2) << std::endl;
+        int arr3[] = {1, 5, 8};
+        std::cout << lower_bound2(arr3, sizeof(arr3) / sizeof(int), 2) << std::endl;
+        printf("-------------\n");
+    }
     return 0;
 }

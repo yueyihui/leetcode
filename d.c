@@ -328,7 +328,7 @@ struct TreeNode *lcaOf3Nodes(struct TreeNode *root, int nodes[3])
         return l != NULL ? l : r;
 }
 
-inline int max(int a, int b)
+int max(int a, int b)
 {
     return a > b ? a : b;
 }
@@ -395,6 +395,64 @@ void connectNodes(struct TreeNode *root)
     {
         struct TreeNode *next = NULL;
         levelConnect(root, &next, i);
+    }
+}
+
+void inorderTraversal(struct TreeNode *root, int *arr, int *i)
+{
+    if (root == NULL)
+        return;
+    inorderTraversal(root->left, arr, i);
+    arr[(*i)++] = root->val;
+    inorderTraversal(root->right, arr, i);
+}
+
+void preorderTranversal(struct TreeNode *root, int *arr, int *i)
+{
+    if (root == NULL)
+        return;
+    root->val = arr[(*i)++];
+    preorderTranversal(root->left, arr, i);
+    preorderTranversal(root->right, arr, i);
+
+}
+
+int sumTreeNodes(struct TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+    return sumTreeNodes(root->left) + sumTreeNodes(root->right) + 1;
+}
+
+struct TreeNode *bstToMinHeap(struct TreeNode *root)
+{
+    int sum = sumTreeNodes(root);
+    int *arr = (int *)malloc(sum * sizeof(int));
+    memset(arr, 0, sum * sizeof(int));
+    int i = 0;
+    inorderTraversal(root, arr, &i);
+    i = 0;
+    preorderTranversal(root, arr, &i);
+    free(arr);
+    return root;
+}
+
+struct TreeNode *buildFullTree(int *arr, int N, int i)
+{
+    if (i >= N)
+        return NULL;
+    struct TreeNode *root = newNode(arr[i]);
+    root->left = buildFullTree(arr, N, 2 * i + 1);
+    root->right = buildFullTree(arr, N, 2 * i + 2);
+    return root;
+}
+
+void printOnLevel(struct TreeNode *root)
+{
+    int depth = maxDepth(root);
+    for (int i = 0; i < depth; i++)
+    {
+        onlevel(root, i);
     }
 }
 
@@ -481,5 +539,23 @@ int main(int argc, char *argv[])
     printf("lca:%d\n", lcaOf3Nodes(root, nodes1)->val);
     int nodes2[] = {4, 7, 8};
     printf("lca:%d\n", lcaOf3Nodes(root, nodes2)->val);
+
+    int a[] = {4, 2, 6, 1, 3, 5, 7};
+    root = buildFullTree(a, sizeof(a) / sizeof(int), 0);
+    bstToMinHeap(root);
+    printOnLevel(root);
+    printf("\n");
+
+    int a1[] = {26, 24, 28, 23, 25, 27, 29};
+    root = buildFullTree(a1, sizeof(a1) / sizeof(int), 0);
+    bstToMinHeap(root);
+    printOnLevel(root);
+    printf("\n");
+
+    int a2[] = {33, 31, 35, 30, 32, 34, 36};
+    root = buildFullTree(a2, sizeof(a2) / sizeof(int), 0);
+    bstToMinHeap(root);
+    printOnLevel(root);
+    printf("\n");
     return 0;
 }

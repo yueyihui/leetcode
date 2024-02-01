@@ -164,17 +164,17 @@ void swap(int *a, int *b)
 
 void heapify(int arr[], int N, int i)
 {
-    int sel = i;
+    int max = i;
     int left = i * 2 + 1;
     int right = i * 2 + 2;
-    if (left < N && arr[left] > arr[sel])
-        sel = left;
-    if (right < N && arr[right] > arr[sel])
-        sel = right;
-    if (sel != i)
+    if (left < N && arr[left] > arr[max])
+        max = left;
+    if (right < N && arr[right] > arr[max])
+        max = right;
+    if (max != i)
     {
-        swap(&arr[i], &arr[sel]);
-        heapify(arr, N, sel);
+        swap(&arr[i], &arr[max]);
+        heapify(arr, N, max);
     }
 }
 

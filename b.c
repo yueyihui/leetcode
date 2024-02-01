@@ -490,6 +490,22 @@ int *goodIndices(int *nums, int numsSize, int k, int *returnSize)
     return rv;
 }
 
+int **printPascal(int n)
+{
+    int **res = (int **)malloc(sizeof(int *) * n);
+    for (int i = 0; i < n; i++)
+    {
+        res[i] = (int *)malloc(sizeof(int) * (i + 1));
+        memset(res[i], 0, sizeof(int) * (i + 1));
+        res[i][0] = res[i][i] = 1;
+        for (int j = 1; j < i; j++)
+        {
+            res[i][j] = res[i - 1][j - 1] + res[i - 1][j];
+        }
+    }
+    return res;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -578,5 +594,15 @@ int main(int argc, char *argv[])
         printf("%d ", ss[i]);
     }
     printf("\n");
+
+    int **pascal = printPascal(5);
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < i + 1; j++)
+        {
+            printf("%d ", pascal[i][j]);
+        }
+        printf("\n");
+    }
     return 0;
 }

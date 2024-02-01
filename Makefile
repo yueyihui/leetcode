@@ -1,6 +1,6 @@
-CFLAGS+= -g -O3 -I./uthash/include
+CFLAGS+= -g -O0 -I./uthash/include
 CC:=gcc
-CXXFLAGS+= -g -O3
+CXXFLAGS+= -g -O0
 
 TARGET:= $(basename $(wildcard *.c), $(wildcard *.cpp))
 
