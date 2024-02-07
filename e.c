@@ -337,7 +337,7 @@ struct ListNode *deleteMiddle(struct ListNode *head)
     return slow;
 }
 
-struct ListNode *insert(struct ListNode *head, struct ListNode *n)
+struct ListNode *merge(struct ListNode *head, struct ListNode *n)
 {
     if (head == NULL)
         return n;
@@ -345,12 +345,12 @@ struct ListNode *insert(struct ListNode *head, struct ListNode *n)
         return head;
     if (head->val <= n->val)
     {
-        head->next = insert(head->next, n);
+        head->next = merge(head->next, n);
         return head;
     }
     else
     {
-        n->next = insert(head, n->next);
+        n->next = merge(head, n->next);
         return n;
     }
 }
@@ -367,9 +367,10 @@ struct ListNode *flattenLinkedList(struct ListNode *head)
     struct ListNode *b = head->child;
     head->child = NULL;
     struct ListNode *br = flattenLinkedList(b);
-    return insert(insert(ar, br), head);
+    return merge(merge(ar, br), head);
 }
 
+//Floyd’s Cycle detection
 struct ListNode *split(struct ListNode *head)
 {
     struct ListNode *fast = head, *slow = head, *pre = NULL;
@@ -397,9 +398,10 @@ struct ListNode *mergeSort(struct ListNode *head)
     if (head->next == NULL)
         return head;
     struct ListNode *half = split(head);
-    return insert(mergeSort(head), mergeSort(half));
+    return merge(mergeSort(head), mergeSort(half));
 }
 
+//Floyd’s Cycle detection
 struct ListNode *firstNode(struct ListNode *head)
 {
     struct ListNode *fast = head, *slow = head;
@@ -425,6 +427,7 @@ struct ListNode *firstNode(struct ListNode *head)
     return NULL;
 }
 
+//Floyd’s Cycle detection
 struct ListNode *removeLoop(struct ListNode *head)
 {
     struct ListNode *fast = head, *slow = head;
@@ -534,9 +537,9 @@ int main(int argc, char *argv[])
     addToList(head2, 1);
     addToList(head2, 3);
     addToList(head2, 9);
-    struct ListNode *merge = mergeTwoLists(head1, head2);
+    head = mergeTwoLists(head1, head2);
     printf("mergeTwoLists:");
-    for (struct ListNode *i = merge; i != NULL; i = i->next)
+    for (struct ListNode *i = head; i != NULL; i = i->next)
     {
         printf("%d ", i->val);
     }

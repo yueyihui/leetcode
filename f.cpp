@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <bits/stdc++.h>
 #include <iostream>
 #include <queue>
 #include <stack>
@@ -80,6 +81,78 @@ void shellSort(vector<int> &arr)
         }
     }
 }
+
+class MergeSort
+{
+  private:
+    void merge(vector<int> &arr, int l, int mid, int r)
+    {
+        vector<int> L, R;
+        for (int i = l; i <= mid; i++)
+            L.push_back(arr[i]);
+
+        for (int i = mid + 1; i <= r; i++)
+            R.push_back(arr[i]);
+
+        int i = 0, j = 0, k = l;
+        while (i < L.size() && j < R.size())
+        {
+            if (L[i] < R[j])
+            {
+                arr[k++] = L[i++];
+            }
+            else
+            {
+                arr[k++] = R[j++];
+            }
+        }
+        while (i < L.size())
+            arr[k++] = L[i++];
+        while (j < R.size())
+            arr[k++] = R[j++];
+    }
+
+    void merge2(vector<int> &arr, int l, int mid, int r)
+    {
+        int r1 = l, r2 = mid + 1;
+        vector<int> temp;
+        while (r1 <= mid && r2 <= r)
+        {
+            if (arr[r1] < arr[r2])
+            {
+                temp.push_back(arr[r1++]);
+            }
+            else
+            {
+                temp.push_back(arr[r2++]);
+            }
+        }
+        while (r1 <= mid)
+        {
+            temp.push_back(arr[r1++]);
+        }
+        while (r2 <= r)
+        {
+            temp.push_back(arr[r2++]);
+        }
+        for (int i = l; i <= r; i++)
+        {
+            arr[i] = temp[i - l];
+        }
+    }
+
+  public:
+    void mergeSort(vector<int> &arr, int l, int r)
+    {
+        if (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            mergeSort(arr, l, mid);
+            mergeSort(arr, mid + 1, r);
+            merge2(arr, l, mid, r);
+        }
+    }
+};
 
 vector<vector<int>> findTriplets(vector<int> arr, int K)
 {
@@ -524,6 +597,68 @@ int findWays(vector<int> &arr, int k)
     return dp[k];
 }
 
+//https://www.codingninjas.com/studio/problems/minimum-elements_3843091?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=ATTEMPTED
+class MinElements
+{
+  private:
+    void loop(vector<int> &num, int x, vector<int> &assist, int &len, int i)
+    {
+        if (x == 0)
+        {
+            if (len == 0)
+                len = assist.size();
+            else
+                len = assist.size() < len ? assist.size() : len;
+        }
+        else if (x < 0)
+        {
+            return;
+        }
+        else
+        {
+            for (; i < num.size(); i++)
+            {
+                assist.push_back(num[i]);
+                loop(num, x - num[i], assist, len, i);
+                assist.pop_back();
+            }
+        }
+    }
+
+  public:
+    //Time Limit Exceeded
+    int minimumElements(vector<int> &num, int x)
+    {
+        int len = -1;
+        vector<int> assist;
+        loop(num, x, assist, len, 0);
+        return len;
+    }
+
+    int minimumElements2(vector<int> &num, int x)
+    {
+        //why -1?
+        //every dp[i] store the min path to i
+        //for j:num
+        //i=(i-j)+j
+        //dp[i] = dp[i-j]+1
+        //for what dp[i] should remain 1
+        vector<int> dp(x + 1, INT_MAX - 1);
+        dp[0] = 0;
+        for (int i = 1; i <= x; i++)
+        {
+            for (int j : num)
+            {
+                if (i >= j)
+                {
+                    dp[i] = min(dp[i], dp[i - j] + 1);
+                }
+            }
+        }
+        return dp[x] == INT_MAX - 1 ? -1 : dp[x];
+    }
+};
+
 int longestIncreasingSubsequence(int arr[], int n)
 {
     vector<int> count;
@@ -599,43 +734,95 @@ int upperBound(vector<int> &arr, int n, int x)
     return arr[l] <= x ? -1 : l;
 }
 
-//https://www.codingninjas.com/studio/problems/minimum-elements_3843091?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=ATTEMPTED
-class MinElements
+//https://www.codingninjas.com/studio/problems/longest-common-substring_1235207?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=3
+int lcs(string &str1, string &str2)
 {
-  private:
-    void loop(vector<int> &num, int x, vector<int> &assist, int &len, int i)
+    int longest = 0;
+    int count[str1.size() + 1][str2.size() + 1];
+    memset(count, 0, sizeof(count));
+    for (int i = 1; i <= str1.size(); i++)
     {
-        if (x == 0)
+        for (int j = 1; j <= str2.size(); j++)
         {
-            if (len == 0)
-                len = assist.size();
-            else
-                len = assist.size() < len ? assist.size() : len;
-        }
-        else if (x < 0)
-        {
-            return;
-        }
-        else
-        {
-            for (; i < num.size(); i++)
+            if (str1[i - 1] == str2[j - 1])
             {
-                assist.push_back(num[i]);
-                loop(num, x - num[i], assist, len, i);
-                assist.pop_back();
+                count[i][j] = count[i - 1][j - 1] + 1;
+                longest = max(longest, count[i][j]);
+            }
+            else
+            {
+                count[i][j] = 0;
             }
         }
     }
+    return longest;
+}
 
-  public:
-    int minimumElements(vector<int> &num, int x)
+//https://www.codingninjas.com/studio/problems/minimum-path-sum_985349?interviewProblemRedirection=true&leftPanelTabValue=SUBMISSION&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=2
+int minSumPath(vector<vector<int>> &grid)
+{
+    int m = grid.size();
+    int n = grid[0].size();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, INT_MAX));
+    dp[0][1] = dp[1][0] = 0;
+    for (int i = 1; i <= m; i++)
     {
-        int len = -1;
-        vector<int> assist;
-        loop(num, x, assist, len, 0);
-        return len;
+        for (int j = 1; j <= n; j++)
+        {
+            dp[i][j] = grid[i - 1][j - 1] + min(dp[i][j - 1], dp[i - 1][j]);
+        }
     }
-};
+    return dp[m][n];
+}
+
+int uniquePaths(int m, int n)
+{
+    vector<vector<int>> dp(m, vector<int>(n, 0));
+    for (int i = 0; i < m; i++)
+    {
+        dp[i][0] = 1;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        dp[0][i] = 1;
+    }
+    for (int i = 1; i < m; i++)
+    {
+        for (int j = 1; j < n; j++)
+        {
+            dp[i][j] = dp[i][j - 1] + dp[i - 1][j];
+        }
+    }
+    return dp[m - 1][n - 1];
+}
+
+//https://www.codingninjas.com/studio/problems/ninja-s-training_3621003?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=2
+int ninjaTraining(int n, vector<vector<int>> &points)
+{
+    vector<vector<int>> dp(n, vector<int>(3, 0));
+    for (int i = 0; i < 3; i++)
+        dp[0][i] = points[0][i];
+
+    for (int i = 1; i < points.size(); i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            switch (j)
+            {
+                case 0:
+                    dp[i][j] = points[i][j] + max(dp[i - 1][j + 1], dp[i - 1][j + 2]);
+                    break;
+                case 1:
+                    dp[i][j] = points[i][j] + max(dp[i - 1][j - 1], dp[i - 1][j + 1]);
+                    break;
+                case 2:
+                    dp[i][j] = points[i][j] + max(dp[i - 1][j - 1], dp[i - 1][j - 2]);
+                    break;
+            }
+        }
+    }
+    return max(max(dp.back()[0], dp.back()[1]), dp.back()[2]);
+}
 
 int main(int argc, char *argv[])
 {
@@ -772,6 +959,49 @@ int main(int argc, char *argv[])
         int arr3[] = {1, 5, 8};
         std::cout << lower_bound2(arr3, sizeof(arr3) / sizeof(int), 2) << std::endl;
         printf("-------------\n");
+    }
+
+    {
+        vector<int> num = {1, 2, 3};
+        MinElements m;
+        std::cout << "minimumElements:" << m.minimumElements2(num, 7) << std::endl;
+
+        num = {1, 9, 10};
+        std::cout << "minimumElements:" << m.minimumElements2(num, 7) << std::endl;
+    }
+
+    {
+        MergeSort m;
+        vector<int> arr = {3, 4, 1, 6, 2, 5, 7};
+        m.mergeSort(arr, 0, arr.size() - 1);
+        for (auto i : arr)
+        {
+            printf("%d ", i);
+        }
+        std::cout << std::endl;
+    }
+
+    {
+        string str1("tsoqqppopp");
+        string str2("tsoprr");
+        std::cout << "Longest Common Substring:" << lcs(str1, str2) << std::endl;
+    }
+
+    {
+        vector<vector<int>> grid = {{8, 1, 6},
+                                    {4, 4, 16},
+                                    {2, 7, 20},
+                                    {20, 7, 20}};
+        std::cout << "minSumPath:" << minSumPath(grid) << std::endl;
+    }
+
+    {
+        std::cout << "matrix[3][4] uniquePaths:" << uniquePaths(3, 4) << std::endl;
+    }
+
+    {
+        vector<vector<int>> points = {{1, 2, 5}, {3, 1, 1}, {3, 3, 3}};
+        std::cout << "ninjaTraining:" << ninjaTraining(points.size(), points) << std::endl;
     }
     return 0;
 }
