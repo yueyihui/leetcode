@@ -701,6 +701,7 @@ int* lower_bound(int arr[], int n, int value)
 int lower_bound2(int arr[], int n, int x)
 {
     int l = 0, r = n - 1;
+    //can't allow l==r, since r at the correct, the loop wouldn't quit
     while (l < r)
     {
         int mid = l + (r - l) / 2;
@@ -823,6 +824,148 @@ int ninjaTraining(int n, vector<vector<int>> &points)
     }
     return max(max(dp.back()[0], dp.back()[1]), dp.back()[2]);
 }
+
+//https://www.codingninjas.com/studio/problems/find-the-single-element_6680465?leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&page=4&attempt_status=COMPLETED
+int getSingleElement(vector<int> &arr)
+{
+    if (arr.size() == 1)
+        return arr[0];
+    if (arr[0] != arr[1])
+        return arr[0];
+    if (arr[arr.size() - 1] != arr[arr.size() - 2])
+        return arr[arr.size() - 1];
+    int l = 0, r = arr.size() - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (arr[mid - 1] != arr[mid] && arr[mid] != arr[mid + 1])
+            return arr[mid];
+        else if ((mid % 2 == 0 && arr[mid] != arr[mid - 1]) ||
+                 (mid % 2 != 0 && arr[mid] != arr[mid + 1]))
+            l = mid + 1;
+        else
+            r = mid - 1;
+    }
+    return -1;
+}
+
+//https://www.codingninjas.com/studio/problems/first-and-last-position-of-an-element-in-sorted-array_1082549?leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=ATTEMPTED
+class FirstLastPos
+{
+  private:
+    int left_bound(vector<int> &arr, int l, int r, int k)
+    {
+        int result = -1;
+        while (l <= r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] == k)
+            {
+                result = mid;
+                r = mid - 1;
+            }
+            else if (arr[mid] < k)
+                l = mid + 1;
+            else
+                r = mid - 1;
+        }
+        return result;
+    }
+
+    int right_bound(vector<int> &arr, int l, int r, int k)
+    {
+        int result = -1;
+        while (l <= r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] == k)
+            {
+                result = mid;
+                l = mid + 1;
+            }
+            else if (arr[mid] < k)
+                l = mid + 1;
+            else
+                r = mid - 1;
+        }
+        return result;
+    }
+
+  public:
+    pair<int, int> firstAndLastPosition(vector<int> &arr, int n, int k)
+    {
+        int l = left_bound(arr, 0, n - 1, k);
+        if (l == -1)
+            return {-1, -1};
+        else
+        {
+            int r = right_bound(arr, l, n - 1, k);
+            return {l, r};
+        }
+    }
+};
+
+//https://www.codingninjas.com/studio/problems/next-greater-element_670312?leftPanelTabValue=SUBMISSION&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=ATTEMPTED
+class NextGreaterElement
+{
+  private:
+    int upper_bound(vector<int> &arr, int l, int r, int x)
+    {
+        if (l > r)
+            return -1;
+        if (l == r)
+        {
+            if (arr[l] > x)
+                return l;
+            else
+                return -1;
+        }
+
+        int mid = l + (r - l) / 2;
+        l = upper_bound(arr, l, mid - 1, x);
+        if (l != -1)
+            return l;
+        else if (arr[mid] > x)
+            return mid;
+        else
+            return upper_bound(arr, mid + 1, r, x);
+    }
+
+  public:
+    vector<int> nextGreaterElement(vector<int> &arr, int n)
+    {
+        vector<int> rv(n, -1);
+        stack<int> st;
+        for (int i = n - 1; i >= 0; i--)
+        {
+            while (st.empty() == false && st.top() <= arr[i])
+            {
+                st.pop();
+            }
+            if (st.empty() == false)
+            {
+                rv[i] = st.top();
+            }
+            st.push(arr[i]);
+        }
+        return rv;
+    }
+
+    //Time Limit Exceeded
+    vector<int> nextGreaterElement2(vector<int> &arr, int n)
+    {
+        vector<int> rv;
+        for (int i = 0; i < n; i++)
+        {
+            int j = upper_bound(arr, i + 1, n - 1, arr[i]);
+            if (j != -1)
+                rv.push_back(arr[j]);
+            else
+                rv.push_back(j);
+        }
+        return rv;
+    }
+};
 
 int main(int argc, char *argv[])
 {
@@ -1002,6 +1145,29 @@ int main(int argc, char *argv[])
     {
         vector<vector<int>> points = {{1, 2, 5}, {3, 1, 1}, {3, 3, 3}};
         std::cout << "ninjaTraining:" << ninjaTraining(points.size(), points) << std::endl;
+    }
+
+    {
+        vector<int> arr = {1, 1, 2, 2, 3, 3, 6, 6, 7, 9, 9};
+        std::cout << "getSingleElement:" << getSingleElement(arr) << std::endl;
+    }
+
+    {
+        vector<int> arr = {3, 4, 4, 4, 4, 5, 5, 5, 6};
+        FirstLastPos flp;
+        pair<int, int> pos = flp.firstAndLastPosition(arr, arr.size(), 5);
+        printf("firstAndLastPosition:[%d,%d]\n", pos.first, pos.second);
+    }
+    {
+        vector<int> arr = {1, 4, 9, 2, 9, 10, 6};
+        NextGreaterElement nge;
+        vector<int> rv = nge.nextGreaterElement(arr, arr.size());
+        std::cout << "Next Greater Element:";
+        for (auto i : rv)
+        {
+            printf("%d ", i);
+        }
+        std::cout << std::endl;
     }
     return 0;
 }

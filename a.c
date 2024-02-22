@@ -557,6 +557,32 @@ int compressDuplicates_sort(char *chars, int charsSize)
     return writer;
 }
 
+int partition(int arr[], int l, int r)
+{
+    int pivot = r;
+    int i = l - 1;
+    for (int j = l; j <= r; j++)
+    {
+        if (arr[j] < arr[pivot])
+        {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[pivot]);
+    return i + 1;
+}
+
+void quickSort(int arr[], int l, int r)
+{
+    if (l < r)
+    {
+        int pi = partition(arr, l, r);
+        quickSort(arr, l, pi - 1);
+        quickSort(arr, pi + 1, r);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -673,6 +699,17 @@ int main(int argc, char *argv[])
         for (int j = 0; j < len; j++)
         {
             printf("%c", dup_sort[i][j]);
+        }
+        printf("\n");
+    }
+
+    {
+        int arr[] = {10, 7, 8, 9, 1, 5};
+        quickSort(arr, 0, sizeof(arr) / sizeof(int) - 1);
+        printf("quickSort:");
+        for (int i = 0; i < sizeof(arr) / sizeof(int); i++)
+        {
+            printf("%d ", arr[i]);
         }
         printf("\n");
     }

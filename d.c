@@ -290,23 +290,24 @@ struct TreeNode *deleteNode(struct TreeNode *root, int key)
     return root;
 }
 
-int goodNodes(struct TreeNode *root)
+int checkNode(struct TreeNode *root, int preVal)
 {
     if (root == NULL)
         return 0;
-
-    int l = goodNodes(root->left);
-    if (l != 0 && root->val > root->left->val)
+    int i = 0;
+    if (root->val >= preVal)
     {
-        l--;
+        i += 1;
+        preVal = root->val;
     }
+    return i + checkNode(root->left, preVal) + checkNode(root->right, preVal);
+}
 
-    int r = goodNodes(root->right);
-    if (r != 0 && root->val > root->right->val)
-    {
-        r--;
-    }
-    return r + l + 1;
+int goodNodes(struct TreeNode *root)
+{
+    if (root == NULL)
+        return -1;
+    return checkNode(root->left, root->val) + checkNode(root->right, root->val) + 1;
 }
 
 struct TreeNode *lcaOf3Nodes(struct TreeNode *root, int nodes[3])
@@ -520,25 +521,36 @@ int main(int argc, char *argv[])
     inorderPrint(after);
     printf("\n");
 
-    int preorder1[] = {3, 1, 3, 4, 1, 5};
-    int inorder1[] = {3, 1, 3, 1, 4, 5};
-    root = buildTree(preorder1, sizeof(preorder1) / sizeof(int), inorder1, sizeof(inorder1) / sizeof(int));
-    printf("goodNodes:%d\n", goodNodes(root));
+    {
+        int preorder1[] = {3, 1, 3, 4, 1, 5};
+        int inorder1[] = {3, 1, 3, 1, 4, 5};
+        root = buildTree(preorder1, sizeof(preorder1) / sizeof(int), inorder1, sizeof(inorder1) / sizeof(int));
+        printf("goodNodes:%d\n", goodNodes(root));
 
-    int preorder2[] = {3, 1, 4};
-    int inorder2[] = {1, 3, 4};
-    root = buildTree(preorder2, sizeof(preorder2) / sizeof(int), inorder2, sizeof(inorder2) / sizeof(int));
-    printf("goodNodes:%d\n", goodNodes(root));
+        int preorder2[] = {3, 1, 4};
+        int inorder2[] = {1, 3, 4};
+        root = buildTree(preorder2, sizeof(preorder2) / sizeof(int), inorder2, sizeof(inorder2) / sizeof(int));
+        printf("goodNodes:%d\n", goodNodes(root));
 
-    int preorder3[] = {1, 2, 4, 7, 8, 3, 5, 6, 9, 10};
-    int inorder3[] = {7, 4, 8, 2, 1, 5, 3, 9, 6, 10};
-    root = buildTree(preorder3, sizeof(preorder3) / sizeof(int), inorder3, sizeof(inorder3) / sizeof(int));
-    int nodes0[] = {7, 8, 2};
-    printf("lca:%d\n", lcaOf3Nodes(root, nodes0)->val);
-    int nodes1[] = {5, 6, 7};
-    printf("lca:%d\n", lcaOf3Nodes(root, nodes1)->val);
-    int nodes2[] = {4, 7, 8};
-    printf("lca:%d\n", lcaOf3Nodes(root, nodes2)->val);
+    //     4
+    //   1   6
+    // 9  10   7
+        int arr[] = {4, 1, 6, 9, 10, 7};
+        root = buildFullTree(arr, sizeof(arr) / sizeof(int), 0);
+        printf("goodNodes:%d\n", goodNodes(root));
+    }
+
+    {
+        int preorder[] = {1, 2, 4, 7, 8, 3, 5, 6, 9, 10};
+        int inorder[] = {7, 4, 8, 2, 1, 5, 3, 9, 6, 10};
+        root = buildTree(preorder, sizeof(preorder) / sizeof(int), inorder, sizeof(inorder) / sizeof(int));
+        int nodes0[] = {7, 8, 2};
+        printf("lca:%d\n", lcaOf3Nodes(root, nodes0)->val);
+        int nodes1[] = {5, 6, 7};
+        printf("lca:%d\n", lcaOf3Nodes(root, nodes1)->val);
+        int nodes2[] = {4, 7, 8};
+        printf("lca:%d\n", lcaOf3Nodes(root, nodes2)->val);
+    }
 
     int a[] = {4, 2, 6, 1, 3, 5, 7};
     root = buildFullTree(a, sizeof(a) / sizeof(int), 0);
