@@ -265,31 +265,6 @@ string longestPalinSubstring(string str)
     return rv;
 }
 
-void setZeros(vector<vector<int>> &matrix)
-{
-    vector<std::pair<int, int>> target;
-    for (int i = 0; i < matrix.size(); i++)
-    {
-        for (int j = 0; j < matrix[i].size(); j++)
-        {
-            if (matrix[i][j] == 0)
-            {
-                target.push_back({i, j});
-            }
-        }
-    }
-    for (auto i = target.begin(); i != target.end(); i++)
-    {
-        for (auto j = matrix[i->first].begin(); j != matrix[i->first].end(); j++)
-        {
-            *j = 0;
-        }
-        for (auto j = matrix.begin(); j != matrix.end(); j++)
-        {
-            (*j)[i->second] = 0;
-        }
-    }
-}
 
 vector<int> countSort(vector<int> &a)
 {
@@ -967,6 +942,237 @@ class NextGreaterElement
     }
 };
 
+//https://www.codingninjas.com/studio/problems/search-in-rotated-sorted-array_1082554?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=3
+class Search_In_Rotated_Sorted_Array
+{
+  private:
+    int partition(vector<int> &arr)
+    {
+        int l = 0, r = arr.size() - 1;
+        while (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[0] > arr[mid])
+                r = mid;
+            else
+                l = mid + 1;
+        }
+        return r;
+    }
+    int binarySearch(vector<int> &arr, int l, int r, int k)
+    {
+        while (l <= r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] == k)
+                return mid;
+            else if (arr[mid] < k)
+                l = mid + 1;
+            else
+                r = mid - 1;
+        }
+        return -1;
+    }
+
+  public:
+    int search(vector<int> &arr, int n, int k)
+    {
+        int pivot = partition(arr);
+        if (arr[pivot] <= k && k <= arr[n - 1])
+            return binarySearch(arr, pivot, n - 1, k);
+        else
+            return binarySearch(arr, 0, pivot - 1, k);
+    }
+};
+
+//https://www.codingninjas.com/studio/problems/longest-consecutive-sequence_759408?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=sort&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=NOT_ATTEMPTED&page=3
+class Longest_Consecutive_Sequence
+{
+  private:
+    void shellSort(vector<int> &arr, int n)
+    {
+        for (int gap = n / 2; gap > 0; gap /= 2)
+        {
+            for (int i = gap; i < n; i++)
+            {
+                int j = i;
+                int tmp = arr[j];
+                while (j >= gap && arr[j - gap] > tmp)
+                {
+                    arr[j] = arr[j - gap];
+                    j -= gap;
+                }
+                arr[j] = tmp;
+            }
+        }
+    }
+
+  public:
+    int lengthOfLongestConsecutiveSequence(vector<int> &arr, int n)
+    {
+        if (n == 0)
+            return 0;
+        if (n == 1)
+            return 1;
+        shellSort(arr, n);
+        int r = 1, longest = 1, sub = 1;
+        while (r < n)
+        {
+            if (arr[r] - arr[r - 1] == 1)
+            {
+                sub++;
+            }
+            else if (arr[r] == arr[r - 1])
+            {
+            }
+            else
+            {
+                longest = max(longest, sub);
+                sub = 1;
+            }
+            r++;
+        }
+        longest = max(longest, sub);
+        return longest;
+    }
+};
+
+//https://www.codingninjas.com/studio/problems/merge-k-sorted-arrays_975379?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=sort&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=NOT_ATTEMPTED&page=3
+class Merge_K_Sorted_Arrays
+{
+  private:
+    void merge(vector<int> &v1, vector<int> &v2)
+    {
+        if (v2.size() == 0)
+            return;
+        vector<int> temp(v1);
+        v1.clear();
+        int l = 0, r = 0;
+        while (l < temp.size() && r < v2.size())
+        {
+            if (temp[l] < v2[r])
+            {
+                v1.push_back(temp[l++]);
+            }
+            else
+                v1.push_back(v2[r++]);
+        }
+        while (l < temp.size())
+            v1.push_back(temp[l++]);
+        while (r < v2.size())
+            v1.push_back(v2[r++]);
+    }
+
+  public:
+    vector<int> mergeKSortedArrays(vector<vector<int>> &kArrays, int k)
+    {
+        vector<int> rv;
+        for (int i = 0; i < k; i++)
+        {
+            merge(rv, kArrays[i]);
+        }
+        return rv;
+    }
+};
+
+//https://www.codingninjas.com/studio/problems/min-stack_3843991?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=min%20stack&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=1
+class MinStack
+{
+  private:
+    stack<int> s;
+    int min;
+
+  public:
+    MinStack() {}
+
+    void push(int num)
+    {
+        if (s.empty())
+        {
+            min = num;
+            s.push(num);
+        }
+        else if (num < min)
+        {
+            s.push(2 * num - min);
+            min = num;
+        }
+        else
+        {
+            s.push(num);
+        }
+    }
+
+    int pop()
+    {
+        if (s.empty())
+            return -1;
+        if (s.top() < min)
+        {
+            int t = top();
+            min = 2 * min - s.top();
+            s.pop();
+            return t;
+        }
+        else
+        {
+            int t = top();
+            s.pop();
+            return t;
+        }
+    }
+
+    int top()
+    {
+        if (s.empty())
+            return -1;
+        else
+            return s.top() < min ? min : s.top();
+    }
+
+    int getMin()
+    {
+        if (s.empty())
+            return -1;
+        else
+            return min;
+    }
+};
+
+//https://www.codingninjas.com/studio/problems/set-matrix-zeros_3846774?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=10
+class Set_Matrix_Zeros
+{
+  public:
+    void setZeros(vector<vector<int>> &matrix)
+    {
+        int n = matrix.size();
+        int m = matrix.front().size();
+        vector<int> row(n, 0);
+        vector<int> col(m, 0);
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (matrix[i][j] == 0)
+                {
+                    row[i] = 1;
+                    col[j] = 1;
+                }
+            }
+        }
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (row[i] or col[j])
+                {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+    }
+};
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;
@@ -994,33 +1200,11 @@ int main(int argc, char *argv[])
     }
     printf("\n");
 
-    string testcase[] = {"abcd", "abcba", "abccbc", "qweeq", "babcbabcbaccba", "abacdfgdcaba", "codingninjas",
-                         "zzzzzzzzzzzzzzzzzzzzzzwwwwwwwwwwwwwwwwwyyyyyyyyyyyyyyyyyyydddddddddddddddddddddddddddddddddddddddddd"};
-    for (int i = 0; i < sizeof(testcase) / sizeof(string); i++)
-        std::cout << longestPalinSubstring(testcase[i]) << std::endl;
-
     {
-        vector<vector<int>> testcase[] = {{{7, 19, 3},
-                                           {4, 21, 0}},
-                                          {{1, 0},
-                                           {2, 7},
-                                           {3, 0},
-                                           {4, 8}},
-                                          {{0, 2, 3},
-                                           {1, 0, 3},
-                                           {1, 2, 0}}};
-        for (int i = 0; i < 3; i++)
-        {
-            setZeros(testcase[i]);
-            for (auto j = testcase[i].begin(); j != testcase[i].end(); j++)
-            {
-                for (auto k = j->begin(); k != j->end(); k++)
-                {
-                    printf("%d ", *k);
-                }
-                printf("\n");
-            }
-        }
+        string testcase[] = {"abcd", "abcba", "abccbc", "qweeq", "babcbabcbaccba", "abacdfgdcaba", "codingninjas",
+                             "zzzzzzzzzzzzzzzzzzzzzzwwwwwwwwwwwwwwwwwyyyyyyyyyyyyyyyyyyydddddddddddddddddddddddddddddddddddddddddd"};
+        for (int i = 0; i < sizeof(testcase) / sizeof(string); i++)
+            std::cout << "longestPalinSubstring:" << longestPalinSubstring(testcase[i]) << std::endl;
     }
 
     vector<int> lar = {12, 1, 20, 1, 15, 5, 5, 8, 10, 0, 2, 3, 4, 11};
@@ -1168,6 +1352,49 @@ int main(int argc, char *argv[])
             printf("%d ", i);
         }
         std::cout << std::endl;
+    }
+    {
+        Search_In_Rotated_Sorted_Array s;
+        vector<int> arr = {11, 13, 5, 8, 9, 10};
+        std::cout << "Search In Rotated Sorted Array:" << s.search(arr, arr.size(), 5) << std::endl;
+    }
+    {
+        vector<int> arr = {100, 4, 200, 1, 3, 2};
+        Longest_Consecutive_Sequence lcs;
+        std::cout << "Longest Consecutive Sequence:" << lcs.lengthOfLongestConsecutiveSequence(arr, arr.size()) << std::endl;
+    }
+    {
+        vector<vector<int>> arr = {{1, 5, 9}, {45, 90}, {2, 6, 78, 100, 234}};
+        Merge_K_Sorted_Arrays merge;
+        vector<int> rv = merge.mergeKSortedArrays(arr, arr.size());
+        printf("Merge K Sorted Arrays:");
+        for (auto i : rv)
+        {
+            printf("%d ", i);
+        }
+        printf("\n");
+    }
+    {
+        MinStack ms;
+        ms.push(1);
+        ms.push(2);
+        ms.getMin();
+        ms.pop();
+        ms.top();
+        ms.getMin();
+    }
+    {
+        vector<vector<int>> arr = {{7, 9, 3}, {4, 2, 0}, {5, 6, 7}};
+        Set_Matrix_Zeros smz;
+        smz.setZeros(arr);
+        for (auto i : arr)
+        {
+            for (auto j : i)
+            {
+                printf("%d ", j);
+            }
+            printf("\n");
+        }
     }
     return 0;
 }

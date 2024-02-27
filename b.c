@@ -506,6 +506,20 @@ int **printPascal(int n)
     return res;
 }
 
+int searchInsert(int arr[], int n, int m)
+{
+    int l = 0, r = n - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (m > arr[mid])
+            l = mid + 1;
+        else
+            r = mid - 1;
+    }
+    return l;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -603,6 +617,11 @@ int main(int argc, char *argv[])
             printf("%d ", pascal[i][j]);
         }
         printf("\n");
+    }
+
+    {
+        int arr[] = {3, 5, 9, 21, 35};
+        printf("searchInsert:%d\n", searchInsert(arr, sizeof(arr) / sizeof(int), 8));
     }
     return 0;
 }
