@@ -734,6 +734,24 @@ int lcs(string &str1, string &str2)
     return longest;
 }
 
+//https://www.codingninjas.com/studio/problems/longest-common-subsequence_624879?interviewProblemRedirection=true&count=25
+int lcs2(string s, string t)
+{
+    int longest = 0;
+    vector<vector<int>> count(s.length() + 1, vector<int>(t.length() + 1, 0));
+    for (int i = 1; i <= s.length(); i++)
+    {
+        for (int j = 1; j <= t.length(); j++)
+        {
+            if (s[i - 1] == t[j - 1])
+                count[i][j] = count[i - 1][j - 1] + 1;
+            else
+                count[i][j] = max(count[i - 1][j], count[i][j - 1]);
+        }
+    }
+    return count[s.length()][t.length()];
+}
+
 //https://www.codingninjas.com/studio/problems/minimum-path-sum_985349?interviewProblemRedirection=true&leftPanelTabValue=SUBMISSION&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=2
 int minSumPath(vector<vector<int>> &grid)
 {
@@ -1312,6 +1330,10 @@ int main(int argc, char *argv[])
         string str1("tsoqqppopp");
         string str2("tsoprr");
         std::cout << "Longest Common Substring:" << lcs(str1, str2) << std::endl;
+
+        string s("adebc");
+        string t("dcadb");
+        std::cout << "Longest Common Substring:" << lcs2(s, t) << std::endl;
     }
 
     {
