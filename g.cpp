@@ -1,4 +1,4 @@
-#include "ringbuffer.h"
+#include "CircularQueue.h"
 #include <bits/stdc++.h>
 #include <iterator>
 #include <stack>
@@ -47,6 +47,32 @@ class Node
         }
         return head;
     }
+    static Node *newLinkList(vector<int> &&arr)
+    {
+        Node *head = NULL, *pre = NULL;
+        for (auto i : arr)
+        {
+            if (head == NULL)
+            {
+                head = new Node(i);
+                pre = head;
+            }
+            else
+            {
+                pre->next = new Node(i);
+                pre = pre->next;
+            }
+        }
+        return head;
+    }
+    static void inorder(Node *head)
+    {
+        if (head == NULL)
+            return;
+        inorder(head->prev);
+        printf(" %d", head->data);
+        inorder(head->next);
+    }
 };
 
 template <typename T>
@@ -63,6 +89,15 @@ class BinaryTreeNode
         right = NULL;
     }
     static BinaryTreeNode<T> *buildTree(vector<int> &arr, int i)
+    {
+        if (i >= arr.size())
+            return NULL;
+        BinaryTreeNode<T> *root = new BinaryTreeNode<T>(arr[i]);
+        root->left = buildTree(arr, 2 * i + 1);
+        root->right = buildTree(arr, 2 * i + 2);
+        return root;
+    }
+    static BinaryTreeNode<T> *buildTree(vector<int> &&arr, int i)
     {
         if (i >= arr.size())
             return NULL;
@@ -98,6 +133,7 @@ class TreeNode
     }
 
     static void preorder(TreeNode<T> *root);
+    static TreeNode<T> *buildTree2(vector<T> &arr, T i);
 };
 
 class SortStack
@@ -348,6 +384,30 @@ class RightView
     {
         vector<int> ans;
         rightview(root, 0, ans);
+        return ans;
+    }
+};
+
+class LeftView
+{
+  private:
+    void leftView(BinaryTreeNode<int> *root, vector<int> &ans, int i)
+    {
+        if (root == NULL)
+            return;
+        if (i == ans.size())
+        {
+            ans.push_back(root->data);
+        }
+        leftView(root->left, ans, i + 1);
+        leftView(root->right, ans, i + 1);
+    }
+
+  public:
+    vector<int> printLeftView(BinaryTreeNode<int> *root)
+    {
+        vector<int> ans;
+        leftView(root, ans, 0);
         return ans;
     }
 };
@@ -775,14 +835,14 @@ class Sorted_Linked_List_to_Balanced_BST
         return a > b ? a + 1 : b + 1;
     }
 
-    TreeNode<int> *insertBST(TreeNode<int> *root, int data)
+    TreeNode<int> *insertAVL(TreeNode<int> *root, int data)
     {
         if (root == NULL)
             return new TreeNode<int>(data);
         else if (data < root->data)
-            root->left = insertBST(root->left, data);
+            root->left = insertAVL(root->left, data);
         else if (data > root->data)
-            root->right = insertBST(root->right, data);
+            root->right = insertAVL(root->right, data);
         int l_h = height(root->left);
         int r_h = height(root->right);
         if (l_h - r_h > 1)
@@ -821,7 +881,7 @@ class Sorted_Linked_List_to_Balanced_BST
         TreeNode<int> *root = NULL;
         while (head != NULL)
         {
-            root = insertBST(root, head->data);
+            root = insertAVL(root, head->data);
             head = head->next;
         }
         return root;
@@ -971,6 +1031,316 @@ bool findBinaryTreeNode(BinaryTreeNode<int> *root, int data)
         return findBinaryTreeNode(root->left, data) || findBinaryTreeNode(root->right, data);
 }
 
+int rangeSum(TreeNode<int> *root, int low, int high)
+{
+    if (root == NULL)
+        return 0;
+    int l = rangeSum(root->left, low, high);
+    int r = rangeSum(root->right, low, high);
+    if (root->data >= low and root->data <= high)
+        return root->data + l + r;
+    else
+        return l + r;
+}
+
+template <typename T>
+TreeNode<T> *TreeNode<T>::buildTree2(vector<T> &arr, T i)
+{
+    if (i >= arr.size())
+        return NULL;
+    TreeNode<T> *root = new TreeNode<T>(arr[i]);
+    root->left = buildTree2(arr, 2 * i + 1);
+    root->right = buildTree2(arr, 2 * i + 2);
+    return root;
+}
+
+Node *partitionList(Node *head, int k)
+{
+    if (head == NULL)
+        return NULL;
+
+    if (head->data < k)
+    {
+        head->next = partitionList(head->next, k);
+        return head;
+    }
+    else
+    {
+        Node *p = head, *pre = NULL;
+        while (p != NULL && p->data >= k)
+        {
+            pre = p;
+            p = p->next;
+        }
+        if (p != NULL)
+        {
+            pre->next = p->next;
+            p->next = partitionList(head, k);
+            return p;
+        }
+        else
+        {
+            return head;
+        }
+    }
+}
+
+//https://www.codingninjas.com/studio/problems/next-greater-node-in-linked-list_1262083?interviewProblemRedirection=true&count=25
+class NextGreaterNode
+{
+  private:
+    void deep(stack<int> &a, stack<int> &s, Node *head)
+    {
+        if (head->next != NULL)
+            deep(a, s, head->next);
+        if (s.empty())
+        {
+            a.push(0);
+        }
+        else
+        {
+            while (s.empty() == false && s.top() <= head->data)
+            {
+                s.pop();
+            }
+            if (s.empty())
+                a.push(0);
+            else
+                a.push(s.top());
+        }
+        s.push(head->data);
+    }
+
+  public:
+    vector<int> findNextGreaterNodeList(Node *head)
+    {
+        vector<int> res;
+        stack<int> a, s;
+        deep(a, s, head);
+        while (a.empty() == false)
+        {
+            res.push_back(a.top());
+            a.pop();
+        }
+        return res;
+    }
+};
+
+Node *findKthFromLast(Node *head, int k)
+{
+    Node *q = head, *p = head;
+    for (int i = 0; i < k; i++)
+    {
+        p = p->next;
+    }
+    while (p != NULL)
+    {
+        q = q->next;
+        p = p->next;
+    }
+    return q;
+}
+
+class FlattenBinaryTreetoLinkedList
+{
+  private:
+    TreeNode<int> *flatten(TreeNode<int> *root)
+    {
+        if (root == NULL)
+            return NULL;
+        root->left = flatten(root->left);
+        root->right = flatten(root->right);
+        TreeNode<int> *tmp = root->right;
+        root->right = root->left;
+        root->left = NULL;
+        TreeNode<int> *p = root;
+        while (p->right != NULL)
+        {
+            p = p->right;
+        }
+        p->right = tmp;
+        return root;
+    }
+
+  public:
+    void flattenBinaryTree(TreeNode<int> *root) { root = flatten(root); }
+};
+
+class ListToTree
+{
+  private:
+    Node *getMid(Node *head)
+    {
+        Node *fast = head, *slow = head, *pre = NULL;
+        while (fast != NULL)
+        {
+            fast = fast->next;
+            if (fast != NULL)
+            {
+                fast = fast->next;
+                pre = slow;
+                slow = slow->next;
+            }
+        }
+        if (pre != NULL)
+        {
+            pre->next = NULL;
+        }
+        return slow;
+    }
+
+    Node *tree(Node *head)
+    {
+        if (head == NULL || head->next == NULL)
+            return head;
+        Node *mid = getMid(head);
+        Node *left = head;
+        Node *right = mid->next;
+        mid->prev = tree(left);
+        mid->next = tree(right);
+        return mid;
+    }
+
+  public:
+    Node *listToTree(Node *head)
+    {
+        Node *p = head;
+        while (p != NULL)
+        {
+            p->prev = NULL;
+            p = p->next;
+        }
+        return tree(head);
+    }
+};
+
+class MergePointOfTwoLinkedLists
+{
+  private:
+    int length(Node *head)
+    {
+        int n = 0;
+        while (head != NULL)
+        {
+            n++;
+            head = head->next;
+        }
+        return n;
+    }
+
+  public:
+    int findIntersection(Node *firstHead, Node *secondHead)
+    {
+        int f = length(firstHead);
+        int s = length(secondHead);
+        if (f > s)
+        {
+            for (int i = 0; i < f - s; i++)
+            {
+                firstHead = firstHead->next;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < s - f; i++)
+            {
+                secondHead = secondHead->next;
+            }
+        }
+        while (firstHead != NULL && secondHead != NULL && firstHead != secondHead)
+        {
+            firstHead = firstHead->next;
+            secondHead = secondHead->next;
+        }
+        return firstHead == NULL ? -1 : firstHead->data;
+    }
+};
+
+Node *linkedListCat(Node *a, Node *b)
+{
+    Node *p = a;
+    while (p->next != NULL)
+        p = p->next;
+    p->next = b;
+    return a;
+}
+
+//https://www.naukri.com/code360/problems/is-binary-heap-tree_893136
+bool isBinaryHeapTree(BinaryTreeNode<int> *root)
+{
+    if (root == NULL)
+        return false;
+    bool last = false;
+    queue<BinaryTreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        BinaryTreeNode<int> *cur = q.front();
+        q.pop();
+
+        if (cur->left)
+        {
+            if (last || cur->left->data > cur->data)
+                return false;
+            else
+                q.push(cur->left);
+        }
+        else
+            last = true;
+
+        if (cur->right)
+        {
+            if (last || cur->right->data > cur->data)
+                return false;
+            else
+                q.push(cur->right);
+        }
+        else
+            last = true;
+    }
+    return true;
+}
+
+//https://www.naukri.com/code360/problems/sum-tree_10373?interviewProblemRedirection=true&count=25
+class SumTree
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, vector<int> &ans)
+    {
+        if (root == NULL)
+            return;
+        ans.push_back(root->data);
+        preorder(root->left, ans);
+        preorder(root->right, ans);
+    }
+
+  public:
+    vector<int> sumTree(BinaryTreeNode<int> *root)
+    {
+        queue<BinaryTreeNode<int> *> q;
+        q.push(root);
+        while (q.empty() == false)
+        {
+            BinaryTreeNode<int> *cur = q.front();
+            q.pop();
+            cur->data = 0;
+            if (cur->left)
+            {
+                cur->data += cur->left->data;
+                q.push(cur->left);
+            }
+            if (cur->right)
+            {
+                cur->data += cur->right->data;
+                q.push(cur->right);
+            }
+        }
+        vector<int> ans;
+        preorder(root, ans);
+        return ans;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -1057,6 +1427,18 @@ int main(int argc, char *argv[])
         RightView view;
         auto rv = view.printRightView(root);
         printf("printRightView:");
+        for (auto i : rv)
+        {
+            printf("%d ", i);
+        }
+        printf("\n");
+    }
+    {
+        vector<int> arr = {5, 6, 7, 8};
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree(arr, 0);
+        LeftView view;
+        auto rv = view.printLeftView(root);
+        printf("printLeftView:");
         for (auto i : rv)
         {
             printf("%d ", i);
@@ -1199,7 +1581,7 @@ int main(int argc, char *argv[])
         std::cout << "Reverse vowels in a string:" << r.reverseVowels(s) << std::endl;
     }
     {
-        //convert vector to balanced binary search tree(BST)
+        //convert vector to balanced binary search tree(AVL BST)
         vector<int> arr = {1, 2, 3, 4, 5};
         Minimal_Tree t;
         t.minimalTree(arr);
@@ -1215,6 +1597,88 @@ int main(int argc, char *argv[])
         std::cout << "find " << root->data << ":" << std::boolalpha << findBinaryTreeNode(new_root, root->data) << std::endl;
         std::cout << "find " << l->data << ":" << std::boolalpha << findBinaryTreeNode(new_root, l->data) << std::endl;
         std::cout << "find " << r->data << ":" << std::boolalpha << findBinaryTreeNode(new_root, r->data) << std::endl;
+    }
+    {
+        vector<int> arr = {24, 15, 33, 12, 21, 30, 36, 9};
+        TreeNode<int> *root = TreeNode<int>::buildTree2(arr, 0);
+        printf("rangeSum:%d\n", rangeSum(root, 18, 24));
+    }
+    {
+        vector<int> arr = {3, 6, 2, 7, 9};
+        Node *head = Node::newLinkList(arr);
+        head = partitionList(head, 6);
+        printf("partitionList:");
+        while (head != NULL)
+        {
+            printf(" %d", head->data);
+            head = head->next;
+        }
+        printf("\n");
+    }
+    {
+        vector<int> arr = {52, 98, 91};
+        Node *head = Node::newLinkList(arr);
+        NextGreaterNode g;
+        vector<int> res = g.findNextGreaterNodeList(head);
+        printf("Next Greater Node In Linked List:");
+        for (auto i : res)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
+    }
+    {
+        vector<int> arr = {43, 6, 9, 1, 5};
+        Node *head = Node::newLinkList(arr);
+        Node *p = findKthFromLast(head, 3);
+        printf("findKthFromLast:%d\n", p->data);
+    }
+    {
+        TreeNode<int> *root = new TreeNode<int>(15);
+        root->left = new TreeNode<int>(40);
+        root->right = new TreeNode<int>(62);
+        root->right->left = new TreeNode<int>(10);
+        root->right->right = new TreeNode<int>(20);
+        FlattenBinaryTreetoLinkedList f;
+        f.flattenBinaryTree(root);
+        printf("flattenBinaryTree:");
+        TreeNode<int>::preorder(root);
+        printf("\n");
+    }
+    {
+        vector<int> arr = {1, 4, 5, 8, 9};
+        Node *head = Node::newLinkList(arr);
+        ListToTree l;
+        head = l.listToTree(head);
+        printf("List to Tree:");
+        Node::inorder(head);
+        printf("\n");
+    }
+    {
+        Node *a = Node::newLinkList({4, 1});
+        Node *b = Node::newLinkList({5, 6, 1});
+        Node *i = Node::newLinkList({8, 4, 5});
+        a = linkedListCat(a, i);
+        b = linkedListCat(b, i);
+        MergePointOfTwoLinkedLists m;
+        printf("findIntersection:%d\n", m.findIntersection(a, b));
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree({1, 2, 3, 4, 5}, 0);
+        std::cout << "isBinaryHeapTree:" << isBinaryHeapTree(root) << std::endl;
+        root = BinaryTreeNode<int>::buildTree({10, 8, 9, 5, 5, 4, 5, 1, 2}, 0);
+        std::cout << "isBinaryHeapTree:" << isBinaryHeapTree(root) << std::endl;
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree({1, 2, 3, 4, 5, 6}, 0);
+        SumTree st;
+        vector<int> ans = st.sumTree(root);
+        printf("sumTree:");
+        for (auto i : ans)
+        {
+            printf("%d ", i);
+        }
+        printf("\n");
     }
     return 0;
 }

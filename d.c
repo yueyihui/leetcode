@@ -268,26 +268,53 @@ struct TreeNode *insert(struct TreeNode *root, struct TreeNode *sub_tree)
     }
 }
 
-struct TreeNode *deleteNode(struct TreeNode *root, int key)
+struct TreeNode *deleteNode(struct TreeNode *root, int k)
 {
     if (root == NULL)
         return NULL;
 
-    if (root->val == key)
+    if (root->val > k)
     {
-        struct TreeNode *new = insert(root->right, root->left);
-        free(root);
-        return new;
+        root->left = deleteNode(root->left, k);
+        return root;
     }
-    else if (root->val < key)
+    else if (root->val < k)
     {
-        root->right = deleteNode(root->right, key);
+        root->right = deleteNode(root->right, k);
+        return root;
     }
     else
     {
-        root->left = deleteNode(root->left, key);
+        if (root->left == NULL)
+        {
+            struct TreeNode *tmp = root->right;
+            return tmp;
+        }
+        else if (root->right == NULL)
+        {
+            struct TreeNode *tmp = root->left;
+            return tmp;
+        }
+        else
+        {
+            struct TreeNode *succParent = root;
+            struct TreeNode *succ = root->right;
+            while (succ->left != NULL)
+            {
+                succParent = succ;
+                succ = succ->left;
+            }
+
+            if (succParent != root)
+                succParent->left = succ->right;
+            else
+                succParent->right = succ->right;
+
+            root->val = succ->val;
+            free(succ);
+            return root;
+        }
     }
-    return root;
 }
 
 int checkNode(struct TreeNode *root, int preVal)

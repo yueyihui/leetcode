@@ -150,6 +150,41 @@ int *productExceptSelf(int *nums, int numsSize, int *returnSize)
     return answer;
 }
 
+int *getProductArrayExceptSelf(int *arr, int n)
+{
+    const int mod = 1000000007;
+    int zero = 0;
+    long product = 1;
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] != 0)
+            product = (product * arr[i]) % mod;
+        else
+            zero++;
+    }
+    int *ans = (int *)malloc(n * sizeof(int));
+    memset(ans, 0, n * sizeof(int));
+    for (int i = 0; i < n; i++)
+    {
+        if (zero == 1)
+        {
+            if (arr[i] == 0)
+                ans[i] = product;
+            else
+                ans[i] = 0;
+        }
+        else if (zero >= 2)
+        {
+            ans[i] = 0;
+        }
+        else
+        {
+            ans[i] = product / arr[i];
+        }
+    }
+    return ans;
+}
+
 int lengthOfLastWord(char *s)
 {
     int len = strlen(s);
@@ -550,6 +585,17 @@ int main(int argc, char *argv[])
         printf("%d ", *i);
     }
     printf("\n");
+
+    {
+        int arr[] = {1, 2, 3, 4};
+        int *ans = getProductArrayExceptSelf(arr, sizeof(arr) / sizeof(int));
+        printf("getProductArrayExceptSelf:");
+        for (int i = 0; i < sizeof(arr) / sizeof(int); i++)
+        {
+            printf(" %d", ans[i]);
+        }
+        printf("\n");
+    }
 
     char w[] = "Hello World";
     printf("lengthOfLastWord:%d\n", lengthOfLastWord(w));
