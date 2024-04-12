@@ -388,6 +388,7 @@ class RightView
     }
 };
 
+//https://www.naukri.com/code360/problems/left-view-of-a-binary-tree_920519?leftPanelTabValue=PROBLEM&count=25
 class LeftView
 {
   private:
@@ -1341,6 +1342,415 @@ class SumTree
     }
 };
 
+class ReverseLL
+{
+  private:
+    void reverse(Node *q, Node *p)
+    {
+        Node *cur = q, *pre = NULL;
+        while (cur != p)
+        {
+            Node *next = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = next;
+        }
+        cur->next = pre;
+    }
+
+  public:
+    Node *reverseLL(Node *head, int low, int high)
+    {
+        Node *q = head, *p = head;
+        for (int i = 0; i < high - low; i++)
+        {
+            p = p->next;
+        }
+        Node *pre = NULL;
+        for (int i = 1; i < low; i++)
+        {
+            pre = q;
+            q = q->next;
+            p = p->next;
+        }
+        Node *temp = p->next;
+        reverse(q, p);
+        q->next = temp;
+        if (pre)
+        {
+            pre->next = p;
+            return head;
+        }
+        else
+        {
+            return p;
+        }
+    }
+};
+
+//https://www.naukri.com/code360/problems/delete-node-in-ll_5881?count=25&search=linked&sort_entity=order&sort_order=ASC&leftPanelTabValue=PROBLEM&customSource=studio_nav&attempt_status=NOT_ATTEMPTED
+Node *deleteNode(Node *head, int pos)
+{
+    Node *cur = head, *pre = NULL;
+    while (pos > 0 && cur != NULL)
+    {
+        pre = cur;
+        cur = cur->next;
+        pos--;
+    }
+    if (cur == NULL)
+        return head;
+    else
+    {
+        if (pre == NULL)
+            return cur->next;
+        else
+        {
+            pre->next = cur->next;
+            return head;
+        }
+    }
+}
+
+int findNode(Node *head, int n)
+{
+    Node *p = head;
+    int i = 0;
+    while (p != NULL && p->data != n)
+    {
+        i++;
+        p = p->next;
+    }
+    return p == NULL ? -1 : i;
+}
+
+class DeletionInCircularLinkedList
+{
+  public:
+    Node *deleteNode(Node *head, int key)
+    {
+        if (head == NULL)
+            return NULL;
+        else if (head->next == head)
+        {
+            if (head->data == key)
+            {
+                delete head;
+                head = NULL;
+            }
+            return head;
+        }
+        else if (head->data == key)
+        {
+            Node *n = head;
+            for (; n->next != head; n = n->next)
+                ;
+            n->next = head->next;
+            delete head;
+            return n->next;
+        }
+        else
+        {
+            for (Node *pre = head, *p = head->next; p != head; pre = p, p = p->next)
+            {
+                if (p->data == key)
+                {
+                    pre->next = p->next;
+                    delete p;
+                    return head;
+                }
+            }
+            return head;
+        }
+    }
+};
+
+class MergeSortLinkedList
+{
+  private:
+    Node *splite(Node *head)
+    {
+        Node *fast = head, *slow = head, *pre = NULL;
+        while (fast != NULL)
+        {
+            fast = fast->next;
+            if (fast != NULL)
+            {
+                fast = fast->next;
+                pre = slow;
+                slow = slow->next;
+            }
+        }
+        if (pre != NULL)
+        {
+            pre->next = NULL;
+        }
+        return slow;
+    }
+
+    Node *merge(Node *a, Node *b)
+    {
+        if (a == NULL)
+            return b;
+        if (b == NULL)
+            return a;
+
+        if (a->data < b->data)
+        {
+            a->next = merge(a->next, b);
+            return a;
+        }
+        else
+        {
+            b->next = merge(a, b->next);
+            return b;
+        }
+    }
+
+  public:
+    Node *mergeSort(Node *head)
+    {
+        if (head == NULL || head->next == NULL)
+            return head;
+
+        Node *buttom = splite(head);
+        return merge(mergeSort(head), mergeSort(buttom));
+    }
+};
+
+Node *sortList(Node *head)
+{
+    int count[3] = {0};
+    Node *n = head;
+    for (; n != NULL; n = n->next)
+    {
+        count[n->data]++;
+    }
+    n = head;
+    for (int i = 0; i < 3; i++)
+    {
+        while (count[i]-- > 0)
+        {
+            n->data = i;
+            n = n->next;
+        }
+    }
+    return head;
+}
+
+//https://www.naukri.com/code360/problems/linked-list-to-binary-tree_981256?count=25&search=linked&sort_entity=order&sort_order=ASC&leftPanelTabValue=PROBLEM&customSource=studio_nav&attempt_status=NOT_ATTEMPTED&page=2
+BinaryTreeNode<int> *LLtoTree(Node *head)
+{
+    if (head == NULL)
+        return NULL;
+    queue<BinaryTreeNode<int> *> q;
+    Node *n = head;
+    BinaryTreeNode<int> *root = new BinaryTreeNode<int>(n->data);
+    n = n->next;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        BinaryTreeNode<int> *t = q.front();
+        q.pop();
+        if (n != NULL)
+        {
+            t->left = new BinaryTreeNode<int>(n->data);
+            n = n->next;
+            q.push(t->left);
+        }
+        if (n != NULL)
+        {
+            t->right = new BinaryTreeNode<int>(n->data);
+            n = n->next;
+            q.push(t->right);
+        }
+    }
+    return root;
+}
+
+//https://www.naukri.com/code360/problems/add-linked-lists_920495?count=25&search=add%20lin&sort_entity=order&sort_order=ASC&leftPanelTabValue=SUBMISSION&customSource=studio_nav&attempt_status=NOT_ATTEMPTED&page=1
+Node *addLL(Node *head1, Node *head2)
+{
+    stack<int> q1;
+    stack<int> q2;
+    while (head1 != NULL)
+    {
+        q1.push(head1->data);
+        head1 = head1->next;
+    }
+    while (head2 != NULL)
+    {
+        q2.push(head2->data);
+        head2 = head2->next;
+    }
+    Node *i = NULL;
+    int carry = 0;
+    while (q1.empty() == false && q2.empty() == false)
+    {
+        int t1 = q1.top();
+        q1.pop();
+        int t2 = q2.top();
+        q2.pop();
+        Node *j = new Node(t1 + t2 + carry);
+        if (j->data >= 10)
+        {
+            j->data %= 10;
+            carry = 1;
+        }
+        else
+        {
+            carry = 0;
+        }
+        j->next = i;
+        i = j;
+    }
+    while (q1.empty() == false)
+    {
+        int t = q1.top();
+        q1.pop();
+        Node *j = new Node(t + carry);
+        if (j->data >= 10)
+        {
+            j->data %= 10;
+            carry = 1;
+        }
+        else
+        {
+            carry = 0;
+        }
+        j->next = i;
+        i = j;
+    }
+    while (q2.empty() == false)
+    {
+        int t = q2.top();
+        q2.pop();
+        Node *j = new Node(t + carry);
+        if (j->data >= 10)
+        {
+            j->data %= 10;
+            carry = 1;
+        }
+        else
+        {
+            carry = 0;
+        }
+        j->next = i;
+        i = j;
+    }
+    if (carry == 1)
+    {
+        Node *j = new Node(1);
+        j->next = i;
+        i = j;
+    }
+    while (i->data == 0 && i->next != NULL)
+    {
+        i = i->next;
+    }
+    return i;
+}
+
+class QuickSortOnLinkedList
+{
+  private:
+    Node *getTail(Node *head)
+    {
+        while (head != NULL && head->next != NULL)
+        {
+            head = head->next;
+        }
+        return head;
+    }
+
+    Node *partition(Node *head, Node *tail)
+    {
+        Node *pi = head;
+        for (Node *j = head; j != tail; j = j->next)
+        {
+            if (j->data < tail->data)
+            {
+                swap(head->data, j->data);
+                pi = head;
+                head = head->next;
+            }
+        }
+        swap(head->data, tail->data);
+        return pi;
+    }
+
+    void quickSort(Node *head, Node *tail)
+    {
+        if (head == NULL || head == tail)
+            return;
+        Node *pi = partition(head, tail);
+        quickSort(head, pi);
+        quickSort(pi->next, tail);
+    }
+
+  public:
+    Node *quickSortLL(Node *head)
+    {
+        if (head != NULL && head->next != NULL)
+        {
+            quickSort(head, getTail(head));
+        }
+        return head;
+    }
+};
+
+vector<int> printLeftRightMostNodes(BinaryTreeNode<int> *root)
+{
+    vector<int> ans;
+    if (root == NULL)
+        return ans;
+    queue<BinaryTreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        int n = q.size();
+        for (int i = 0; i < n; i++)
+        {
+            BinaryTreeNode<int> *f = q.front();
+            q.pop();
+            if (i == 0 || i == n - 1)
+                ans.push_back(f->data);
+            if (f->left != NULL)
+                q.push(f->left);
+            if (f->right != NULL)
+                q.push(f->right);
+        }
+    }
+    return ans;
+}
+
+//https://www.naukri.com/code360/problems/count-subtrees_920526?count=25&search=subtree&sort_entity=order&sort_order=ASC&leftPanelTabValue=PROBLEM&customSource=studio_nav&page=1
+class CountSubtrees
+{
+  private:
+    bool getCount(BinaryTreeNode<int> *root, int low, int high, int &count)
+    {
+        if (root == NULL)
+            return true;
+        bool l = getCount(root->left, low, high, count);
+        bool r = getCount(root->right, low, high, count);
+        if (l & r & (low <= root->data && root->data <= high))
+        {
+            count++;
+            return true;
+        }
+        return false;
+    }
+
+  public:
+    int getCount(BinaryTreeNode<int> *root, int low, int high)
+    {
+        int count = 0;
+        getCount(root, low, high, count);
+        return count;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -1679,6 +2089,114 @@ int main(int argc, char *argv[])
             printf("%d ", i);
         }
         printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({1, 3, 2, 4, 6, 5});
+        ReverseLL r;
+        head = r.reverseLL(head, 2, 3);
+        printf("reverseLL:");
+        while (head != NULL)
+        {
+            printf(" %d", head->data);
+            head = head->next;
+        }
+        printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({3, 4, 5, 2, 6, 1, 9});
+        head = deleteNode(head, 3);
+        printf("deleteNode:");
+        while (head != NULL)
+        {
+            printf(" %d", head->data);
+            head = head->next;
+        }
+        printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({1, 2, 3, 4, 5});
+        Node *n = head;
+        while (n->next != NULL)
+        {
+            n = n->next;
+        }
+        n->next = head;
+        DeletionInCircularLinkedList del;
+        head = del.deleteNode(head, 3);
+        printf("deleteNode: %d",head->data);
+        for (Node *n = head->next; n != head; n = n->next)
+        {
+            printf(" %d", n->data);
+        }
+        printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({10, 9, 8, 7, 6, 5, 4, 3});
+        MergeSortLinkedList m;
+        head = m.mergeSort(head);
+        printf("MergeSort Linked List:");
+        while (head != NULL)
+        {
+            printf(" %d", head->data);
+            head = head->next;
+        }
+        printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({1, 0, 2, 1, 0, 2, 1});
+        head = sortList(head);
+        printf("Sort linked list of 0s 1s 2s:");
+        for (Node *n = head; n != NULL; n = n->next)
+        {
+            printf(" %d", n->data);
+        }
+        printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({1, 2, 3, 4, 5, 6});
+        BinaryTreeNode<int> *root = LLtoTree(head);
+        printf("Linked List to binary Tree:");
+        BinaryTreeNode<int>::preorder(root);
+        printf("\n");
+    }
+    {
+        Node *head1 = Node::newLinkList({0, 0, 0, 1, 0, 0, 0, 0});
+        Node *head2 = Node::newLinkList({5, 5, 1, 7, 1, 1, 5, 2, 7, 6, 1, 4});
+        Node *head = addLL(head1, head2);
+        printf("addLL:");
+        while (head != NULL)
+        {
+            printf(" %d", head->data);
+            head = head->next;
+        }
+        printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({5, 4, 3, 2, 1});
+        QuickSortOnLinkedList q;
+        head = q.quickSortLL(head);
+        printf("Quick Sort on Linked List:");
+        while (head != NULL)
+        {
+            printf(" %d", head->data);
+            head = head->next;
+        }
+        printf("\n");
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree({1, 2, 3, 4, 5, 6}, 0);
+        vector<int> ans = printLeftRightMostNodes(root);
+        printf("Leftmost & Rightmost Nodes of Binary Tree:");
+        for (int i = 0; i < ans.size(); i++)
+        {
+            printf(" %d", ans[i]);
+        }
+        printf("\n");
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree({40, 30, 50, 20, 35}, 0);
+        CountSubtrees c;
+        printf("Count Subtrees:%d\n", c.getCount(root, 15, 32));
     }
     return 0;
 }
