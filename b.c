@@ -63,15 +63,15 @@ int minSubArrayLen(int target, int *nums, int numsSize)
 
 int removeDuplicates(int *nums, int numsSize)
 {
-    int *p = nums + 1;
-    int *q = p;
-    while (q < nums + numsSize)
+    int *q = nums + 1;
+    int *p = q;
+    while (p < nums + numsSize)
     {
-        *p = *q;
+        *q = *p;
         int same = 0;
-        for (int *i = nums; i < p; i++)
+        for (int *i = nums; i < q; i++)
         {
-            if (*i == *p)
+            if (*i == *q)
             {
                 same = 1;
                 break;
@@ -79,11 +79,27 @@ int removeDuplicates(int *nums, int numsSize)
         }
         if (same == 0)
         {
-            p++;
+            q++;
         }
-        q++;
+        p++;
     }
-    return p - nums;
+    return q - nums;
+}
+
+//https://www.naukri.com/code360/problems/find-duplicate_625160
+//contains numbers from 0 to (N - 2)
+int duplicateNumber(int *arr, int size)
+{
+    int dup = 0;
+    for (int i = 0; i < size; i++)
+    {
+        if (i != size - 1)
+        {
+            dup ^= i;
+        }
+        dup ^= arr[i];
+    }
+    return dup;
 }
 
 void rotate(int *nums, int numsSize, int k)
@@ -668,6 +684,11 @@ int main(int argc, char *argv[])
     {
         int arr[] = {3, 5, 9, 21, 35};
         printf("searchInsert:%d\n", searchInsert(arr, sizeof(arr) / sizeof(int), 8));
+    }
+    {
+        //constraint of topic: if size 7, value must 0~5, and have one duplicate
+        int arr[] = {0, 3, 1, 5, 4, 3, 2};
+        printf("Find Duplicate:%d\n", duplicateNumber(arr, sizeof(arr) / sizeof(int)));
     }
     return 0;
 }

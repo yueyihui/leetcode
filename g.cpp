@@ -106,7 +106,50 @@ class BinaryTreeNode
         root->right = buildTree(arr, 2 * i + 2);
         return root;
     }
+    static BinaryTreeNode<T> *buildTree1(vector<int> &arr)
+    {
+        return NULL;
+    }
+    static BinaryTreeNode<T> *buildTree1(vector<int> &&arr)
+    {
+        int i = 0;
+        BinaryTreeNode *root = new BinaryTreeNode(arr[i++]);
+        queue<BinaryTreeNode<T> *> q;
+        q.push(root);
+        while (q.empty() == false && i < arr.size())
+        {
+            BinaryTreeNode<T> *temp = q.front();
+            q.pop();
+            if (arr[i] != -1)
+            {
+                temp->left = new BinaryTreeNode<int>(arr[i++]);
+                q.push(temp->left);
+            }
+            else
+            {
+                i++;
+            }
+            if (arr[i] != -1)
+            {
+                temp->right = new BinaryTreeNode<int>(arr[i++]);
+                q.push(temp->right);
+            }
+            else
+            {
+                i++;
+            }
+        }
+        return root;
+    }
     static void preorder(BinaryTreeNode<T> *root);
+    void preorder()
+    {
+        printf(" %d", data);
+        if (this->left != NULL)
+            this->left->preorder();
+        if (this->right != NULL)
+            this->right->preorder();
+    }
 };
 
 template <typename T>
@@ -805,6 +848,51 @@ vector<int> spiralPathMatrix(vector<vector<int>> matrix, int n, int m)
     return ans;
 }
 
+//https://www.naukri.com/code360/problems/spiral-matrix_800309
+vector<long> spiralPathMatrix(vector<vector<long>> matrix, long n, long m)
+{
+    vector<long> ans;
+    int left = 0, right = m - 1, top = 0, bottom = n - 1;
+    int dir = 0;
+    while (left <= right && top <= bottom)
+    {
+        if (dir == 0)
+        {
+            for (int i = left; i <= right; i++)
+            {
+                ans.push_back(matrix[top][i]);
+            }
+            top++;
+        }
+        else if (dir == 1)
+        {
+            for (int i = top; i <= bottom; i++)
+            {
+                ans.push_back(matrix[i][right]);
+            }
+            right--;
+        }
+        else if (dir == 2)
+        {
+            for (int i = right; i >= left; i--)
+            {
+                ans.push_back(matrix[bottom][i]);
+            }
+            bottom--;
+        }
+        else if (dir == 3)
+        {
+            for (int i = bottom; i >= top; i--)
+            {
+                ans.push_back(matrix[i][left]);
+            }
+            left++;
+        }
+        dir = (dir + 1) % 4;
+    }
+    return ans;
+}
+
 //https://www.codingninjas.com/studio/problems/sorted-linked-list-to-balanced-bst_842564?interviewProblemRedirection=true&count=25
 class Sorted_Linked_List_to_Balanced_BST
 {
@@ -1032,6 +1120,7 @@ bool findBinaryTreeNode(BinaryTreeNode<int> *root, int data)
         return findBinaryTreeNode(root->left, data) || findBinaryTreeNode(root->right, data);
 }
 
+//https://www.naukri.com/code360/problems/range-sum-of-bst_1262280
 int rangeSum(TreeNode<int> *root, int low, int high)
 {
     if (root == NULL)
@@ -1724,7 +1813,8 @@ vector<int> printLeftRightMostNodes(BinaryTreeNode<int> *root)
     return ans;
 }
 
-//https://www.naukri.com/code360/problems/count-subtrees_920526?count=25&search=subtree&sort_entity=order&sort_order=ASC&leftPanelTabValue=PROBLEM&customSource=studio_nav&page=1
+//https://www.naukri.com/code360/problems/count-subtrees_920526
+//Cisco rangeSum
 class CountSubtrees
 {
   private:
@@ -1750,6 +1840,315 @@ class CountSubtrees
         return count;
     }
 };
+
+//https://www.naukri.com/code360/problems/convert-binary-tree-to-mirror-tree_873140
+class MirrorTree
+{
+  private:
+    BinaryTreeNode<int> *mirror(BinaryTreeNode<int> *root)
+    {
+        if (root == NULL || (root->left == NULL && root->right == NULL))
+            return root;
+
+        BinaryTreeNode<int> *temp = root->right;
+        root->right = mirror(root->left);
+        root->left = mirror(temp);
+        return root;
+    }
+
+  public:
+    void mirrorTree(BinaryTreeNode<int> *root)
+    {
+        if (root == NULL)
+            return;
+        root = mirror(root);
+    }
+};
+
+//https://www.naukri.com/code360/problems/isomorphic-trees_794946
+bool checkTree(BinaryTreeNode<int> *tree1, BinaryTreeNode<int> *tree2)
+{
+    if (tree1 == NULL && tree2 == NULL)
+        return true;
+    if (tree1 == NULL || tree2 == NULL)
+        return false;
+    if (tree1->data != tree2->data)
+        return false;
+    return checkTree(tree1->left, tree2->left) && checkTree(tree1->right, tree2->right) ||
+           checkTree(tree1->left, tree2->right) && checkTree(tree1->right, tree2->left);
+}
+
+//https://www.naukri.com/code360/problems/binary-tree-to-bst_893074
+//Note: The conversion must be done in such a way that keeps the original structure of the Binary Tree.
+class BinaryTreeToBST
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, deque<int> &arr)
+    {
+        if (root == NULL)
+            return;
+        arr.push_back(root->data);
+        preorder(root->left, arr);
+        preorder(root->right, arr);
+    }
+
+    void inorder(BinaryTreeNode<int> *root, deque<int> &arr)
+    {
+        if (root == NULL)
+            return;
+        inorder(root->left, arr);
+        root->data = arr.front();
+        arr.pop_front();
+        inorder(root->right, arr);
+    }
+
+  public:
+    BinaryTreeNode<int> *binaryTreeToBst(BinaryTreeNode<int> *root)
+    {
+        deque<int> arr;
+        preorder(root, arr);
+        sort(arr.begin(), arr.end());
+        inorder(root, arr);
+        return root;
+    }
+};
+
+//https://www.naukri.com/code360/problems/spiral-order-traversal-of-a-binary-tree_630521
+vector<int> spiralOrder(BinaryTreeNode<int> *root)
+{
+    vector<int> ans;
+    if (root == NULL)
+        return ans;
+    stack<BinaryTreeNode<int> *> s1, s2;
+    s1.push(root);
+    while (s1.empty() == false || s2.empty() == false)
+    {
+        while (s1.empty() == false)
+        {
+            BinaryTreeNode<int> *temp = s1.top();
+            s1.pop();
+            ans.push_back(temp->data);
+            if (temp->left != NULL)
+            {
+                s2.push(temp->left);
+            }
+            if (temp->right != NULL)
+            {
+                s2.push(temp->right);
+            }
+        }
+        while (s2.empty() == false)
+        {
+            BinaryTreeNode<int> *temp = s2.top();
+            s2.pop();
+            ans.push_back(temp->data);
+            if (temp->right != NULL)
+            {
+                s1.push(temp->right);
+            }
+            if (temp->left != NULL)
+            {
+                s1.push(temp->left);
+            }
+        }
+    }
+    return ans;
+}
+
+//https://www.naukri.com/code360/problems/sum-of-k-smallest-elements-in-bst_920525
+class SumOfKSmallestElementsInBST
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, vector<int> &small, const int k)
+    {
+        if (root == NULL)
+        {
+            return;
+        }
+        preorder(root->left, small, k);
+        if (small.size() < k)
+            small.push_back(root->data);
+        preorder(root->right, small, k);
+    }
+
+  public:
+    long ksmallestElementSum(BinaryTreeNode<int> *root, int k)
+    {
+        vector<int> small;
+        preorder(root, small, k);
+        long sum = 0;
+        for (int i : small)
+        {
+            sum += i;
+        }
+        return sum;
+    }
+};
+
+//https://www.naukri.com/code360/problems/elements-in-two-bsts_981278
+//2 vector merge sort
+class ElementsInTwoBSTs
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, vector<int> &res)
+    {
+        if (root == NULL)
+            return;
+        preorder(root->left, res);
+        res.push_back(root->data);
+        preorder(root->right, res);
+    }
+
+  public:
+    vector<int> allElements(BinaryTreeNode<int> *root1, BinaryTreeNode<int> *root2)
+    {
+        vector<int> a;
+        preorder(root1, a);
+        vector<int> b;
+        preorder(root2, b);
+
+        vector<int> res;
+        int i = 0, j = 0;
+        while (i < a.size() && j < b.size())
+        {
+            if (a[i] < b[j])
+            {
+                res.push_back(a[i++]);
+            }
+            else
+            {
+                res.push_back(b[j++]);
+            }
+        }
+        while (i < a.size())
+        {
+            res.push_back(a[i++]);
+        }
+        while (j < b.size())
+        {
+            res.push_back(b[j++]);
+        }
+        return res;
+    }
+};
+
+//https://www.naukri.com/code360/problems/tree-symmetricity_630426
+class SymmetricTree
+{
+  private:
+    bool mirror(BinaryTreeNode<int> *root1, BinaryTreeNode<int> *root2)
+    {
+        if (root1 == NULL && root2 == NULL)
+            return true;
+        if (root1 == NULL || root2 == NULL)
+            return false;
+        if (root1->data == root2->data)
+        {
+            return mirror(root1->left, root2->right) &&
+                   mirror(root1->right, root2->left);
+        }
+        else
+            return false;
+    }
+
+  public:
+    bool isSymmetric(BinaryTreeNode<int> *root)
+    {
+        if (root == NULL)
+            return true;
+        else
+            return mirror(root->left, root->right);
+    }
+};
+
+
+//https://www.naukri.com/code360/problems/multiply-linked-lists_983603
+class MultiplyLinkedLists
+{
+  private:
+    //https://www.tutorialspoint.com/multiply-strings-in-cplusplus
+    string multiplyStr(string s1, string s2)
+    {
+        int n = s1.size();
+        int m = s2.size();
+        string ans(n + m, '0');
+        for (int i = n - 1; i >= 0; i--)
+        {
+            for (int j = m - 1; j >= 0; j--)
+            {
+                int p = (s1[i] - '0') * (s2[j] - '0') + (ans[i + j + 1] - '0');
+                ans[i + j + 1] = p % 10 + '0';
+                ans[i + j] += p / 10;
+            }
+        }
+        for (int i = 0; i < m + n; i++)
+        {
+            if (ans[i] != '0')
+                return ans.substr(i);
+        }
+        return "0";
+    }
+
+    Node *str2LL(string s)
+    {
+        Node *head = new Node(s[0] - '0');
+        Node *n = head;
+        for (int i = 1; i < s.length(); i++)
+        {
+            n->next = new Node(s[i] - '0');
+            n = n->next;
+        }
+        return head;
+    }
+
+  public:
+    Node *multiplyLL(Node *head1, Node *head2)
+    {
+        string s1;
+        while (head1 != NULL)
+        {
+            s1 += std::to_string(head1->data);
+            head1 = head1->next;
+        }
+        string s2;
+        while (head2 != NULL)
+        {
+            s2 += std::to_string(head2->data);
+            head2 = head2->next;
+        }
+        string s = multiplyStr(s1, s2);
+        return str2LL(s);
+    }
+};
+
+//https://www.naukri.com/code360/problems/detect-and-remove-cycle_920523
+bool detectAndRemoveCycle(Node *head)
+{
+    Node *fast = head, *slow = head, *pre = NULL;
+    while (fast != NULL)
+    {
+        fast = fast->next;
+        if (fast != NULL)
+        {
+            fast = fast->next;
+            pre = slow;
+            slow = slow->next;
+        }
+        if (slow == fast)
+        {
+            fast = head;
+            while (fast != slow)
+            {
+                fast = fast->next;
+                pre = slow;
+                slow = slow->next;
+            }
+            pre->next = NULL;
+            return true;
+        }
+    }
+    return false;
+}
 
 int main(int argc, char *argv[])
 {
@@ -2197,6 +2596,107 @@ int main(int argc, char *argv[])
         BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree({40, 30, 50, 20, 35}, 0);
         CountSubtrees c;
         printf("Count Subtrees:%d\n", c.getCount(root, 15, 32));
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree({0, 1, 2}, 0);
+        MirrorTree m;
+        m.mirrorTree(root);
+        printf("Convert binary tree to mirror tree:");
+        BinaryTreeNode<int>::preorder(root);
+        printf("\n");
+    }
+    {
+        BinaryTreeNode<int> *root1 = BinaryTreeNode<int>::buildTree({1, 2, 3, 4}, 0);
+        BinaryTreeNode<int> *root2 = BinaryTreeNode<int>::buildTree({1, 2, 4, 3}, 0);
+        std::cout << "Isomorphic Trees:" << checkTree(root1, root2) << std::endl;
+    }
+    {
+        BinaryTreeNode<int> *root1 = BinaryTreeNode<int>::buildTree({1, 2, 3, 4}, 0);
+        BinaryTreeNode<int> *root2 = BinaryTreeNode<int>::buildTree({1, 3, 2, 4}, 0);
+        std::cout << "Isomorphic Trees:" << checkTree(root1, root2) << std::endl;
+    }
+    {
+        BinaryTreeNode<int> *root1 = BinaryTreeNode<int>::buildTree1({1, 2, 3, 4, -1, -1, -1, -1, -1});
+        BinaryTreeNode<int> *root2 = BinaryTreeNode<int>::buildTree1({1, 3, 2, -1, -1, -1, 4, -1, -1});
+        std::cout << "Isomorphic Trees:" << checkTree(root1, root2) << std::endl;
+    }
+    {
+        BinaryTreeNode<int> *root1 = BinaryTreeNode<int>::buildTree1({1, 2, 3, 4, -1, -1, -1, -1, -1});
+        BinaryTreeNode<int> *root2 = BinaryTreeNode<int>::buildTree1({1, 3, 2, -1, -1, 4, -1, -1, -1});
+        std::cout << "Isomorphic Trees:" << checkTree(root1, root2) << std::endl;
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree1({5, 6, 10, 2, 3, -1, 9, -1, -1, -1, -1, -1, -1});
+        BinaryTreeToBST b;
+        root = b.binaryTreeToBst(root);
+        printf("Binary Tree To BST:");
+        root->preorder();
+        printf("\n");
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree1({1, 2, 3, -1, -1, 4, 5, -1, -1, -1, -1});
+        vector<int> ans = spiralOrder(root);
+        printf("Spiral Order Traversal of a Binary Tree:");
+        for (int i : ans)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree1({8, 4, 12, 1, 6, -1, -1, -1, -1, -1, 7, -1, -1});
+        SumOfKSmallestElementsInBST s;
+        printf("Sum Of K Smallest Elements In BST: %ld\n", s.ksmallestElementSum(root, 4));
+    }
+    {
+        BinaryTreeNode<int> *root1 = BinaryTreeNode<int>::buildTree1({10, 5, 16, 2, 7, -1, 20, -1, -1, -1, -1, -1, -1});
+        BinaryTreeNode<int> *root2 = BinaryTreeNode<int>::buildTree1({10, 7, 16, 2, -1, -1, 20, -1, -1, -1, -1});
+        ElementsInTwoBSTs e;
+        vector<int> res = e.allElements(root1, root2);
+        printf("Elements In Two BSTs:");
+        for (int i : res)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree1({1, 2, 2, 3, 4, 4, 3, -1, -1, -1, -1, -1, -1, -1, -1});
+        SymmetricTree s;
+        std::cout << "Symmetric Tree:" << s.isSymmetric(root) << std::endl;
+    }
+    {
+        Node *head1 = Node::newLinkList({1, 5, 4});
+        Node *head2 = Node::newLinkList({3, 6, 4});
+        MultiplyLinkedLists m;
+        Node *head = m.multiplyLL(head1, head2);
+        printf("Multiply Linked Lists:");
+        while (head != NULL)
+        {
+            printf("%d", head->data);
+            head = head->next;
+        }
+        printf("\n");
+    }
+    {
+        vector<vector<long>> matrix = {{1, 2, 3, 4}, {10, 11, 12, 5}, {9, 8, 7, 6}};
+        vector<long> ans = spiralPathMatrix(matrix, 3, 4);
+        printf("Spiral Matrix:");
+        for (auto i : ans)
+        {
+            printf(" %ld", i);
+        }
+        printf("\n");
+    }
+    {
+        Node *head = Node::newLinkList({1, 2, 3});
+        Node *p = head;
+        while (p->next != NULL)
+        {
+            p = p->next;
+        }
+        p->next = head;
+        std::cout << "Detect And Remove Cycle:" << detectAndRemoveCycle(head) << std::endl;
     }
     return 0;
 }

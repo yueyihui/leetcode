@@ -583,6 +583,37 @@ void quickSort(int arr[], int l, int r)
     }
 }
 
+//https://www.naukri.com/code360/problems/set-k-bits_972999
+int setKBits(int n, int k)
+{
+    int set = 1;
+    for (int i = 0; i < k; i++)
+    {
+        n |= set;
+        set <<= 1;
+    }
+    return n;
+}
+
+//https://www.naukri.com/code360/problems/remove-character_624477
+void removeAllOccurrencesOfChar(char input[], char c)
+{
+    int i = 0;
+    for (int j = 0; j < strlen(input); j++)
+    {
+        if (input[j] == c)
+        {
+            continue;
+        }
+        input[i] = input[j];
+        i++;
+    }
+    for (int j = i; j < strlen(input); j++)
+    {
+        input[i] = 0;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -713,6 +744,14 @@ int main(int argc, char *argv[])
         }
         printf("\n");
     }
-
+    {
+        printf("Set K Bits:%d\n", setKBits(5, 2));
+        printf("Set K Bits:%d\n", setKBits(16, 3));
+    }
+    {
+        char input[] = "aabccbaa";
+        removeAllOccurrencesOfChar(input, 'a');
+        printf("Remove character:%s\n", input);
+    }
     return 0;
 }

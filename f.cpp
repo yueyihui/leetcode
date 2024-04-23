@@ -752,6 +752,22 @@ int lcs2(string s, string t)
     return count[s.length()][t.length()];
 }
 
+//https://www.geeksforgeeks.org/maximum-sum-such-that-no-two-elements-are-adjacent/
+//https://www.naukri.com/code360/problems/maximum-sum-of-non-adjacent-elements_843261
+int maximumNonAdjacentSum(vector<int> &nums)
+{
+    int n = nums.size();
+    int dp[n][2] = {{0}};
+    dp[0][0] = 0;
+    dp[0][1] = nums[0];
+    for (int i = 1; i < n; i++)
+    {
+        dp[i][1] = dp[i - 1][0] + nums[i];
+        dp[i][0] = max(dp[i - 1][0], dp[i - 1][1]);
+    }
+    return max(dp[n - 1][0], dp[n - 1][1]);
+}
+
 //https://www.codingninjas.com/studio/problems/minimum-path-sum_985349?interviewProblemRedirection=true&leftPanelTabValue=SUBMISSION&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=2
 int minSumPath(vector<vector<int>> &grid)
 {
@@ -1191,6 +1207,272 @@ class Set_Matrix_Zeros
     }
 };
 
+//https://www.naukri.com/code360/problems/matrix-flip-bit_920503
+//Matrix Flip
+int countFlip(vector<vector<int>> &mat)
+{
+    int n = mat.size();
+    vector<bool> row(n, false), col(n, false);
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (mat[i][j] == 0)
+            {
+                row[i] = true;
+                col[j] = true;
+            }
+        }
+    }
+    int count = 0;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (row[i] || col[j])
+            {
+                if (mat[i][j] == 1)
+                {
+                    count++;
+                }
+            }
+        }
+    }
+    return count;
+}
+
+//https://www.naukri.com/code360/problems/kth-largest-element_796007
+class KthLargestElement
+{
+  private:
+    void heapify(vector<int> &arr, int N, int i)
+    {
+        int max = i;
+        int l = 2 * i + 1;
+        int r = 2 * i + 2;
+        if (l < N && arr[l] > arr[max])
+            max = l;
+        if (r < N && arr[r] > arr[max])
+            max = r;
+        if (max != i)
+        {
+            swap(arr[i], arr[max]);
+            heapify(arr, N, max);
+        }
+    }
+    void heapSort(vector<int> &arr)
+    {
+        for (int i = arr.size() / 2 - 1; i >= 0; i--)
+        {
+            heapify(arr, arr.size(), i);
+        }
+        for (int i = arr.size() - 1; i >= 0; i--)
+        {
+            swap(arr[0], arr[i]);
+            heapify(arr, i, 0);
+        }
+    }
+
+  public:
+    int findKthLargest(vector<int> &nums, int k)
+    {
+        heapSort(nums);
+        return nums[nums.size() - k];
+    }
+};
+
+class ConsecutiveElements
+{
+  private:
+    int partition(vector<int> &arr, int l, int r)
+    {
+        int pivot = r;
+        int i = l - 1;
+        for (int j = l; j < r; j++)
+        {
+            if (arr[j] <= arr[pivot])
+            {
+                i++;
+                swap(arr[i], arr[j]);
+            }
+        }
+        i++;
+        swap(arr[i], arr[pivot]);
+        return i;
+    }
+
+    void quickSort(vector<int> &arr, int l, int r)
+    {
+        if (l < r)
+        {
+            int pi = partition(arr, l, r);
+            quickSort(arr, l, pi - 1);
+            quickSort(arr, pi + 1, r);
+        }
+    }
+
+  public:
+    bool isConsecutive(vector<int> &arr, int n)
+    {
+        quickSort(arr, 0, n - 1);
+        for (int i = 1; i < n; i++)
+        {
+            if (arr[i - 1] + 1 != arr[i])
+                return false;
+        }
+        return true;
+    }
+};
+
+//https://www.naukri.com/code360/problems/consecutive-elements_795127
+bool isConsecutive(vector<int> &arr, int n)
+{
+    int minElem = INT_MAX;
+    for (int i = 0; i < n; i++)
+    {
+        minElem = min(minElem, arr[i]);
+    }
+    int expect = 0;
+    int actual = 0;
+    for (int i = 0; i < n; i++)
+    {
+        expect += minElem + i;
+        actual += arr[i];
+    }
+    return expect == actual;
+}
+
+//https://www.naukri.com/code360/problems/fourth-largest-element-in-the-array_630422
+int getFourthLargest(int arr[], int n)
+{
+    priority_queue<int, vector<int>, greater<int>> q;
+    for (int i = 0; i < n; i++)
+    {
+        if (q.size() == 4)
+        {
+            if (arr[i] > q.top())
+            {
+                q.pop();
+                q.push(arr[i]);
+            }
+        }
+        else
+            q.push(arr[i]);
+    }
+    if (q.size() < 4)
+        return INT_MIN;
+    else
+        return q.top();
+}
+
+//https://www.naukri.com/code360/problems/kth-largest-element-in-the-unsorted-array_893030
+int kthLargest(vector<int> &arr, int size, int K)
+{
+    priority_queue<int, vector<int>, greater<int>> q;
+    for (int i = 0; i < arr.size(); i++)
+    {
+        if (q.size() == K)
+        {
+            if (arr[i] > q.top())
+            {
+                q.pop();
+                q.push(arr[i]);
+            }
+        }
+        else
+            q.push(arr[i]);
+    }
+    return q.top();
+}
+
+//https://www.naukri.com/code360/problems/count-distinct-element-in-every-k-size-window_920336
+vector<int> countDistinctElements(vector<int> &arr, int k)
+{
+    vector<int> ans;
+    unordered_map<int, int> m;
+    for (int i = 0; i < k; i++)
+    {
+        auto iter = m.find(arr[i]);
+        if (iter == m.end())
+        {
+            m.insert({arr[i], 1});
+        }
+        else
+            iter->second++;
+    }
+    ans.push_back(m.size());
+    int back = 0;
+    auto iter = m.find(arr[back++]);
+    if (iter->second > 1)
+        iter->second--;
+    else
+    {
+        m.erase(iter);
+    }
+    for (int i = k; i < arr.size(); i++)
+    {
+        auto iter = m.find(arr[i]);
+        if (iter == m.end())
+        {
+            m.insert({arr[i], 1});
+        }
+        else
+        {
+            iter->second++;
+        }
+        ans.push_back(m.size());
+        iter = m.find(arr[back++]);
+        if (iter->second > 1)
+            iter->second--;
+        else
+        {
+            m.erase(iter);
+        }
+    }
+    return ans;
+}
+
+//https://www.naukri.com/code360/problems/dfs-traversal_630462
+class DFS
+{
+  private:
+    void dfs(vector<vector<int>> &graph, vector<bool> &visited, const int i, vector<int> &res)
+    {
+        visited[i] = true;
+        res.push_back(i);
+        for (int j = 0; j < graph[i].size(); j++)
+        {
+            if (visited[graph[i][j]] == false)
+            {
+                dfs(graph, visited, graph[i][j], res);
+            }
+        }
+    }
+
+  public:
+    vector<vector<int>> depthFirstSearch(int V, int E, vector<vector<int>> &edges)
+    {
+        vector<vector<int>> graph(V);
+        for (int e = 0; e < E; e++)
+        {
+            graph[edges[e][0]].push_back(edges[e][1]);
+            graph[edges[e][1]].push_back(edges[e][0]);
+        }
+        vector<vector<int>> ans;
+        vector<bool> visited(V, false);
+        for (int i = 0; i < V; i++)
+        {
+            if (visited[i] == false)
+            {
+                vector<int> res;
+                dfs(graph, visited, i, res);
+                ans.push_back(res);
+            }
+        }
+        return ans;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;
@@ -1417,6 +1699,70 @@ int main(int argc, char *argv[])
             }
             printf("\n");
         }
+    }
+    {
+        vector<int> nums = {1, 5, 10, 100, 10, 5};
+        printf("Maximum sum of non-adjacent elements:%d\n", maximumNonAdjacentSum(nums));
+    }
+    {
+        vector<int> nums = {3, 4, 6, 9, 5, 1, 7, 8};
+        KthLargestElement k;
+        printf("Kth largest element:%d\n", k.findKthLargest(nums, 4));
+    }
+    {
+        vector<int> arr = {3, 1, 2, 4};
+        ConsecutiveElements c;
+        printf("Consecutive elements:%d\n", c.isConsecutive(arr, arr.size()));
+    }
+    {
+        vector<int> arr = {3, 4, 5, 6, 7};
+        printf("Consecutive elements:%d\n", isConsecutive(arr, arr.size()));
+    }
+    {
+        int arr[] = {3, 5, 1, 3, 1, 6, 2, 7};
+        printf("Fourth Largest Element in the Array:%d\n", getFourthLargest(arr, sizeof(arr) / sizeof(int)));
+    }
+    {
+        vector<int> arr = {3, 5, 1, 3, 1, 6, 2, 7};
+        printf("Kth largest element in the unsorted array:%d\n", kthLargest(arr, arr.size(), 4));
+    }
+    {
+        vector<int> arr = {1, 2, 1, 3, 4, 2, 3};
+        vector<int> ans = countDistinctElements(arr, 3);
+        printf("Count Distinct Element in Every K Size Window:");
+        for (int i : ans)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
+    }
+    {
+        vector<vector<int>> mat = {{1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
+        printf("Matrix Flip Bit:%d\n", countFlip(mat));
+    }
+    {
+        vector<vector<int>> edges = {
+            {1, 0},
+            {2, 0},
+            {3, 0},
+            {4, 0},
+            {5, 0},
+            {6, 0},
+            {7, 0},
+            {8, 0},
+            {9, 0},
+        };
+        DFS dfs;
+        vector<vector<int>> ans = dfs.depthFirstSearch(10, 9, edges);
+        printf("DFS Traversal:");
+        for (auto i : ans)
+        {
+            for (auto j : i)
+            {
+                printf(" %d", j);
+            }
+        }
+        printf("\n");
     }
     return 0;
 }

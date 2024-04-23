@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include <ios>
+#include <unordered_map>
 using namespace std;
 
 template <typename T>
@@ -44,6 +44,41 @@ class TreeNode
         TreeNode<T> *root = new TreeNode<T>(arr[i]);
         root->left = buildTree(arr, 2 * i + 1);
         root->right = buildTree(arr, 2 * i + 2);
+        return root;
+    }
+    static TreeNode<T> *buildTree1(vector<T> &arr)
+    {
+        return NULL;
+    }
+    static TreeNode<T> *buildTree1(vector<T> &&arr)
+    {
+        int i = 0;
+        TreeNode<int> *root = new TreeNode<int>(arr[i++]);
+        queue<TreeNode<T> *> q;
+        q.push(root);
+        while (q.empty() == false && i < arr.size())
+        {
+            TreeNode<int> *temp = q.front();
+            q.pop();
+            if (arr[i] != -1)
+            {
+                temp->left = new TreeNode<int>(arr[i++]);
+                q.push(temp->left);
+            }
+            else
+            {
+                i++;
+            }
+            if (arr[i] != -1)
+            {
+                temp->right = new TreeNode<int>(arr[i++]);
+                q.push(temp->right);
+            }
+            else
+            {
+                i++;
+            }
+        }
         return root;
     }
 };
@@ -232,7 +267,7 @@ class LargestTreeValue
     }
 };
 
-//https://www.codingninjas.com/studio/problems/inplace-rotate-matrix-90-degree_839734?interviewProblemRedirection=true&count=25
+//https://www.codingninjas.com/studio/problems/inplace-rotate-matrix-90-degree_839734
 void inplaceRotate(vector<vector<int>> &inputArray)
 {
     int n = inputArray.size();
@@ -250,6 +285,21 @@ void inplaceRotate(vector<vector<int>> &inputArray)
             swap(inputArray[j][i], inputArray[n - 1 - j][i]);
         }
     }
+}
+
+//https://www.naukri.com/code360/problems/matrix-is-symmetric_799361
+bool isMatrixSymmetric(vector<vector<int>> matrix)
+{
+    int n = matrix.size();
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = i; j < n; j++)
+        {
+            if (matrix[i][j] != matrix[j][i])
+                return false;
+        }
+    }
+    return true;
 }
 
 class IsItTree
@@ -749,6 +799,151 @@ vector<int> bfsTraversal(int n, vector<vector<int>> &adj)
     return ans;
 }
 
+//https://www.naukri.com/code360/problems/detect-cycle-in-a-directed-graph_1542162
+class DetectCycleDirectedGraph
+{
+  private:
+    bool dfs(vector<vector<int>> &adj, vector<bool> &visited, vector<bool> &trace, int i)
+    {
+        trace[i] = true;
+        visited[i] = true;
+        for (int j = 0; j < adj[i].size(); j++)
+        {
+            if (visited[adj[i][j]] == false)
+            {
+                if (dfs(adj, visited, trace, adj[i][j]))
+                    return true;
+            }
+            else if (trace[adj[i][j]])
+                return true;
+        }
+        trace[i] = false;
+        return false;
+    }
+
+  public:
+    bool isCyclic(vector<vector<int>> &edges, int v, int e)
+    {
+        vector<bool> visited(v, false);
+        vector<bool> trace(v, false);
+        vector<vector<int>> adj(v, vector<int>());
+        for (int i = 0; i < e; i++)
+        {
+            adj[edges[i][0]].push_back(edges[i][1]);
+        }
+        for (int i = 0; i < v; i++)
+        {
+            if (visited[i] == false)
+                if (dfs(adj, visited, trace, i))
+                    return true;
+        }
+        return false;
+    }
+};
+
+//https://www.naukri.com/code360/problems/minimum-depth-in-a-binary-tree_696332
+int minDepth(TreeNode<int> *root)
+{
+    if (root == NULL)
+        return 0;
+    if (root->left == NULL && root->right == NULL)
+    {
+        return 1;
+    }
+    if (root->left == NULL)
+    {
+        return minDepth(root->right) + 1;
+    }
+    else if (root->right == NULL)
+    {
+        return minDepth(root->left) + 1;
+    }
+    else
+    {
+        int a = minDepth(root->left);
+        int b = minDepth(root->right);
+        return a < b ? a + 1 : b + 1;
+    }
+}
+
+vector<string> findCommonElements(string arr1[], string arr2[], int n, int m)
+{
+    vector<string> ans;
+    unordered_map<string, int> counter;
+    for (int i = 0; i < n; i++)
+    {
+        counter[arr1[i]]++;
+    }
+    for (int i = 0; i < m; i++)
+    {
+        unordered_map<string, int>::iterator iter = counter.find(arr2[i]);
+        if (iter != counter.end() && iter->second > 0)
+        {
+            ans.push_back(iter->first);
+            iter->second--;
+        }
+    }
+    return ans;
+}
+
+//https://www.naukri.com/code360/problems/swap-and-maximise_1164405
+//sum of the absolute difference
+//maxAbsSum
+int maxSum(vector<int> &arr, int n)
+{
+    sort(arr.begin(), arr.end());
+    int l = 0, r = n - 1;
+    int ans = 0;
+    while (l < r)
+    {
+        ans += arr[r] - arr[l];
+        l++;
+        ans += arr[r] - arr[l];
+        r--;
+    }
+    ans += arr[l] - arr[0];
+    return ans;
+}
+
+//https://www.naukri.com/code360/problems/connect-n-ropes-with-minimum-cost_630476
+//minSum
+long long connectRopes(int *arr, int n)
+{
+    priority_queue<int, vector<int>, greater<int>> q;
+    for (int i = 0; i < n; i++)
+    {
+        q.push(arr[i]);
+    }
+    long long cost = 0;
+    while (q.size() > 1)
+    {
+        int x = q.top();
+        q.pop();
+        int y = q.top();
+        q.pop();
+        int sum = x + y;
+        cost += sum;
+        q.push(sum);
+    }
+    return cost;
+}
+
+//https://www.naukri.com/code360/problems/remove-duplicates-from-string_630470
+string removeDuplicates(string str, int n)
+{
+    vector<int> dp(26, 0);
+    string ans;
+    for (int i = 0; i < n; i++)
+    {
+        if (dp[str[i] - 'a'] == 0)
+        {
+            dp[str[i] - 'a']++;
+            ans.push_back(str[i]);
+        }
+    }
+    return ans;
+}
+
 int main(int argc, char *argv[])
 {
     {
@@ -803,6 +998,10 @@ int main(int argc, char *argv[])
             }
             printf("\n");
         }
+    }
+    {
+        vector<vector<int>> matrix = {{1, 2, 3}, {2, 4, 5}, {3, 5, 8}};
+        std::cout << "Matrix Is Symmetric:" << isMatrixSymmetric(matrix) << std::endl;
     }
     {
         vector<vector<int>> adj(4);
@@ -941,6 +1140,42 @@ int main(int argc, char *argv[])
             printf(" %d", i);
         }
         printf("\n");
+    }
+    {
+        vector<vector<int>> edges = {{0, 1}, {0, 2}};
+        DetectCycleDirectedGraph d;
+        std::cout << "Detect Cycle in a Directed Graph: " << d.isCyclic(edges, 3, 2) << std::endl;
+    }
+    {
+        TreeNode<int> *root = TreeNode<int>::buildTree1({8, 1, 2, 5, 2, -1, -1, 9, -1, -1, -1, -1, -1});
+        printf("Minimum Depth Of Binary Tree:%d\n", minDepth(root));
+    }
+    {
+        TreeNode<int> *root = TreeNode<int>::buildTree1({1, 2, 3, 4, -1, -1, 5, -1, -1, -1, -1});
+        printf("Minimum Depth Of Binary Tree:%d\n", minDepth(root));
+    }
+    {
+        string str1[] = {"ab", "dc", "ab", "ab"};
+        string str2[] = {"dc", "ab", "ab"};
+        vector<string> ans = findCommonElements(str1, str2, 4, 3);
+        printf("Common Elements:");
+        for (string i : ans)
+        {
+            printf(" %s", i.c_str());
+        }
+        printf("\n");
+    }
+    {
+        vector<int> arr = {7, 2, 4, 5};
+        std::cout << "Swap And Maximise:" << maxSum(arr, arr.size()) << std::endl;
+    }
+    {
+        int arr[] = {4, 3, 2, 6};
+        printf("Connect N Ropes With Minimum Cost:%lld\n", connectRopes(arr, sizeof(arr) / sizeof(int)));
+    }
+    {
+        string str = "abcadeecfb";
+        std::cout << "Remove Duplicates From String:" << removeDuplicates(str, str.length()) << std::endl;
     }
     return 0;
 }
