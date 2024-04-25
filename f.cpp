@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <bits/stdc++.h>
+#include <ios>
 #include <iostream>
 #include <queue>
 #include <stack>
@@ -1386,6 +1387,7 @@ int kthLargest(vector<int> &arr, int size, int K)
 }
 
 //https://www.naukri.com/code360/problems/count-distinct-element-in-every-k-size-window_920336
+//duplicate in window
 vector<int> countDistinctElements(vector<int> &arr, int k)
 {
     vector<int> ans;
@@ -1430,6 +1432,24 @@ vector<int> countDistinctElements(vector<int> &arr, int k)
         }
     }
     return ans;
+}
+
+//https://www.naukri.com/code360/problems/check-duplicate_763405
+//duplicate in window
+bool checkDuplicate(vector<int> &arr, int n, int k)
+{
+    unordered_map<int, int> m;
+    for (int i = 0; i < n; i++)
+    {
+        auto iter = m.find(arr[i]);
+        if (iter != m.end())
+        {
+            if (i - iter->second <= k)
+                return true;
+        }
+        m[arr[i]] = i;
+    }
+    return false;
 }
 
 //https://www.naukri.com/code360/problems/dfs-traversal_630462
@@ -1763,6 +1783,10 @@ int main(int argc, char *argv[])
             }
         }
         printf("\n");
+    }
+    {
+        vector<int> arr = {3, 4, 9, 4, 2};
+        std::cout << "Contains Duplicate ll:" << std::boolalpha << checkDuplicate(arr, arr.size(), 2) << std::endl;
     }
     return 0;
 }

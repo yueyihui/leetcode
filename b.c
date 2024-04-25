@@ -102,6 +102,22 @@ int duplicateNumber(int *arr, int size)
     return dup;
 }
 
+//https://www.naukri.com/code360/problems/duplicate-in-array_893397
+//ntains numbers from 1 to (n - 1)
+int findDuplicate(int *arr, int n)
+{
+    int dup = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (i != n - 1)
+        {
+            dup ^= i;
+        }
+        dup ^= arr[i] - 1;
+    }
+    return dup + 1;
+}
+
 void rotate(int *nums, int numsSize, int k)
 {
     int tmp = nums[0];
@@ -689,6 +705,11 @@ int main(int argc, char *argv[])
         //constraint of topic: if size 7, value must 0~5, and have one duplicate
         int arr[] = {0, 3, 1, 5, 4, 3, 2};
         printf("Find Duplicate:%d\n", duplicateNumber(arr, sizeof(arr) / sizeof(int)));
+    }
+    {
+        //constraint of topic: if size 7, value must 1~6, and have one duplicate
+        int arr[] = {6, 3, 1, 5, 4, 3, 2};
+        printf("Duplicate In Array:%d\n", findDuplicate(arr, sizeof(arr) / sizeof(int)));
     }
     return 0;
 }

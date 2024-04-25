@@ -106,32 +106,32 @@ class BinaryTreeNode
         root->right = buildTree(arr, 2 * i + 2);
         return root;
     }
-    static BinaryTreeNode<T> *buildTree1(vector<int> &arr)
+    static BinaryTreeNode<T> *buildTree1(vector<T> &arr)
     {
-        return NULL;
+        return buildTree1(std::move(arr));
     }
-    static BinaryTreeNode<T> *buildTree1(vector<int> &&arr)
+    static BinaryTreeNode<T> *buildTree1(vector<T> &&arr)
     {
         int i = 0;
-        BinaryTreeNode *root = new BinaryTreeNode(arr[i++]);
+        BinaryTreeNode<T> *root = new BinaryTreeNode<T>(arr[i++]);
         queue<BinaryTreeNode<T> *> q;
         q.push(root);
         while (q.empty() == false && i < arr.size())
         {
             BinaryTreeNode<T> *temp = q.front();
             q.pop();
-            if (arr[i] != -1)
+            if (arr[i] != -1 && arr[i] != '#')
             {
-                temp->left = new BinaryTreeNode<int>(arr[i++]);
+                temp->left = new BinaryTreeNode<T>(arr[i++]);
                 q.push(temp->left);
             }
             else
             {
                 i++;
             }
-            if (arr[i] != -1)
+            if (arr[i] != -1 && arr[i] != '#')
             {
-                temp->right = new BinaryTreeNode<int>(arr[i++]);
+                temp->right = new BinaryTreeNode<T>(arr[i++]);
                 q.push(temp->right);
             }
             else
@@ -2150,6 +2150,43 @@ bool detectAndRemoveCycle(Node *head)
     return false;
 }
 
+//https://www.naukri.com/code360/problems/check-for-duplicate-subtree_1089641
+class CheckDuplicateSubtree
+{
+  private:
+    string subtree(BinaryTreeNode<char> *root, unordered_set<string> &mp, bool &flag)
+    {
+        //why return #?
+        //in a big tree it can't say ab == ab
+        //it may #ab a#b ab#
+        if (root == NULL)
+            return "#";
+        if (root->left == NULL && root->right == NULL)
+            return string(1, root->data);
+        string strL = subtree(root->left, mp, flag);
+        string strR = subtree(root->right, mp, flag);
+        string temp = strL + strR + root->data;
+        if (mp.find(temp) != mp.end())
+        {
+            flag = true;
+        }
+        else
+        {
+            mp.insert(temp);
+        }
+        return temp;
+    }
+
+  public:
+    bool similarSubtree(BinaryTreeNode<char> *root)
+    {
+        unordered_set<string> mp;
+        bool flag = false;
+        subtree(root, mp, flag);
+        return flag;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -2697,6 +2734,13 @@ int main(int argc, char *argv[])
         }
         p->next = head;
         std::cout << "Detect And Remove Cycle:" << detectAndRemoveCycle(head) << std::endl;
+    }
+    {
+        string str = "abac#b###c###";
+        vector<char> v(str.begin(), str.end());
+        BinaryTreeNode<char> *root = BinaryTreeNode<char>::buildTree1(v);
+        CheckDuplicateSubtree c;
+        std::cout << "Check for Duplicate Subtree:" << c.similarSubtree(root) << std::endl;
     }
     return 0;
 }

@@ -53,16 +53,16 @@ class TreeNode
     static TreeNode<T> *buildTree1(vector<T> &&arr)
     {
         int i = 0;
-        TreeNode<int> *root = new TreeNode<int>(arr[i++]);
+        TreeNode<T> *root = new TreeNode<T>(arr[i++]);
         queue<TreeNode<T> *> q;
         q.push(root);
         while (q.empty() == false && i < arr.size())
         {
-            TreeNode<int> *temp = q.front();
+            TreeNode<T> *temp = q.front();
             q.pop();
             if (arr[i] != -1)
             {
-                temp->left = new TreeNode<int>(arr[i++]);
+                temp->left = new TreeNode<T>(arr[i++]);
                 q.push(temp->left);
             }
             else
@@ -71,7 +71,7 @@ class TreeNode
             }
             if (arr[i] != -1)
             {
-                temp->right = new TreeNode<int>(arr[i++]);
+                temp->right = new TreeNode<T>(arr[i++]);
                 q.push(temp->right);
             }
             else
@@ -944,6 +944,40 @@ string removeDuplicates(string str, int n)
     return ans;
 }
 
+//https://www.naukri.com/code360/problems/duplicate-subtrees_920530
+class DuplicateSubtrees
+{
+  private:
+    string subtree(TreeNode<int> *root, unordered_map<string, int> &mp, vector<int> &ans)
+    {
+        if (root == NULL)
+            return "-1";
+        string strL = subtree(root->left, mp, ans);
+        string strR = subtree(root->right, mp, ans);
+        string temp = to_string(root->data) + "," + strL + "," + strR;
+        mp[temp]++;
+        if (mp[temp] == 2)
+        {
+            ans.push_back(root->data);
+        }
+        return temp;
+    }
+
+  public:
+    vector<int> duplicateSubtrees(TreeNode<int> *root)
+    {
+        vector<int> ans;
+        if (root == NULL)
+            return ans;
+        unordered_map<string, int> mp;
+        subtree(root, mp, ans);
+        if (ans.empty())
+            return {-1};
+        else
+            return ans;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -1176,6 +1210,17 @@ int main(int argc, char *argv[])
     {
         string str = "abcadeecfb";
         std::cout << "Remove Duplicates From String:" << removeDuplicates(str, str.length()) << std::endl;
+    }
+    {
+        TreeNode<int> *root = TreeNode<int>::buildTree1({1, 2, 3, 4, -1, 2, 4, -1, -1, 4, -1, -1, -1, -1, -1});
+        DuplicateSubtrees d;
+        vector<int> ans = d.duplicateSubtrees(root);
+        printf("Duplicate Subtrees:");
+        for (int i : ans)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
     }
     return 0;
 }
