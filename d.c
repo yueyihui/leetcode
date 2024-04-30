@@ -356,6 +356,23 @@ struct TreeNode *lcaOf3Nodes(struct TreeNode *root, int nodes[3])
         return l != NULL ? l : r;
 }
 
+// https://www.naukri.com/code360/problems/lca-in-a-bst_981280
+struct TreeNode *LCAinaBST(struct TreeNode *root, struct TreeNode *P, struct TreeNode *Q)
+{
+    if (root == NULL)
+        return NULL;
+    if (root->val == P->val || root->val == Q->val)
+    {
+        return root;
+    }
+    struct TreeNode *l = LCAinaBST(root->left, P, Q);
+    struct TreeNode *r = LCAinaBST(root->right, P, Q);
+    if (l != NULL & r != NULL)
+        return root;
+    else
+        return l != NULL ? l : r;
+}
+
 int max(int a, int b)
 {
     return a > b ? a : b;

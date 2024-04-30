@@ -10,7 +10,7 @@ class CircularQueue
         int capability;
         bool isEmpty() { return rear == -1 && front == -1; }
         bool isFull() { return front == 0 && rear == edge() || front == rear + 1; }
-        bool isLastOne() { isEmpty() == false && front == rear; }
+        bool isLastOne() { return isEmpty() == false && front == rear; }
         int edge() { return capability - 1; }
 
       public:

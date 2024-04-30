@@ -82,11 +82,13 @@ class BinaryTreeNode
     T data;
     BinaryTreeNode<T> *left;
     BinaryTreeNode<T> *right;
+    BinaryTreeNode<T> *parent;
     BinaryTreeNode(T data)
     {
         this->data = data;
         left = NULL;
         right = NULL;
+        parent = NULL;
     }
     static BinaryTreeNode<T> *buildTree(vector<int> &arr, int i)
     {
@@ -2187,6 +2189,167 @@ class CheckDuplicateSubtree
     }
 };
 
+// https://www.naukri.com/code360/problems/lowest-common-ancestor-of-a-binary-tree-iii_1280134
+// LCA
+class LowestCommonAncestorBinaryTreeIII
+{
+  private:
+    int depth(BinaryTreeNode<int> *root)
+    {
+        int i = 0;
+        while (root != NULL)
+        {
+            i++;
+            root = root->parent;
+        }
+        return i;
+    }
+
+  public:
+    BinaryTreeNode<int> *leastCommonAncestor(BinaryTreeNode<int> *n1, BinaryTreeNode<int> *n2)
+    {
+        int d1 = depth(n1);
+        int d2 = depth(n2);
+        if (d1 > d2)
+        {
+            for (int i = 0; i < d1 - d2; i++)
+            {
+                n1 = n1->parent;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < d2 - d1; i++)
+            {
+                n2 = n2->parent;
+            }
+        }
+        while (n1 != n2)
+        {
+            n1 = n1->parent;
+            n2 = n2->parent;
+        }
+        return n1;
+    }
+};
+
+class Count_Univalue_Subtrees
+{
+  private:
+    bool postOrder(BinaryTreeNode<int> *root, int &nums)
+    {
+        if (root == NULL)
+            return true;
+        bool l = postOrder(root->left, nums);
+        bool r = postOrder(root->right, nums);
+        if (l & r)
+        {
+            if ((root->left != NULL && root->left->data != root->data) ||
+                (root->right != NULL && root->right->data != root->data))
+            {
+                return false;
+            }
+            nums++;
+            return true;
+        }
+        return false;
+    }
+
+  public:
+    int countUnivalTrees(BinaryTreeNode<int> *root)
+    {
+        int nums = 0;
+        postOrder(root, nums);
+        return nums;
+    }
+};
+
+// https://www.naukri.com/code360/problems/larget-number-in-binary-tree_790727
+class LargestNumberInBinaryTree
+{
+  private:
+    template <typename T>
+    void preorder(BinaryTreeNode<int> *root,
+                  priority_queue<string, vector<string>, T> &q)
+    {
+        if (root == NULL)
+            return;
+        q.push(to_string(root->data));
+        preorder(root->left, q);
+        preorder(root->right, q);
+    }
+
+  public:
+    string printLargest(BinaryTreeNode<int> *root)
+    {
+        if (root == NULL)
+            return "";
+        auto cmp = [](string a, string b)
+        { return a + b < b + a; };
+        priority_queue<string, vector<string>, decltype(cmp)> q(cmp);
+        preorder(root, q);
+        string ans;
+        while (q.empty() == false)
+        {
+            ans += q.top();
+            q.pop();
+        }
+        for (int i = 0; i < ans.size(); i++)
+        {
+            if (ans[i] != '0')
+            {
+                return ans.substr(i);
+            }
+        }
+        return "0";
+    }
+};
+
+// https://www.naukri.com/code360/problems/unival-trees_697311
+class CountUnivalueSubtrees
+{
+  private:
+    bool postOrder(BinaryTreeNode<int> *root, int &nums)
+    {
+        if (root == NULL)
+            return true;
+        bool l = postOrder(root->left, nums);
+        bool r = postOrder(root->right, nums);
+        if (l & r)
+        {
+            if ((root->left != NULL && root->left->data != root->data) ||
+                (root->right != NULL && root->right->data != root->data))
+            {
+                return false;
+            }
+            nums++;
+            return true;
+        }
+        return false;
+    }
+
+  public:
+    int countUnivalTrees(BinaryTreeNode<int> *root)
+    {
+        int nums = 0;
+        postOrder(root, nums);
+        return nums;
+    }
+};
+
+// https://www.naukri.com/code360/problems/merge-linkedlist_3125813
+void merge(Node *head1, Node *head2)
+{
+    Node *a = head1, *b = head2;
+    while (a != NULL && b != NULL)
+    {
+        Node *n = a->next;
+        a->next = b;
+        a = b;
+        b = n;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     {
@@ -2741,6 +2904,17 @@ int main(int argc, char *argv[])
         BinaryTreeNode<char> *root = BinaryTreeNode<char>::buildTree1(v);
         CheckDuplicateSubtree c;
         std::cout << "Check for Duplicate Subtree:" << c.similarSubtree(root) << std::endl;
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree1({1, 1, 1, -1, -1, -1, -1});
+        Count_Univalue_Subtrees c;
+        printf("Count Univalue Subtrees:%d\n", c.countUnivalTrees(root));
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree1({1, 2, 3});
+        LargestNumberInBinaryTree l;
+        string num = l.printLargest(root);
+        std::cout << "Largest Number in Binary Tree:" << num << std::endl;
     }
     return 0;
 }

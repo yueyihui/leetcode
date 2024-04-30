@@ -978,6 +978,51 @@ class DuplicateSubtrees
     }
 };
 
+class TopViewOfBinaryTree
+{
+  public:
+    vector<int> getTopView(TreeNode<int> *root)
+    {
+        stack<TreeNode<int> *> left;
+        queue<TreeNode<int> *> right;
+        queue<pair<TreeNode<int> *, int>> q;
+        q.push({root, 0});
+        left.push(root);
+        int l = 0, r = 0;
+        while (q.empty() == false)
+        {
+            auto temp = q.front();
+            q.pop();
+            if (temp.second < l)
+            {
+                left.push(temp.first);
+                l--;
+            }
+            else if (temp.second > r)
+            {
+                right.push(temp.first);
+                r++;
+            }
+            if (temp.first->left)
+                q.push({temp.first->left, temp.second - 1});
+            if (temp.first->right)
+                q.push({temp.first->right, temp.second + 1});
+        }
+        vector<int> ans;
+        while (left.empty() == false)
+        {
+            ans.push_back(left.top()->data);
+            left.pop();
+        }
+        while (right.empty() == false)
+        {
+            ans.push_back(right.front()->data);
+            right.pop();
+        }
+        return ans;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -1217,6 +1262,18 @@ int main(int argc, char *argv[])
         vector<int> ans = d.duplicateSubtrees(root);
         printf("Duplicate Subtrees:");
         for (int i : ans)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
+    }
+    {
+        TreeNode<int> *root = TreeNode<int>::buildTree1({1, 2, 3, 4, 5, -1, 6, -1, 7, -1, -1,
+                                                         8, -1, 9, -1, -1, 11, 10, -1, -1, -1, -1, -1});
+        TopViewOfBinaryTree t;
+        vector<int> ans = t.getTopView(root);
+        printf("Top View Of Binary Tree:");
+        for (auto i : ans)
         {
             printf(" %d", i);
         }
