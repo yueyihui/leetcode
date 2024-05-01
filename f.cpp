@@ -984,16 +984,18 @@ class Search_In_Rotated_Sorted_Array
     int partition(vector<int> &arr)
     {
         int l = 0, r = arr.size() - 1;
+        int pivot = r;
         while (l < r)
         {
             int mid = l + (r - l) / 2;
-            if (arr[0] > arr[mid])
+            if (arr[mid] <= arr[pivot])
                 r = mid;
             else
                 l = mid + 1;
         }
         return r;
     }
+
     int binarySearch(vector<int> &arr, int l, int r, int k)
     {
         while (l <= r)
@@ -1017,6 +1019,86 @@ class Search_In_Rotated_Sorted_Array
             return binarySearch(arr, pivot, n - 1, k);
         else
             return binarySearch(arr, 0, pivot - 1, k);
+    }
+};
+
+//https://www.naukri.com/code360/problems/rotated-sorted-array-search_893009
+class Rotated_Sorted_Array_Search
+{
+  private:
+    int partition(vector<int> &arr, int l, int r)
+    {
+        int pivot = r;
+        while (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] <= arr[pivot])
+                r = mid;
+            else
+                l = mid + 1;
+        }
+        return r;
+    }
+
+    int binSearch(vector<int> &arr, int l, int r, int x)
+    {
+        while (l <= r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] < x)
+                l = mid + 1;
+            else if (arr[mid] > x)
+                r = mid - 1;
+            else
+                return mid;
+        }
+        return -1;
+    }
+
+  public:
+    int getIndexInRotatedArray(vector<int> &arr, int x)
+    {
+        int n = arr.size();
+        int pi = partition(arr, 0, n - 1);
+        if (arr[0] <= x && x <= arr[pi - 1])
+            return binSearch(arr, 0, pi - 1, x);
+        else
+            return binSearch(arr, pi, n - 1, x);
+    }
+};
+
+//https://www.naukri.com/code360/problems/sorting-of-a-rotated-sorted-array_1070231
+class Sorting_Rotated_Sorted_Array
+{
+  private:
+    int partition(vector<int> &arr, int l, int r)
+    {
+        int pivot = r;
+        while (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] <= arr[pivot])
+                r = mid;
+            else
+                l = mid + 1;
+        }
+        return r;
+    }
+
+  public:
+    void sortRotatedArray(vector<int> &arr, int n)
+    {
+        int pi = partition(arr, 0, n - 1);
+        vector<int> v1, v2;
+        for (int i = 0; i < pi; i++)
+            v2.push_back(arr[i]);
+        for (int i = pi; i < n; i++)
+            v1.push_back(arr[i]);
+        int i = 0;
+        for (int j = 0; j < v1.size(); j++)
+            arr[i++] = v1[j];
+        for (int j = 0; j < v2.size(); j++)
+            arr[i++] = v2[j];
     }
 };
 

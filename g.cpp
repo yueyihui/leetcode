@@ -2350,6 +2350,44 @@ void merge(Node *head1, Node *head2)
     }
 }
 
+// https://www.naukri.com/code360/problems/k-sum-path-in-a-binary-tree_893543
+class K_Sum_Path_In_Binary_Tree
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, int k, vector<vector<int>> &ans, vector<int> &r)
+    {
+        if (root == NULL)
+            return;
+        r.push_back(root->data);
+        preorder(root->left, k, ans, r);
+        preorder(root->right, k, ans, r);
+        int sum = 0;
+        int n = r.size();
+        for (auto i = r.end() - 1; i >= r.begin(); i--)
+        {
+            sum += *i;
+            if (sum == k)
+            {
+                vector<int> temp(i, r.end());
+                ans.push_back(temp);
+            }
+        }
+        r.pop_back();
+    }
+
+  public:
+    vector<vector<int>> kPathSum(BinaryTreeNode<int> *root, int k)
+    {
+        vector<vector<int>> ans;
+        if (root != NULL)
+        {
+            vector<int> r;
+            preorder(root, k, ans, r);
+        }
+        return ans;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -2915,6 +2953,21 @@ int main(int argc, char *argv[])
         LargestNumberInBinaryTree l;
         string num = l.printLargest(root);
         std::cout << "Largest Number in Binary Tree:" << num << std::endl;
+    }
+    {
+        BinaryTreeNode<int> *root = BinaryTreeNode<int>::buildTree1({10, 5, -3, 3, 2, -1, 11, 3, -2, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1});
+        K_Sum_Path_In_Binary_Tree k;
+        vector<vector<int>> ans = k.kPathSum(root, 8);
+        printf("K - Sum Path In A Binary Tree:");
+        for (auto i : ans)
+        {
+            for (auto j : i)
+            {
+                printf(" %d", j);
+            }
+            printf(" ");
+        }
+        printf("\n");
     }
     return 0;
 }
