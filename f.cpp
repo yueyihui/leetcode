@@ -1575,6 +1575,26 @@ class DFS
     }
 };
 
+// https://www.naukri.com/code360/problems/maximum-frequency-number_920319
+int maximumFrequency(vector<int> &arr, int n)
+{
+    unordered_map<int, int> m;
+    int maxFreq = 0;
+    for (int i = 0; i < n; i++)
+    {
+        m[arr[i]]++;
+        maxFreq = max(maxFreq, m[arr[i]]);
+    }
+    for (int i = 0; i < n; i++)
+    {
+        if (maxFreq == m[arr[i]])
+        {
+            return arr[i];
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;
@@ -1869,6 +1889,10 @@ int main(int argc, char *argv[])
     {
         vector<int> arr = {3, 4, 9, 4, 2};
         std::cout << "Contains Duplicate ll:" << std::boolalpha << checkDuplicate(arr, arr.size(), 2) << std::endl;
+    }
+    {
+        vector<int> arr = {2, 12, 2, 11, -12, 2, -1, 2, 2};
+        printf("Maximum Frequency Number:%d\n", maximumFrequency(arr, arr.size()));
     }
     return 0;
 }

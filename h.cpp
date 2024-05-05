@@ -1023,6 +1023,31 @@ class TopViewOfBinaryTree
     }
 };
 
+// https://www.naukri.com/code360/problems/maximum-width-in-binary-tree_763671
+int getMaxWidth(TreeNode<int> *root)
+{
+    if (root == NULL)
+        return 0;
+    int maxWidth = INT_MIN;
+    queue<TreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        int width = q.size();
+        maxWidth = max(maxWidth, width);
+        for (int i = 0; i < width; i++)
+        {
+            TreeNode<int> *temp = q.front();
+            q.pop();
+            if (temp->left)
+                q.push(temp->left);
+            if (temp->right)
+                q.push(temp->right);
+        }
+    }
+    return maxWidth;
+}
+
 int main(int argc, char *argv[])
 {
     {
@@ -1278,6 +1303,10 @@ int main(int argc, char *argv[])
             printf(" %d", i);
         }
         printf("\n");
+    }
+    {
+        TreeNode<int> *root = TreeNode<int>::buildTree1({1, 2, 3, 4, -1, 5, 6, -1, 7, -1, -1, -1, -1, -1, -1});
+        printf("Maximum Width In Binary Tree: %d\n", getMaxWidth(root));
     }
     return 0;
 }

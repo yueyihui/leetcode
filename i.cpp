@@ -204,6 +204,71 @@ class Convert_Binary_Tree_Sum_Tree
     }
 };
 
+// https://www.naukri.com/code360/problems/longest-substring-without-repeating-characters_758894
+// cisco longest substring
+int lengthOfLongestSubstring(string &s)
+{
+    if (s.empty() == true)
+        return 0;
+    int q = 0, p = 1;
+    int ans = 0;
+    while (p < s.length())
+    {
+        ans = max(ans, p - q);
+        string temp(&s[q], p - q);
+        size_t i = temp.find(s[p]);
+        if (i != string::npos)
+        {
+            q += i + 1;
+        }
+        p++;
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/longest-repeating-subsequence_1118110
+// https://www.geeksforgeeks.org/longest-repeating-subsequence/
+int longestRepeatingSubsequence(string st, int n)
+{
+    vector<vector<int>> dp(n + 1, vector<int>(n + 1, 0));
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= n; j++)
+        {
+            if (st[i - 1] == st[j - 1] && i != j)
+            {
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            }
+            else
+            {
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    return dp[n][n];
+}
+
+// https://www.naukri.com/code360/problems/longest-repeating-substring_980523
+int longestRepeatingSubstring(string &str, int k)
+{
+    int countArray[26] = {0};
+    int left = 0;
+    int ans = 0;
+    int maxCount = INT_MIN;
+    for (int right = 0; right < str.size(); right++)
+    {
+        countArray[str[right] - 'A']++;
+        maxCount = max(maxCount, countArray[str[right] - 'A']);
+        if (right - left + 1 - maxCount > k)
+        {
+            countArray[str[left] - 'A']--;
+            left++;
+        }
+        ans = max(ans, right - left + 1);
+    }
+    return ans;
+}
+
 int main(int argc, char *argv[])
 {
     {
@@ -234,6 +299,18 @@ int main(int argc, char *argv[])
             printf(" %d", i);
         }
         printf("\n");
+    }
+    {
+        string s("axbab 9xbb");
+        printf("Longest Substring Without Repeating Characters:%d\n", lengthOfLongestSubstring(s));
+    }
+    {
+        string st("AABCBDC");
+        printf("Longest Repeating Subsequence:%d\n", longestRepeatingSubsequence(st, st.length()));
+    }
+    {
+        string str("ABCCAA");
+        printf("Longest Repeating Substring:%d\n", longestRepeatingSubstring(str, 2));
     }
     return 0;
 }
