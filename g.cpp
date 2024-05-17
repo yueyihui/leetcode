@@ -2388,6 +2388,40 @@ class K_Sum_Path_In_Binary_Tree
     }
 };
 
+// https://www.naukri.com/code360/problems/binary-tree-from-parent-array_873336
+BinaryTreeNode<int> *createTree(vector<int> &parent)
+{
+    unordered_map<int, vector<int>> mp;
+    for (int i = 0; i < parent.size(); i++)
+    {
+        mp[parent[i]].push_back(i);
+    }
+    BinaryTreeNode<int> *root = new BinaryTreeNode<int>(mp[-1][0]);
+    queue<BinaryTreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        BinaryTreeNode<int> *temp = q.front();
+        q.pop();
+        auto iter = mp.find(temp->data);
+        if (iter == mp.end())
+        {
+            continue;
+        }
+        if (iter->second.size() > 0)
+        {
+            temp->left = new BinaryTreeNode<int>(iter->second[0]);
+            q.push(temp->left);
+        }
+        if (iter->second.size() > 1)
+        {
+            temp->right = new BinaryTreeNode<int>(iter->second[1]);
+            q.push(temp->right);
+        }
+    }
+    return root;
+}
+
 int main(int argc, char *argv[])
 {
     {
@@ -2968,6 +3002,10 @@ int main(int argc, char *argv[])
             printf(" ");
         }
         printf("\n");
+    }
+    {
+        vector<int> parent = {-1, 0, 1, 2, 2, 3};
+        BinaryTreeNode<int> *root = createTree(parent);
     }
     return 0;
 }
