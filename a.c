@@ -614,6 +614,25 @@ void removeAllOccurrencesOfChar(char input[], char c)
     }
 }
 
+// chatgpt4
+int *lower_bound(int *first, int *last, int value)
+{
+    int n = last - first;
+    while (n > 0)
+    {
+        int mid = n / 2;
+        int *it = first + mid;
+        if (*it < value)
+        {
+            first = it + 1;
+            n -= mid + 1;
+        }
+        else
+            n = mid;
+    }
+    return first;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -752,6 +771,15 @@ int main(int argc, char *argv[])
         char input[] = "aabccbaa";
         removeAllOccurrencesOfChar(input, 'a');
         printf("Remove character:%s\n", input);
+    }
+    {
+        int arr[] = {1, 3, 3, 5, 8, 10, 12};
+        int n = sizeof(arr) / sizeof(int);
+        int *lb = lower_bound(arr, arr + n, 6);
+        if (lb != arr + n)
+        {
+            printf("The lower bound of 4 in the array is at index %ld.\n", lb - arr);
+        }
     }
     return 0;
 }

@@ -467,6 +467,25 @@ vector<int> dijkstra(vector<vector<int>> &vec, int vertices, int edges, int sour
     return dist;
 }
 
+// https://www.naukri.com/code360/problems/bellmon-ford_2041977
+vector<int> bellmonFord(int n, int m, int src, vector<vector<int>> &edges)
+{
+    vector<int> dist(n + 1, 100000000);
+    dist[src] = 0;
+    for (int i = 1; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            int u = edges[j][0];
+            int v = edges[j][1];
+            int w = edges[j][2];
+            if (dist[u] + w < dist[v])
+                dist[v] = dist[u] + w;
+        }
+    }
+    return dist;
+}
+
 class DSU
 {
   private:
@@ -644,6 +663,43 @@ LinkedListNode<int> *cloneRandomList(LinkedListNode<int> *head)
     return head;
 }
 
+// https://www.naukri.com/code360/problems/clone-a-linked-list-with-random-pointers_983604
+LinkedListNode<int> *cloneLL(LinkedListNode<int> *head)
+{
+    for (LinkedListNode<int> *p = head; p != NULL;)
+    {
+        LinkedListNode<int> *n = p->next;
+        p->next = new LinkedListNode<int>(p->data);
+        p = p->next;
+        p->next = n;
+        p = p->next;
+    }
+    LinkedListNode<int> *new_head = head->next;
+    LinkedListNode<int> *a = head, *b = new_head;
+    while (b != NULL)
+    {
+        b->random = a->random;
+        if (b->random != NULL)
+            b->random = b->random->next;
+        a = b->next;
+        if (a != NULL)
+            b = a->next;
+        else
+            b = NULL;
+    }
+    a = head, b = new_head;
+    while (b->next != NULL)
+    {
+        a->next = b->next;
+        a = a->next;
+        b->next = a->next;
+        b = b->next;
+    }
+    a->next = NULL;
+    b->next = NULL;
+    return new_head;
+}
+
 // https://www.naukri.com/code360/problems/modify-linked-list_1095632
 class ModifyLinkedlist
 {
@@ -814,6 +870,154 @@ Node<int> *insertionSortLL(Node<int> *head)
     return head;
 }
 
+// https://www.naukri.com/code360/problems/find-pattern-in-string_1112621
+// kmp Knuth–Morris–Pratt algorithm
+class KMP
+{
+  private:
+    void longestPrefixSuffix(string &p, vector<int> &lps)
+    {
+        lps[0] = 0;
+        int len = 0, i = 1;
+        while (i < p.length())
+        {
+            if (p[i] == p[len])
+            {
+                len++;
+                lps[i] = len;
+                i++;
+            }
+            else
+            {
+                if (len == 0)
+                {
+                    lps[i] = 0;
+                    i++;
+                }
+                else
+                {
+                    len = lps[len - 1];
+                }
+            }
+        }
+    }
+
+  public:
+    bool findPattern(string p, string s)
+    {
+        vector<int> lps(p.length(), 0);
+        longestPrefixSuffix(p, lps);
+        int i = 0, j = 0;
+        while (i < s.length())
+        {
+            if (s[i] == p[j])
+            {
+                i++;
+                j++;
+                if (j == p.length())
+                    return true;
+            }
+            else
+            {
+                if (j == 0)
+                {
+                    i++;
+                }
+                else
+                {
+                    j = lps[j - 1];
+                }
+            }
+        }
+        return false;
+    }
+};
+
+// https://www.naukri.com/code360/problems/majority-element_893051
+// boyer moore majority vote algorithm
+int majorityElement(vector<int> &nums)
+{
+    int major = -1;
+    int vote = 0;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        if (vote == 0)
+        {
+            major = nums[i];
+            vote = 1;
+        }
+        else
+        {
+            if (major == nums[i])
+                vote++;
+            else
+                vote--;
+        }
+    }
+    return major;
+}
+
+// https://www.naukri.com/code360/problems/0-1-knapsack_920542
+// https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
+int knapsack(vector<int> weight, vector<int> value, int n, int W)
+{
+    vector<vector<int>> dp(n + 1, vector<int>(W + 1, 0));
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= W; j++)
+        {
+            if (weight[i - 1] <= j)
+            {
+                dp[i][j] =
+                    max(value[i - 1] + dp[i - 1][j - weight[i - 1]], dp[i - 1][j]);
+            }
+            else
+            {
+                dp[i][j] = dp[i - 1][j];
+            }
+        }
+    }
+    return dp[n][W];
+}
+
+// https://www.naukri.com/code360/problems/longest-increasing-subsequence_630459
+class Longest_Increasing_Subsequence
+{
+  private:
+    int lower_bound(vector<int> &arr, int n, int value)
+    {
+        if (n == 0)
+            return -1;
+        int l = 0, r = n - 1;
+        while (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] < value)
+                l = mid + 1;
+            else
+                r = mid;
+        }
+        return arr[r] < value ? -1 : r;
+    }
+
+  public:
+    int longestIncreasingSubsequence(int arr[], int n)
+    {
+        vector<int> ans;
+        for (int i = 0; i < n; i++)
+        {
+            int lb = lower_bound(ans, ans.size(), arr[i]);
+            if (lb == -1)
+            {
+                ans.push_back(arr[i]);
+            }
+            else
+                ans[lb] = arr[i];
+        }
+        return ans.size();
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -921,6 +1125,23 @@ int main(int argc, char *argv[])
             printf(" %d", i->data);
         }
         printf("\n");
+    }
+    {
+        string str("yxxyxxy");
+        string pattern("xxy");
+        KMP k;
+        printf("Find Pattern in String - KMP Algorithm:%s\n",
+               k.findPattern(pattern, str) == true ? "true" : "false");
+    }
+    {
+        vector<int> nums = {4, 2, 1, 4, 4};
+        printf("Majority Element:%d\n", majorityElement(nums));
+    }
+    {
+        int arr[] = {5, 4, 11, 1, 16, 8};
+        Longest_Increasing_Subsequence lis;
+        printf("Longest Increasing Subsequence:%d\n",
+               lis.longestIncreasingSubsequence(arr, sizeof(arr) / sizeof(int)));
     }
     return 0;
 }

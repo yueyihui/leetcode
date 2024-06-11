@@ -653,28 +653,7 @@ int longestIncreasingSubsequence(int arr[], int n)
     return count.size();
 }
 
-int* lower_bound(int arr[], int n, int value)
-{
-    int distance = n - 1;
-    int *it = NULL;
-    int step = 0;
-    while (distance > 0)
-    {
-        it = arr;
-        step = distance / 2;
-        it += step;
-        if (*it < value)
-        {
-            arr = ++it;
-            distance -= step + 1;
-        }
-        else
-            distance = step;
-    }
-    return arr;
-}
-
-int lower_bound2(int arr[], int n, int x)
+int lower_bound(int arr[], int n, int x)
 {
     int l = 0, r = n - 1;
     //can't allow l==r, since r at the correct, the loop wouldn't quit
@@ -711,46 +690,69 @@ int upperBound(vector<int> &arr, int n, int x)
     return arr[l] <= x ? -1 : l;
 }
 
-//https://www.codingninjas.com/studio/problems/longest-common-substring_1235207?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=3
+// https://www.naukri.com/code360/problems/longest-common-substring_1235207
+// longest common substring
 int lcs(string &str1, string &str2)
 {
-    int longest = 0;
-    int count[str1.size() + 1][str2.size() + 1];
-    memset(count, 0, sizeof(count));
-    for (int i = 1; i <= str1.size(); i++)
+    int longest = INT_MIN;
+    int n = str1.length();
+    int m = str2.length();
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+    for (int i = 1; i <= n; i++)
     {
-        for (int j = 1; j <= str2.size(); j++)
+        for (int j = 1; j <= m; j++)
         {
             if (str1[i - 1] == str2[j - 1])
             {
-                count[i][j] = count[i - 1][j - 1] + 1;
-                longest = max(longest, count[i][j]);
-            }
-            else
-            {
-                count[i][j] = 0;
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+                longest = max(longest, dp[i][j]);
             }
         }
     }
     return longest;
 }
 
-//https://www.codingninjas.com/studio/problems/longest-common-subsequence_624879?interviewProblemRedirection=true&count=25
+// https://www.codingninjas.com/studio/problems/longest-common-subsequence_624879
+// longest common subsequence
 int lcs2(string s, string t)
 {
-    int longest = 0;
-    vector<vector<int>> count(s.length() + 1, vector<int>(t.length() + 1, 0));
-    for (int i = 1; i <= s.length(); i++)
+    int n = s.length();
+    int m = t.length();
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+    for (int i = 1; i <= n; i++)
     {
-        for (int j = 1; j <= t.length(); j++)
+        for (int j = 1; j <= m; j++)
         {
             if (s[i - 1] == t[j - 1])
-                count[i][j] = count[i - 1][j - 1] + 1;
+                dp[i][j] = dp[i - 1][j - 1] + 1;
             else
-                count[i][j] = max(count[i - 1][j], count[i][j - 1]);
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
         }
     }
-    return count[s.length()][t.length()];
+    return dp[n][m];
+}
+
+// shortest common supersequence
+int shortestSupersequence(string a, string b)
+{
+    int n = a.length();
+    int m = b.length();
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+    for (int i = 0; i <= n; i++)
+    {
+        for (int j = 0; j <= m; j++)
+        {
+            if (i == 0)
+                dp[i][j] = j;
+            else if (j == 0)
+                dp[i][j] = i;
+            else if (a[i] == b[j])
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            else
+                dp[i][j] = min(dp[i - 1][j], dp[i][j - 1]) + 1;
+        }
+    }
+    return dp[n][m];
 }
 
 //https://www.geeksforgeeks.org/maximum-sum-such-that-no-two-elements-are-adjacent/
@@ -1595,6 +1597,28 @@ int maximumFrequency(vector<int> &arr, int n)
     return 0;
 }
 
+// https://www.naukri.com/code360/problems/maximum-1s_893303
+// max row in matrix
+int maxOne(vector<vector<int>> &arr)
+{
+    int row = 0;
+    int sumMax = 0;
+    for (int i = 0; i < arr.size(); i++)
+    {
+        int sum = 0;
+        for (int j = 0; j < arr[0].size(); j++)
+        {
+            sum += arr[i][j];
+        }
+        if (sum > sumMax)
+        {
+            row = i;
+            sumMax = sum;
+        }
+    }
+    return row;
+}
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;
@@ -1697,16 +1721,16 @@ int main(int argc, char *argv[])
     {
         printf("-------------\n");
         int arr[] = {1, 1, 1, 3, 5, 5, 16, 28, 19};
-        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 12) << std::endl;
-        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 2) << std::endl;
-        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 5) << std::endl;
-        std::cout << lower_bound2(arr, sizeof(arr) / sizeof(int), 7) << std::endl;
+        std::cout << lower_bound(arr, sizeof(arr) / sizeof(int), 12) << std::endl;
+        std::cout << lower_bound(arr, sizeof(arr) / sizeof(int), 2) << std::endl;
+        std::cout << lower_bound(arr, sizeof(arr) / sizeof(int), 5) << std::endl;
+        std::cout << lower_bound(arr, sizeof(arr) / sizeof(int), 7) << std::endl;
         int arr1[] = {1,5,5,5,5,5};
-        std::cout << lower_bound2(arr1, sizeof(arr1) / sizeof(int), 2) << std::endl;
+        std::cout << lower_bound(arr1, sizeof(arr1) / sizeof(int), 2) << std::endl;
         int arr2[] = {1, 5};
-        std::cout << lower_bound2(arr2, sizeof(arr2) / sizeof(int), 2) << std::endl;
+        std::cout << lower_bound(arr2, sizeof(arr2) / sizeof(int), 2) << std::endl;
         int arr3[] = {1, 5, 8};
-        std::cout << lower_bound2(arr3, sizeof(arr3) / sizeof(int), 2) << std::endl;
+        std::cout << lower_bound(arr3, sizeof(arr3) / sizeof(int), 2) << std::endl;
         printf("-------------\n");
     }
 
@@ -1737,7 +1761,13 @@ int main(int argc, char *argv[])
 
         string s("adebc");
         string t("dcadb");
-        std::cout << "Longest Common Substring:" << lcs2(s, t) << std::endl;
+        std::cout << "Longest Common Subsequence:" << lcs2(s, t) << std::endl;
+    }
+
+    {
+        string a("abcde");
+        string b("ac");
+        std::cout << "Shortest Common Subsequence:" << shortestSupersequence(a, b) << std::endl;
     }
 
     {
