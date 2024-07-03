@@ -1048,6 +1048,397 @@ int getMaxWidth(TreeNode<int> *root)
     return maxWidth;
 }
 
+// https://www.naukri.com/code360/problems/number-of-pairs-with-given-sum_630509
+long long pairsWithGivenSum(int arr[], int n, int sum)
+{
+    long long ans = 0;
+    unordered_map<int, int> m;
+    for (int i = 0; i < n; i++)
+    {
+        ans += m[sum - arr[i]];
+        m[arr[i]]++;
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/rotate-linked-list_920454
+Node<int> *rotate(Node<int> *head, int k)
+{
+    if (k == 0 || head == NULL || head->next == NULL)
+        return head;
+    int len = 1;
+    Node<int> *last = head;
+    while (last->next != NULL)
+    {
+        last = last->next;
+        len++;
+    }
+    k = len - (k % len);
+    Node<int> *p = head;
+    while (k > 0)
+    {
+        Node<int> *n = p->next;
+        p->next = NULL;
+        last->next = p;
+        last = last->next;
+        p = n;
+        k--;
+    }
+    return p;
+}
+
+// https://www.naukri.com/code360/problems/leaders-in-an-array_873144
+vector<int> findLeaders(vector<int> &elements, int n)
+{
+    vector<int> ans;
+    int i = INT_MIN;
+    for (; n > 0; n--)
+    {
+        if (elements[n - 1] > i)
+        {
+            i = elements[n - 1];
+            ans.push_back(i);
+        }
+    }
+    reverse(ans.begin(), ans.end());
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/maximum-distance_758901
+int maximumDistance(int arr[], int n)
+{
+    int dist = 0;
+    unordered_map<int, int> map;
+    for (int i = 0; i < n; i++)
+    {
+        auto it = map.find(arr[i]);
+        if (it == map.end())
+        {
+            map[arr[i]] = i;
+        }
+        else
+        {
+            dist = max(dist, i - it->second);
+        }
+    }
+    return dist;
+}
+
+// https://www.naukri.com/code360/problems/distinct-subsequences_799558
+// https://www.geeksforgeeks.org/count-distinct-subsequences/
+int distinctSubsequences(string S)
+{
+    const int MOD = 1e9 + 7;
+    vector<int> last(256, -1);
+    int n = S.length();
+    int dp[n + 1] = {0};
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        dp[i] = (2 * dp[i - 1]) % MOD;
+        if (last[S[i - 1]] != -1)
+        {
+            dp[i] = (dp[i] - dp[last[S[i - 1]]] + MOD) % MOD;
+        }
+        last[S[i - 1]] = i - 1;
+    }
+    return dp[n];
+}
+
+// https://www.naukri.com/code360/problems/distinct-subsets-count_764603
+int countDistinctArrays(vector<int> &arr)
+{
+    unordered_map<int, int> m;
+    for (int i = 0; i < arr.size(); i++)
+    {
+        m[arr[i]]++;
+    }
+    long long mod = 1e9 + 7, ans = 1;
+    for (auto it : m)
+    {
+        ans = (ans * (it.second + 1)) % mod;
+    }
+    return ans - 1;
+}
+
+// https://www.naukri.com/code360/problems/distinct-subsequences_981277
+int numDistinct(string S, string T)
+{
+    int n = T.length();
+    int m = S.length();
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+    for (int j = 0; j <= m; j++)
+        dp[0][j] = 1;
+    for (int i = 1; i <= m; i++)
+    {
+        for (int j = 1; j <= n; j++)
+        {
+            if (S[i - 1] == T[j - 1])
+                dp[j][i] = dp[j - 1][i - 1] + dp[j][i - 1];
+            else
+                dp[j][i] = dp[j][i - 1];
+        }
+    }
+    return dp[n][m];
+}
+
+// https://www.naukri.com/code360/problems/edit-distance_630420
+// Moderate Solution
+// dp[i][0] and dp[0][j] == shortestSupersequence
+int editDistance(string str1, string str2)
+{
+    int n = str1.length();
+    int m = str2.length();
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+    for (int i = 0; i <= n; i++)
+    {
+        dp[i][0] = i;
+    }
+    for (int j = 0; j <= m; j++)
+    {
+        dp[0][j] = j;
+    }
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= m; j++)
+        {
+            if (str1[i - 1] == str2[j - 1])
+            {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+            else
+            {
+                dp[i][j] = min(min(dp[i][j - 1], dp[i - 1][j]), dp[i - 1][j - 1]) + 1;
+            }
+        }
+    }
+    return dp[n][m];
+}
+
+// https://www.naukri.com/code360/problems/smallest-subarray-with-k-distinct-elements_630523
+vector<int> smallestSubarrayWithKDistinct(vector<int> &arr, int k)
+{
+    bool got = false;
+    unordered_map<int, int> map;
+    int n = arr.size();
+    int l = 0, r = n;
+    for (int i = 0, j = 0; i < n; i++)
+    {
+        map[arr[i]]++;
+        while (map.size() == k)
+        {
+            if (i - j < r - l)
+            {
+                l = j;
+                r = i;
+                got = true;
+            }
+            auto it = map.find(arr[j]);
+            it->second--;
+            if (it->second == 0)
+                map.erase(it);
+            j++;
+        }
+    }
+    if (got)
+        return {l, r};
+    else
+        return {-1};
+}
+
+// https://www.naukri.com/code360/problems/longest-sub-string-with-k-distinct-characters_920521
+int getLengthofLongestSubstring(string s, int k)
+{
+    unordered_map<char, int> freq;
+    int ans = INT_MIN;
+    for (int i = 0, j = 0; i < s.length(); i++)
+    {
+        freq[s[i]]++;
+        while (freq.size() > k)
+        {
+            auto it = freq.find(s[j]);
+            it->second--;
+            if (it->second == 0)
+                freq.erase(it);
+            j++;
+        }
+        ans = max(ans, i - j + 1);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/subarray-with-distinct-integers_893062
+// https://www.naukri.com/code360/problems/subarrays-with-at-most-k-distinct-values_1473804
+// https://www.geeksforgeeks.org/count-of-subarrays-having-exactly-k-distinct-elements/
+class Subarray_with_distinct_integers
+{
+  private:
+    // Count of subarrays with at most K different elements
+    int atMost(vector<int> &arr, int n, int b)
+    {
+        int cnt = 0;
+        unordered_map<int, int> map;
+        for (int i = 0, j = 0; i < n; i++)
+        {
+            map[arr[i]]++;
+            while (map.size() > b)
+            {
+                auto it = map.find(arr[j]);
+                it->second--;
+                if (it->second == 0)
+                    map.erase(it);
+                j++;
+            }
+            cnt += i - j + 1;
+        }
+        return cnt;
+    }
+
+  public:
+    int goodSubarrays(vector<int> &arr, int n, int b)
+    {
+        return atMost(arr, n, b) - atMost(arr, n, b - 1);
+    }
+};
+
+// https://www.naukri.com/code360/problems/longest-repeating-substring_980523
+int longestRepeatingSubstring(string &str, int k)
+{
+    int countArray[26] = {0};
+    int left = 0;
+    int ans = 0;
+    int maxCount = INT_MIN;
+    for (int right = 0; right < str.size(); right++)
+    {
+        countArray[str[right] - 'A']++;
+        maxCount = max(maxCount, countArray[str[right] - 'A']);
+        if (right - left + 1 - maxCount > k)
+        {
+            countArray[str[left] - 'A']--;
+            left++;
+        }
+        ans = max(ans, right - left + 1);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/disjoint-intervals_1089562
+// Disjoint Intervals
+int disjointIntervals(vector<pair<int, int>> arr, int n)
+{
+    auto cmp = [](pair<int, int> &a, pair<int, int> &b)
+    {
+        return a.second < b.second;
+    };
+    sort(arr.begin(), arr.end(), cmp);
+
+    int last = 0;
+    int maxSize = 1;
+    for (int i = 1; i < n; i++)
+    {
+        if (arr[last].second < arr[i].first)
+        {
+            maxSize++;
+            last = i;
+        }
+    }
+    return maxSize;
+}
+
+// https://www.naukri.com/code360/problems/2-sum_893025
+pair<int, int> twoSum(vector<int> &arr, int n, int target)
+{
+    unordered_map<int, int> mp;
+    pair<int, int> ans = {-1, -1};
+    for (int i = 0; i < n; i++)
+    {
+        auto it = mp.find(target - arr[i]);
+        if (it != mp.end())
+        {
+            if (ans.first == -1 || it->second < ans.first)
+            {
+                ans.first = it->second;
+                ans.second = i;
+            }
+        }
+        mp.insert({arr[i], i});
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/detect-cycle-in-an-undirected-graph_758967
+class Detect_Cycle_In_Undirected_Graph
+{
+  private:
+    bool dfs(vector<int> adj[], int cur, int pre, vector<bool> &visited)
+    {
+        visited[cur] = true;
+        for (auto next : adj[cur])
+        {
+            if (next != pre)
+            {
+                if (visited[next] == false)
+                {
+                    if (dfs(adj, next, cur, visited))
+                        return true;
+                }
+                else
+                    return true;
+            }
+        }
+        return false;
+    }
+
+  public:
+    bool detectCycle(int V, vector<int> adj[])
+    {
+        vector<bool> visited(V, false);
+        for (int i = 0; i < V; i++)
+        {
+            if (visited[i] == false && dfs(adj, i, -1, visited))
+                return true;
+        }
+        return false;
+    }
+};
+
+// https://www.naukri.com/code360/problems/bst-iterator_1112601
+class BSTiterator
+{
+  private:
+    stack<TreeNode<int> *> st;
+    void inorder(TreeNode<int> *root, stack<TreeNode<int> *> &st)
+    {
+        if (root == NULL)
+            return;
+        inorder(root->left, st);
+        st.push(root);
+        inorder(root->right, st);
+    }
+
+  public:
+    BSTiterator(TreeNode<int> *root)
+    {
+        stack<TreeNode<int> *> temp;
+        inorder(root, temp);
+        while (temp.empty() == false)
+        {
+            TreeNode<int> *top = temp.top();
+            temp.pop();
+            st.push(top);
+        }
+    }
+
+    int next()
+    {
+        TreeNode<int> *temp = st.top();
+        st.pop();
+        return temp->data;
+    }
+
+    bool hasNext() { return !st.empty(); }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -1307,6 +1698,19 @@ int main(int argc, char *argv[])
     {
         TreeNode<int> *root = TreeNode<int>::buildTree1({1, 2, 3, 4, -1, 5, 6, -1, 7, -1, -1, -1, -1, -1, -1});
         printf("Maximum Width In Binary Tree: %d\n", getMaxWidth(root));
+    }
+    {
+        Node<int> *head = Node<int>::newLinkList({1, 2, 3, 4, 5});
+        head = rotate(head, 2);
+        printf("Rotate Linked List:");
+        head->printLL();
+    }
+    {
+        int arr[] = {1, 3, 1, 4, 5, 6, 4, 8, 3};
+        printf("Maximum Distance:%d\n", maximumDistance(arr, sizeof(arr) / sizeof(int)));
+    }
+    {
+        printf("Distinct Subsequences:%d\n", distinctSubsequences("deed"));
     }
     return 0;
 }

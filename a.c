@@ -367,6 +367,19 @@ unsigned int reverseBits(unsigned int n)
     return reverse;
 }
 
+// https://www.naukri.com/code360/problems/reverse-bits_2181102
+long reverseBits1(long n)
+{
+    long result = 0;
+    for (int i = 0; i < 32; i++)
+    {
+        long lsb = n & 1;
+        result |= lsb << (31 - i);
+        n = n >> 1;
+    }
+    return result;
+}
+
 int majorityElement(int *nums, int numsSize)
 {
     //shellsort
@@ -633,6 +646,22 @@ int *lower_bound(int *first, int *last, int value)
     return first;
 }
 
+// https://www.naukri.com/code360/problems/reset-in-range_972998
+int resetAllBitsInRange(int n, int l, int r)
+{
+    int reset = 0;
+    for (int i = r; i <= l; i++)
+    {
+        reset <<= 1;
+        reset |= 1;
+    }
+    for (int i = 1; i < r; i++)
+    {
+        reset <<= 1;
+    }
+    return n & (~reset);
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -780,6 +809,9 @@ int main(int argc, char *argv[])
         {
             printf("The lower bound of 4 in the array is at index %ld.\n", lb - arr);
         }
+    }
+    {
+        printf("Reset in Range:%#x\n", resetAllBitsInRange(23, 4, 2));
     }
     return 0;
 }

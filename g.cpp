@@ -2305,6 +2305,42 @@ class LargestNumberInBinaryTree
     }
 };
 
+// https://www.naukri.com/code360/problems/k-most-frequent-words_696192
+vector<string> kMostFreqWords(string words[], int n, int k)
+{
+    auto cmp = [](pair<string, int> &a, pair<string, int> &b)
+    {
+        if (a.second == b.second)
+        {
+            return a.first > b.first;
+        }
+        else
+            return a.second < b.second;
+    };
+    priority_queue<pair<string, int>,
+                   vector<pair<string, int>>,
+                   decltype(cmp)>
+        q(cmp);
+    unordered_map<string, int> map;
+    for (int i = 0; i < n; i++)
+    {
+        map[words[i]]++;
+    }
+    for (auto it : map)
+    {
+        q.push({it.first, it.second});
+    }
+    vector<string> ans;
+    while (k > 0)
+    {
+        pair<string, int> temp = q.top();
+        q.pop();
+        ans.push_back(temp.first);
+        k--;
+    }
+    return ans;
+}
+
 // https://www.naukri.com/code360/problems/unival-trees_697311
 class CountUnivalueSubtrees
 {
@@ -2421,6 +2457,124 @@ BinaryTreeNode<int> *createTree(vector<int> &parent)
     }
     return root;
 }
+
+// https://www.naukri.com/code360/problems/bst-delete_973001
+class BST_Delete
+{
+  private:
+    BinaryTreeNode<int> *findMinNode(BinaryTreeNode<int> *root)
+    {
+        while (root && root->left != NULL)
+        {
+            root = root->left;
+        }
+        return root;
+    }
+
+  public:
+    BinaryTreeNode<int> *bstDelete(BinaryTreeNode<int> *root, int key)
+    {
+        if (root == NULL)
+            return NULL;
+        else if (key < root->data)
+            root->left = bstDelete(root->left, key);
+        else if (root->data < key)
+            root->right = bstDelete(root->right, key);
+        else
+        {
+            if (root->left == NULL)
+                return root->right;
+            else if (root->right == NULL)
+                return root->left;
+            else
+            {
+                BinaryTreeNode<int> *temp = findMinNode(root->right);
+                root->data = temp->data;
+                root->right = bstDelete(root->right, temp->data);
+            }
+        }
+        return root;
+    }
+};
+
+// https://www.naukri.com/code360/problems/time-to-burn-tree_630563
+class Time_To_Burn_Tree
+{
+  private:
+    int findTime(
+        BinaryTreeNode<int> *root, BinaryTreeNode<int> *target,
+        unordered_map<BinaryTreeNode<int> *, BinaryTreeNode<int> *> &parent)
+    {
+        queue<BinaryTreeNode<int> *> q;
+        int time = 0;
+        q.push(target);
+        unordered_map<BinaryTreeNode<int> *, bool> vis;
+        vis[target] = true;
+        while (!q.empty())
+        {
+            int size = q.size();
+            for (int i = 0; i < size; i++)
+            {
+                auto top = q.front();
+                q.pop();
+                if (top->left && !vis[top->left])
+                {
+                    vis[top->left] = true;
+                    q.push(top->left);
+                }
+                if (top->right && !vis[top->right])
+                {
+                    vis[top->right] = true;
+                    q.push(top->right);
+                }
+                if (parent[top] && !vis[parent[top]])
+                {
+                    vis[parent[top]] = true;
+                    q.push(parent[top]);
+                }
+            }
+            if (q.size() > 0)
+                time++;
+        }
+        return time;
+    }
+
+    BinaryTreeNode<int> *findParent(
+        BinaryTreeNode<int> *root, int start,
+        unordered_map<BinaryTreeNode<int> *, BinaryTreeNode<int> *> &parent)
+    {
+        queue<BinaryTreeNode<int> *> q;
+        q.push(root);
+        BinaryTreeNode<int> *temp;
+        parent[root] = NULL;
+        while (!q.empty())
+        {
+            auto top = q.front();
+            q.pop();
+            if (top->data == start)
+                temp = top;
+            if (top->left)
+            {
+                q.push(top->left);
+                parent[top->left] = top;
+            }
+            if (top->right)
+            {
+                q.push(top->right);
+                parent[top->right] = top;
+            }
+        }
+        return temp;
+    }
+
+  public:
+    int timeToBurnTree(BinaryTreeNode<int> *root, int start)
+    {
+        unordered_map<BinaryTreeNode<int> *, BinaryTreeNode<int> *> parent;
+        BinaryTreeNode<int> *target = findParent(root, start, parent);
+        return findTime(root, target, parent);
+    }
+};
 
 int main(int argc, char *argv[])
 {

@@ -733,6 +733,7 @@ int lcs2(string s, string t)
 }
 
 // shortest common supersequence
+// dp[i][0] and dp[0][j] == editDistance
 int shortestSupersequence(string a, string b)
 {
     int n = a.length();

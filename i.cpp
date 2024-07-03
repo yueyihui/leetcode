@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <cmath>
 #include <vector>
 using namespace std;
 
@@ -310,27 +311,6 @@ int longestRepeatingSubsequence(string st, int n)
         }
     }
     return dp[n][n];
-}
-
-// https://www.naukri.com/code360/problems/longest-repeating-substring_980523
-int longestRepeatingSubstring(string &str, int k)
-{
-    int countArray[26] = {0};
-    int left = 0;
-    int ans = 0;
-    int maxCount = INT_MIN;
-    for (int right = 0; right < str.size(); right++)
-    {
-        countArray[str[right] - 'A']++;
-        maxCount = max(maxCount, countArray[str[right] - 'A']);
-        if (right - left + 1 - maxCount > k)
-        {
-            countArray[str[left] - 'A']--;
-            left++;
-        }
-        ans = max(ans, right - left + 1);
-    }
-    return ans;
 }
 
 // https://www.naukri.com/code360/problems/floyd-warshall_2041979
@@ -933,6 +913,21 @@ class KMP
     }
 };
 
+// https://www.naukri.com/code360/problems/two-substrings_920397
+// Overlapping ABBA, by KMP
+bool findOverlap(string &s)
+{
+    const char *str = s.c_str();
+    const char *i = strstr(str, "AB");
+    if (i == NULL)
+        return false;
+    const char *j = strstr(str, "BA");
+    if (j == NULL)
+        return false;
+
+    return i + 1 != j && j + 1 != i;
+}
+
 // https://www.naukri.com/code360/problems/majority-element_893051
 // boyer moore majority vote algorithm
 int majorityElement(vector<int> &nums)
@@ -1018,6 +1013,399 @@ class Longest_Increasing_Subsequence
     }
 };
 
+// https://www.naukri.com/code360/problems/two-sum_839653
+vector<pair<int, int>> twoSum(vector<int> &arr, int target, int n)
+{
+    sort(arr.begin(), arr.end());
+    vector<pair<int, int>> ans;
+    int l = 0, r = n - 1;
+    while (l < r)
+    {
+        int value = arr[l] + arr[r];
+        if (value < target)
+        {
+            l++;
+        }
+        else if (value > target)
+        {
+            r--;
+        }
+        else
+        {
+            ans.push_back({arr[l], arr[r]});
+            l++;
+            r--;
+        }
+    }
+    if (ans.size() == 0)
+    {
+        ans.push_back({-1, -1});
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/excel-column-number_630461
+long long excelColumnNumber(string input)
+{
+    long long column = 0;
+    for (char c : input)
+    {
+        int value = c - 'A' + 1;
+        column = column * 26 + value;
+    }
+    return column;
+}
+
+class Path_In_A_Tree
+{
+  private:
+    bool find(TreeNode<int> *root, int x, vector<int> &path)
+    {
+        if (root == NULL)
+            return false;
+        else if (root->data == x)
+        {
+            path.push_back(root->data);
+            return true;
+        }
+        else
+        {
+            path.push_back(root->data);
+            if (find(root->left, x, path))
+                return true;
+            else
+            {
+                if (find(root->right, x, path))
+                    return true;
+                else
+                    path.pop_back();
+            }
+        }
+        return false;
+    }
+
+  public:
+    vector<int> pathInATree(TreeNode<int> *root, int x)
+    {
+        vector<int> path;
+        find(root, x, path);
+        return path;
+    }
+};
+
+// https://www.naukri.com/code360/problems/merge-sort-in-place_1118623
+class Merge_Sort_In_Place
+{
+  private:
+    void merge(vector<int> &arr, int l, int mid, int r)
+    {
+        vector<int> temp;
+        int i = l, j = mid + 1;
+        while (i <= mid && j <= r)
+        {
+            if (arr[i] < arr[j])
+                temp.push_back(arr[i++]);
+            else
+                temp.push_back(arr[j++]);
+        }
+        while (i <= mid)
+            temp.push_back(arr[i++]);
+        while (j <= r)
+            temp.push_back(arr[j++]);
+
+        i = l;
+        for (; i <= r; i++)
+            arr[i] = temp[i - l];
+    }
+
+    void _mergeSort(vector<int> &arr, int l, int r)
+    {
+        if (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            _mergeSort(arr, l, mid);
+            _mergeSort(arr, mid + 1, r);
+            merge(arr, l, mid, r);
+        }
+    }
+
+  public:
+    vector<int> mergeSort(vector<int> &arr)
+    {
+        _mergeSort(arr, 0, arr.size() - 1);
+        return arr;
+    }
+};
+
+// https://www.naukri.com/code360/problems/all-prime-numbers_624970
+// Sieve of Eratosthenes
+void all_prime_numbers(int n)
+{
+    vector<bool> arr(n + 1, true);
+    for (int i = 2; i <= n; i++)
+    {
+        for (int j = i; j <= n / i; j++)
+        {
+            arr[j * i] = false;
+        }
+    }
+    for (int i = 2; i <= n; i++)
+    {
+        if (arr[i] == true)
+            printf(" %d", i);
+    }
+}
+
+// https://www.naukri.com/code360/problems/largest-distance-between-two-nodes-in-a-tree_1093218
+// largest distance between two nodes in a tree
+class Largest_Distance_In_Tree
+{
+  private:
+    pair<int, int> bfs(int start, const vector<vector<int>> &adj)
+    {
+        vector<bool> visited(adj.size(), false);
+        queue<pair<int, int>> q;
+        visited[start] = true;
+        q.push({start, 0});
+        pair<int, int> farthest = {start, 0};
+
+        while (!q.empty())
+        {
+            int node = q.front().first;
+            int dist = q.front().second;
+            q.pop();
+            farthest = {node, dist};
+
+            for (int neighbor : adj[node])
+            {
+                if (!visited[neighbor])
+                {
+                    visited[neighbor] = true;
+                    q.push({neighbor, dist + 1});
+                }
+            }
+        }
+        return farthest;
+    }
+
+  public:
+    int largestDistance(int n, vector<vector<int>> &edges)
+    {
+        vector<vector<int>> adj(n);
+        for (const auto &edge : edges)
+        {
+            adj[edge[0]].push_back(edge[1]);
+            adj[edge[1]].push_back(edge[0]);
+        }
+        pair<int, int> farthestFromRoot = bfs(0, adj);
+        pair<int, int> farthestFromFarthest = bfs(farthestFromRoot.first, adj);
+        return farthestFromFarthest.second;
+    }
+};
+
+// https://www.naukri.com/code360/problems/floor-from-bst_920457
+int floorInBST(TreeNode<int> *root, int X)
+{
+    if (root == NULL)
+        return -1;
+    int rv = floorInBST(root->right, X);
+    if (rv != -1)
+        return rv;
+    else if (root->data <= X)
+        return root->data;
+    else
+        return floorInBST(root->left, X);
+}
+
+// https://www.naukri.com/code360/problems/boundary-traversal_790725
+class Boundary_Traversal_of_Binary_Tree
+{
+  private:
+    bool isLeaf(TreeNode<int> *root)
+    {
+        return root->left == NULL && root->right == NULL;
+    }
+    void addLeftBoundary(TreeNode<int> *root, vector<int> &ans)
+    {
+        if (root == NULL)
+            return;
+        TreeNode<int> *cur = root->left;
+        while (cur != NULL)
+        {
+            if (isLeaf(cur) == false)
+            {
+                ans.push_back(cur->data);
+            }
+            if (cur->left != NULL)
+                cur = cur->left;
+            else
+                cur = cur->right;
+        }
+    }
+    void addLeaves(TreeNode<int> *root, vector<int> &ans)
+    {
+        if (isLeaf(root))
+        {
+            ans.push_back(root->data);
+            return;
+        }
+        if (root->left)
+            addLeaves(root->left, ans);
+        if (root->right)
+            addLeaves(root->right, ans);
+    }
+    void addRightBoundary(TreeNode<int> *root, vector<int> &ans)
+    {
+        stack<int> st;
+        TreeNode<int> *cur = root->right;
+        while (cur)
+        {
+            if (!isLeaf(cur))
+                st.push(cur->data);
+            if (cur->right)
+                cur = cur->right;
+            else
+                cur = cur->left;
+        }
+        while (st.empty() == false)
+        {
+            ans.push_back(st.top());
+            st.pop();
+        }
+    }
+
+  public:
+    vector<int> traverseBoundary(TreeNode<int> *root)
+    {
+        vector<int> ans;
+        if (root == NULL)
+            return ans;
+        if (isLeaf(root) == false)
+            ans.push_back(root->data);
+        addLeftBoundary(root, ans);
+        addLeaves(root, ans);
+        addRightBoundary(root, ans);
+        return ans;
+    }
+};
+
+// https://www.naukri.com/code360/problems/serialise-deserialise-a-binary-tree_920328
+class Serialize_and_Deserialize_Binary_Tree
+{
+  public:
+    string serializeTree(TreeNode<int> *root)
+    {
+        string s = "";
+        queue<TreeNode<int> *> q;
+        q.push(root);
+        while (q.empty() == false)
+        {
+            TreeNode<int> *temp = q.front();
+            q.pop();
+
+            if (temp->data == -1)
+            {
+                s += "#,";
+                continue;
+            }
+            else
+            {
+                s += to_string(temp->data);
+                s += ',';
+            }
+
+            if (temp->left)
+                q.push(temp->left);
+            else
+            {
+                q.push(new TreeNode<int>(-1));
+            }
+
+            if (temp->right)
+                q.push(temp->right);
+            else
+                q.push(new TreeNode<int>(-1));
+        }
+        // 1,2,3,#,4,5,#,#,#,#,#,
+        return s;
+    }
+
+    TreeNode<int> *deserializeTree(string &s)
+    {
+        int i = 0;
+        string str = "";
+        while (i < s.length() && s[i] != ',')
+        {
+            str += s[i];
+            i++;
+        }
+        i++;
+        TreeNode<int> *root = new TreeNode<int>(stoi(str));
+        queue<TreeNode<int> *> q;
+        q.push(root);
+        while (i < s.length())
+        {
+            TreeNode<int> *temp = q.front();
+            q.pop();
+            if (s[i] != '#')
+            {
+                str = "";
+                while (i < s.length() && s[i] != ',')
+                {
+                    str += s[i];
+                    i++;
+                }
+                temp->left = new TreeNode<int>(stoi(str));
+                q.push(temp->left);
+            }
+            else
+            {
+                i++;
+            }
+            i++; // to skip ,
+
+            if (s[i] != '#')
+            {
+                str = "";
+                while (i < s.length() && s[i] != ',')
+                {
+                    str += s[i];
+                    i++;
+                }
+                temp->right = new TreeNode<int>(stoi(str));
+                q.push(temp->right);
+            }
+            else
+            {
+                i++;
+            }
+            i++; // to skip ,
+        }
+        return root;
+    }
+};
+
+// https://www.naukri.com/code360/problems/diagonal-traversal-of-a-binary-tree_920477
+// 135 degrees traversal
+vector<int> diagonalTraversal(TreeNode<int> *root)
+{
+    vector<int> ans;
+    queue<TreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        TreeNode<int> *temp = q.front();
+        q.pop();
+        for (TreeNode<int> *cur = temp; cur != NULL; cur = cur->right)
+        {
+            ans.push_back(cur->data);
+            if (cur->left)
+                q.push(cur->left);
+        }
+    }
+    return ans;
+}
+
 int main(int argc, char *argv[])
 {
     {
@@ -1056,10 +1444,6 @@ int main(int argc, char *argv[])
     {
         string st("AABCBDC");
         printf("Longest Repeating Subsequence:%d\n", longestRepeatingSubsequence(st, st.length()));
-    }
-    {
-        string str("ABCCAA");
-        printf("Longest Repeating Substring:%d\n", longestRepeatingSubstring(str, 2));
     }
     {
         string s("N2 i&nJA?a& jnI2n");
@@ -1142,6 +1526,59 @@ int main(int argc, char *argv[])
         Longest_Increasing_Subsequence lis;
         printf("Longest Increasing Subsequence:%d\n",
                lis.longestIncreasingSubsequence(arr, sizeof(arr) / sizeof(int)));
+    }
+    {
+        vector<int> arr = {2, 7, 11, 13};
+        vector<pair<int, int>> ans = twoSum(arr, 9, arr.size());
+        printf("Two Sum:");
+        for (auto i : ans)
+        {
+            printf("%d %d\n", i.first, i.second);
+        }
+    }
+    {
+        printf("Excel Column Number:%lld\n", excelColumnNumber("AAA"));
+    }
+    {
+        TreeNode<int> *root = TreeNode<int>::buildTree({1, 2, 3, 4, -1, -1, -1, -1, -1});
+        Path_In_A_Tree p;
+        vector<int> path = p.pathInATree(root, 4);
+        printf("Path In A Tree:");
+        for (int i : path)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
+    }
+    {
+        vector<int> arr = {1, -4, -2, 5, 3};
+        Merge_Sort_In_Place m;
+        vector<int> ans = m.mergeSort(arr);
+        printf("Merge Sort In-Place:");
+        for (int i : ans)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
+    }
+    {
+        printf("All prime numbers:");
+        all_prime_numbers(20);
+        printf("\n");
+    }
+    {
+        TreeNode<int> *root = TreeNode<int>::buildTree({10, 12, -1, 3, -1, 16, -1, 12, -1, 12, -1, -1, -1});
+        Serialize_and_Deserialize_Binary_Tree sd;
+        string s = sd.serializeTree(root);
+        std::cout << "Serialize Binary Tree: " << s << std::endl;
+        root = sd.deserializeTree(s);
+        vector<int> res = root->toVector();
+        std::cout << "Deserialize Binary Tree:";
+        for (int i : res)
+        {
+            printf(" %d", i);
+        }
+        printf("\n");
     }
     return 0;
 }
