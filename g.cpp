@@ -458,6 +458,69 @@ class LeftView
     }
 };
 
+// https://www.naukri.com/code360/problems/vertical-sum-in-a-binary-tree_981285
+class Vertical_Sum_in_Binary_Tree
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, map<int, int> &mm, int i)
+    {
+        if (root == NULL)
+            return;
+        mm[i] += root->data;
+        preorder(root->left, mm, i - 1);
+        preorder(root->right, mm, i + 1);
+    }
+
+  public:
+    vector<int> verticalSumBinaryTree(BinaryTreeNode<int> *root)
+    {
+        map<int, int> mm;
+        preorder(root, mm, 0);
+        vector<int> ans;
+        for (auto i : mm)
+        {
+            ans.push_back(i.second);
+        }
+        return ans;
+    }
+};
+
+// https://www.naukri.com/code360/problems/vertical-binary-tree_982801
+class Vertical_Binary_Tree
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, map<int, vector<int>> &mm,
+                  int i, int &l, int &r)
+    {
+        if (root == NULL)
+            return;
+        mm[i].push_back(root->data);
+        l = min(i, l);
+        r = max(i, r);
+        preorder(root->left, mm, i - 1, l, r);
+        preorder(root->right, mm, i + 1, l, r);
+    }
+
+  public:
+    vector<int> verticalBinaryTree(BinaryTreeNode<int> *root)
+    {
+        int l = 0, r = 0;
+        map<int, vector<int>> mm;
+        vector<int> ans;
+        preorder(root, mm, 0, l, r);
+        for (int i = l; i <= r; i++)
+        {
+            auto vec = mm[i];
+            sort(vec.begin(), vec.end());
+            for (int j : vec)
+            {
+                ans.push_back(j);
+            }
+        }
+        return ans;
+    }
+};
+
 //https://www.geeksforgeeks.org/minimum-count-of-numbers-required-from-given-array-to-represent-s/
 int findMinCountToReachSum(int sum, vector<int> components)
 {
@@ -959,7 +1022,7 @@ class Sorted_Linked_List_to_Balanced_BST
             else
             { // right left case
                 root->right = rightRotate(root->right);
-                return leftRotate(root->right);
+                return leftRotate(root);
             }
         }
         else
@@ -2573,6 +2636,211 @@ class Time_To_Burn_Tree
         unordered_map<BinaryTreeNode<int> *, BinaryTreeNode<int> *> parent;
         BinaryTreeNode<int> *target = findParent(root, start, parent);
         return findTime(root, target, parent);
+    }
+};
+
+// https://www.naukri.com/code360/problems/maximum-subtree-sum_1082330
+// max subtree
+class Maximum_Subtree_Sum
+{
+  private:
+    long long postorder(BinaryTreeNode<int> *root, long long &sum)
+    {
+        if (root == NULL)
+            return 0;
+        long long cur =
+            postorder(root->left, sum) + postorder(root->right, sum) + root->data;
+        sum = max(sum, cur);
+        return cur;
+    }
+
+  public:
+    long long maxSubtreeSum(BinaryTreeNode<int> *root)
+    {
+        long long sum = INT_MIN;
+        postorder(root, sum);
+        return sum;
+    }
+};
+
+// https://www.naukri.com/code360/problems/is-height-balanced-binary-tree_975497
+class Is_Balanced_Binary_Tree
+{
+  private:
+    bool _isBalancedBT(TreeNode<int> *root, int &sum)
+    {
+        if (root == NULL)
+        {
+            sum = 0;
+            return true;
+        }
+        if (root->left == NULL && root->right == NULL)
+        {
+            sum = 1;
+            return true;
+        }
+        int left = 0, right = 0;
+        if (_isBalancedBT(root->left, left) && _isBalancedBT(root->right, right))
+        {
+            if (abs(left - right) <= 1)
+            {
+                sum = max(left, right) + 1;
+                return true;
+            }
+        }
+        return false;
+    }
+
+  public:
+    bool isBalancedBT(TreeNode<int> *root)
+    {
+        int sum = 0;
+        return _isBalancedBT(root, sum);
+    }
+};
+
+// https://www.naukri.com/code360/problems/leftmost-and-rightmost-nodes-in-a-binary-tree_981310
+class Leftmost_rightmost_binary_tree
+{
+  private:
+    void leftView(BinaryTreeNode<int> *root, vector<int> &view, int i)
+    {
+        if (root == NULL)
+            return;
+        if (view.size() == i)
+        {
+            view.push_back(root->data);
+        }
+        leftView(root->left, view, i + 1);
+        leftView(root->right, view, i + 1);
+    }
+    void rightView(BinaryTreeNode<int> *root, vector<int> &view, int i)
+    {
+        if (root == NULL)
+            return;
+        if (view.size() == i)
+        {
+            view.push_back(root->data);
+        }
+        rightView(root->right, view, i + 1);
+        rightView(root->left, view, i + 1);
+    }
+
+  public:
+    vector<vector<int>> cornerNodes(BinaryTreeNode<int> *root)
+    {
+        vector<vector<int>> ans;
+        vector<int> left;
+        vector<int> right;
+        leftView(root, left, 0);
+        rightView(root, right, 0);
+        for (int i = 0; i < left.size(); i++)
+        {
+            ans.push_back({left[i], right[i]});
+        }
+        return ans;
+    }
+};
+
+BinaryTreeNode<int> *insertNode(BinaryTreeNode<int> *root, int key)
+{
+    if (root == NULL)
+        return new BinaryTreeNode<int>(key);
+    if (root->data < key)
+        root->right = insertNode(root->right, key);
+    else if (root->data > key)
+        root->left = insertNode(root->left, key);
+    return root;
+}
+
+// https://www.naukri.com/code360/problems/delete-node-in-bst_920381
+BinaryTreeNode<int> *deleteNode(BinaryTreeNode<int> *root, int key)
+{
+    if (root == NULL)
+        return NULL;
+    if (root->data < key)
+    {
+        root->right = deleteNode(root->right, key);
+        return root;
+    }
+    if (root->data > key)
+    {
+        root->left = deleteNode(root->left, key);
+        return root;
+    }
+    if (root->left == NULL)
+        return root->right;
+    if (root->right == NULL)
+        return root->left;
+    BinaryTreeNode<int> *succP = root;
+    BinaryTreeNode<int> *succ = root->right;
+    while (succ->left != NULL)
+    {
+        succP = succ;
+        succ = succ->left;
+    }
+    if (succP == root)
+        root->right = succ->right;
+    else
+        succP->left = succ->right;
+    root->data = succ->data;
+    return root;
+}
+
+// https://www.naukri.com/code360/problems/closest-element-in-bst_920449
+class Closest_BST_Value
+{
+  private:
+    void dfs(BinaryTreeNode<int> *root, int k, int &diff, int &ans)
+    {
+        if (root == NULL)
+            return;
+
+        int temp = abs(root->data - k);
+        if (diff > temp)
+        {
+            diff = temp;
+            ans = root->data;
+        }
+        else if (diff == temp)
+        {
+            ans = min(ans, root->data);
+        }
+
+        dfs(root->left, k, diff, ans);
+        dfs(root->right, k, diff, ans);
+    }
+
+  public:
+    int findClosestElement(BinaryTreeNode<int> *node, int k)
+    {
+        int ans = INT_MAX, diff = INT_MAX;
+        dfs(node, k, diff, ans);
+        return ans;
+    }
+};
+
+// https://www.naukri.com/code360/problems/construct-tree-from-preorder-traversal_980532
+class Construct_Tree_From_Preorder
+{
+  private:
+    BinaryTreeNode<int> *build(vector<int> &pre, vector<int> &isLeaf, int &i)
+    {
+        if (i > pre.size())
+            return NULL;
+        if (isLeaf[i] == 1)
+            return new BinaryTreeNode<int>(pre[i]);
+        BinaryTreeNode<int> *root = new BinaryTreeNode<int>(pre[i]);
+        root->left = build(pre, isLeaf, ++i);
+        root->right = build(pre, isLeaf, ++i);
+        return root;
+    }
+
+  public:
+    BinaryTreeNode<int> *constructTree(vector<int> &pre, vector<int> &isLeaf)
+    {
+        int i = 0;
+        return build(pre, isLeaf, i);
     }
 };
 

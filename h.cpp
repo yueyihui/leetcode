@@ -1023,6 +1023,74 @@ class TopViewOfBinaryTree
     }
 };
 
+// https://www.naukri.com/code360/problems/bottom-view-of-binary-tree_893110
+vector<int> bottomView(TreeNode<int> *root)
+{
+    map<int, int> m;
+    queue<pair<int, TreeNode<int> *>> q;
+    q.push({0, root});
+    while (q.empty() == false)
+    {
+        auto temp = q.front();
+        q.pop();
+        m[temp.first] = temp.second->data;
+        if (temp.second->left)
+            q.push({temp.first - 1, temp.second->left});
+        if (temp.second->right)
+            q.push({temp.first + 1, temp.second->right});
+    }
+    vector<int> ans;
+    for (auto i : m)
+    {
+        ans.push_back(i.second);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/binary-tree-leaves-to-doubly-linked-list_983643
+class Binary_Tree_Leaves_to_dll
+{
+    void preorder(TreeNode<int> *root, TreeNode<int> **pre,
+                  TreeNode<int> **head)
+    {
+        if (root == NULL)
+            return;
+        if (root->left == NULL && root->right == NULL)
+        {
+            if (*head == NULL)
+            {
+            }
+            else
+            {
+                (*head)->right = root;
+                root->left = (*head);
+            }
+            *head = root;
+            if (pre != NULL)
+            {
+                *pre = NULL;
+            }
+            return;
+        }
+
+        preorder(root->left, &root->left, head);
+        preorder(root->right, &root->right, head);
+    }
+
+    TreeNode<int> *leafToDLL(TreeNode<int> *root)
+    {
+        if (root == NULL || root->left == NULL && root->right == NULL)
+            return root;
+        TreeNode<int> *head = NULL;
+        preorder(root, NULL, &head);
+        while (head->left != NULL)
+        {
+            head = head->left;
+        }
+        return head;
+    }
+};
+
 // https://www.naukri.com/code360/problems/maximum-width-in-binary-tree_763671
 int getMaxWidth(TreeNode<int> *root)
 {
@@ -1301,6 +1369,37 @@ class Subarray_with_distinct_integers
     }
 };
 
+// https://www.naukri.com/code360/problems/count-with-k-different-characters_1214627
+class Count_exactly_K_Different_Characters
+{
+  private:
+    int countSubStr(string &str, int k)
+    {
+        unordered_map<char, int> dp;
+        int count = 0;
+        for (int l = 0, r = 0; r < str.length(); r++)
+        {
+            dp[str[r]]++;
+            while (dp.size() > k)
+            {
+                auto it = dp.find(str[l]);
+                it->second--;
+                if (it->second == 0)
+                    dp.erase(it);
+                l++;
+            }
+            count += r - l + 1;
+        }
+        return count;
+    }
+
+  public:
+    int countSubStrings(string str, int k)
+    {
+        return countSubStr(str, k) - countSubStr(str, k - 1);
+    }
+};
+
 // https://www.naukri.com/code360/problems/longest-repeating-substring_980523
 int longestRepeatingSubstring(string &str, int k)
 {
@@ -1438,6 +1537,44 @@ class BSTiterator
 
     bool hasNext() { return !st.empty(); }
 };
+
+// https://www.naukri.com/code360/problems/cousins-of-given-node-in-binary-tree_873363
+vector<int> cousinsOfNode(TreeNode<int> *root, int node)
+{
+    vector<int> ans;
+    queue<TreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        bool ret = false;
+        int n = q.size();
+        for (int i = 0; i < n; i++)
+        {
+            auto temp = q.front();
+            q.pop();
+            if (temp->left && temp->left->data == node ||
+                temp->right && temp->right->data == node)
+            {
+                ret = true;
+                continue;
+            }
+            if (temp->left)
+                q.push(temp->left);
+            if (temp->right)
+                q.push(temp->right);
+        }
+        if (ret)
+            break;
+    }
+    while (q.empty() == false)
+    {
+        auto front = q.front();
+        q.pop();
+        ans.push_back(front->data);
+    }
+    sort(ans.begin(), ans.end());
+    return ans;
+}
 
 int main(int argc, char *argv[])
 {

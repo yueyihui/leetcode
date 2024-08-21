@@ -1620,6 +1620,41 @@ int maxOne(vector<vector<int>> &arr)
     return row;
 }
 
+// https://www.naukri.com/code360/problems/find-k-closest-elements_1263702
+vector<int> KClosest(vector<int> &a, int n, int k, int x)
+{
+    list<int> temp;
+    vector<int> ans;
+    int l = 0, r = n - 1;
+    while (l < r)
+    {
+        int mid = l + (r - l) / 2;
+        if (a[mid] > x)
+            r = mid;
+        else
+            l = mid + 1;
+    }
+
+    l -= k;
+    if (l < 0)
+        l = 0;
+
+    for (int i = 0; i < k; i++)
+    {
+        temp.push_back(a[l++]);
+    }
+    while (l < a.size() && abs(a[l] - x) < abs(temp.front() - x))
+    {
+        temp.pop_front();
+        temp.push_back(a[l++]);
+    }
+    for (auto i = temp.begin(); i != temp.end(); i++)
+    {
+        ans.push_back(*i);
+    }
+    return ans;
+}
+
 int main(int argc, char *argv[])
 {
     std::unordered_map<char, char> a;

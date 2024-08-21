@@ -13,6 +13,7 @@ class TreeNode
     T data;
     TreeNode<T> *left;
     TreeNode<T> *right;
+    int height;
 
     TreeNode(T val)
     {
@@ -20,6 +21,7 @@ class TreeNode
         this->bubble = false;
         left = NULL;
         right = NULL;
+        height = 1;
     }
 
     TreeNode()
@@ -28,6 +30,7 @@ class TreeNode
         this->bubble = true;
         left = NULL;
         right = NULL;
+        height = 1;
     }
 
     bool isBubble()
@@ -1406,6 +1409,307 @@ vector<int> diagonalTraversal(TreeNode<int> *root)
     return ans;
 }
 
+// https://www.naukri.com/code360/problems/diagonal-traversal_920391
+vector<vector<int>> diagonal(TreeNode<int> *root)
+{
+    vector<vector<int>> ans;
+    queue<TreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        vector<int> ans1;
+        for (int n = q.size(); n > 0; n--)
+        {
+            TreeNode<int> *temp = q.front();
+            q.pop();
+            while (temp != NULL)
+            {
+                ans1.push_back(temp->data);
+                if (temp->left)
+                    q.push(temp->left);
+                temp = temp->right;
+            }
+        }
+        ans.push_back(ans1);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/bottom-right-view-of-binary-tree_1081489
+// 135 degrees
+vector<int> bottomRightView(TreeNode<int> *root)
+{
+    vector<int> ans;
+    queue<TreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        int n = q.size();
+        int last = 0;
+        for (int i = 0; i < n; i++)
+        {
+            TreeNode<int> *temp = q.front();
+            q.pop();
+            while (temp != NULL)
+            {
+                if (temp->left)
+                    q.push(temp->left);
+                if (temp->right == NULL)
+                    last = temp->data;
+                temp = temp->right;
+            }
+        }
+        ans.push_back(last);
+    }
+    sort(ans.begin(), ans.end());
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/kth-missing-element_893215
+int missingK(vector<int> vec, int n, int k)
+{
+    int l = 0, r = n - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        int diff = vec[mid] - (mid + 1);
+        if (diff < k)
+            l = mid + 1;
+        else
+            r = mid - 1;
+    }
+    return l + k;
+}
+
+// https://www.naukri.com/code360/problems/construct-a-strict-binary-tree_893101
+class Construct_strict_binary_tree
+{
+  private:
+    TreeNode<int> *preorder(vector<int> &pre, vector<char> &typeNL, int &i)
+    {
+        if (typeNL[i] == 'L')
+        {
+            return new TreeNode<int>(pre[i++]);
+        }
+        TreeNode<int> *root = new TreeNode<int>(pre[i++]);
+        root->left = preorder(pre, typeNL, i);
+        root->right = preorder(pre, typeNL, i);
+        return root;
+    }
+
+  public:
+    TreeNode<int> *constructSBT(vector<int> &pre, vector<char> &typeNL)
+    {
+        int i = 0;
+        return preorder(pre, typeNL, i);
+    }
+};
+
+// https://www.naukri.com/code360/problems/insertion-in-avl-tree_1263690
+class Insertion_in_AVL_Tree
+{
+  private:
+    int heightOf(TreeNode<int> *root)
+    {
+        if (root == NULL)
+            return 0;
+        return root->height;
+    }
+
+    void updateHeight(TreeNode<int> *root)
+    {
+        if (root == NULL)
+            return;
+        root->height = max(heightOf(root->left), heightOf(root->right)) + 1;
+    }
+
+    TreeNode<int> *leftRotate(TreeNode<int> *root)
+    {
+        TreeNode<int> *y = root->right;
+        root->right = y->left;
+        y->left = root;
+        updateHeight(root);
+        updateHeight(y);
+        return y;
+    }
+
+    TreeNode<int> *rightRotate(TreeNode<int> *root)
+    {
+        TreeNode<int> *y = root->left;
+        root->left = y->right;
+        y->right = root;
+        updateHeight(root);
+        updateHeight(y);
+        return y;
+    }
+
+    TreeNode<int> *insertIntoAvl(TreeNode<int> *root, int data)
+    {
+        if (root == NULL)
+            return new TreeNode<int>(data);
+
+        if (root->data < data)
+            root->right = insertIntoAvl(root->right, data);
+        else if (root->data > data)
+            root->left = insertIntoAvl(root->left, data);
+
+        updateHeight(root);
+        int lh = heightOf(root->left);
+        int rh = heightOf(root->right);
+        if (lh - rh > 1)
+        {
+            // left left
+            if (data < root->left->data)
+                return rightRotate(root);
+            // left right
+            else
+            {
+                root->left = leftRotate(root->left);
+                return rightRotate(root);
+            }
+        }
+        else if (rh - lh > 1)
+        {
+            // right right
+            if (data > root->right->data)
+                return leftRotate(root);
+            // right left
+            else
+            {
+                root->right = rightRotate(root->right);
+                return leftRotate(root);
+            }
+        }
+        else
+            return root;
+    }
+
+  public:
+    TreeNode<int> *insertionInAvlTree(vector<int> &allNodeValues, int n)
+    {
+        TreeNode<int> *root = NULL;
+        for (int i = 0; i < n; i++)
+        {
+            root = insertIntoAvl(root, allNodeValues[i]);
+        }
+        return root;
+    }
+};
+
+// https://www.naukri.com/code360/problems/diameter-of-the-binary-tree_920552
+class DiameterOfBinaryTree
+{
+  private:
+    int diameter(TreeNode<int> *root, int &dia)
+    {
+        if (root == NULL)
+            return 0;
+        int ld = diameter(root->left, dia);
+        int rd = diameter(root->right, dia);
+        dia = max(ld + rd, dia);
+        return max(ld, rd) + 1;
+    }
+
+  public:
+    int diameterOfBinaryTree(TreeNode<int> *root)
+    {
+        int dia = 0;
+        diameter(root, dia);
+        return dia;
+    }
+};
+
+// https://www.naukri.com/code360/problems/longest-word-made-from-other-words_1229401
+// a word is constructed by words
+class Longest_Word
+{
+  private:
+    bool canBeConstructed(const string &word, const unordered_set<string> &wordSet)
+    {
+        for (int i = 1; i < word.size(); ++i)
+        {
+            string prefix = word.substr(0, i);
+            string suffix = word.substr(i);
+            if (wordSet.find(prefix) != wordSet.end() &&
+                (wordSet.find(suffix) != wordSet.end() || canBeConstructed(suffix, wordSet)))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+  public:
+    vector<string> findLongestWordList(vector<string> &wordList)
+    {
+        sort(wordList.begin(), wordList.end(),
+             [](const string &a, const string &b)
+             { return a.size() > b.size(); });
+        unordered_set<string> wordSet(wordList.begin(), wordList.end());
+        vector<string> result;
+        for (const string &word : wordList)
+        {
+            if (canBeConstructed(word, wordSet))
+            {
+                if (result.empty())
+                    result.push_back(word);
+                else if (result.back().size() == word.size())
+                    result.push_back(word);
+            }
+        }
+        sort(result.begin(), result.end());
+        return result;
+    }
+};
+
+// https://www.naukri.com/code360/problems/minimum-swaps-to-convert-binary-tree-into-bst_1118109
+// https://www.naukri.com/code360/library/minimum-swap-required-to-convert-binary-tree-to-binary-search-tree
+class Minimum_Swaps_To_Convert_Into_BST
+{
+  private:
+    void _inorder(vector<int> &arr, vector<int> &inorder, int i)
+    {
+        if (i >= arr.size())
+            return;
+        _inorder(arr, inorder, 2 * i + 1);
+        inorder.push_back(arr[i]);
+        _inorder(arr, inorder, 2 * i + 2);
+    }
+
+  public:
+    int minimumSwaps(vector<int> &arr, int n)
+    {
+        int i = 0, ans = 0;
+        vector<vector<int>> dp;
+        vector<int> inorder;
+        _inorder(arr, inorder, i);
+        for (int i = 0; i < n; i++)
+        {
+            vector<int> temp;
+            temp.push_back(inorder[i]);
+            temp.push_back(i);
+            dp.push_back(temp);
+        }
+        sort(dp.begin(), dp.end(),
+             [](vector<int> &a, vector<int> &b) -> bool
+             { return a[0] < b[0]; });
+        for (int i = 0; i < n; i++)
+        {
+            if (i == dp[i][1])
+                continue;
+            else
+            {
+                swap(dp[i][0], dp[dp[i][1]][0]);
+                swap(dp[i][1], dp[dp[i][1]][1]);
+            }
+            if (i != dp[i][1])
+                i--;
+            ans++;
+        }
+        return ans;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     {
@@ -1579,6 +1883,18 @@ int main(int argc, char *argv[])
             printf(" %d", i);
         }
         printf("\n");
+    }
+    {
+        vector<string> wordList = {"cat", "banana", "dog", "nana", "my", "walk",
+                                   "walker", "baby", "dogwalkers", "s", "babymybaby"};
+        Longest_Word lw;
+        vector<string> ans = lw.findLongestWordList(wordList);
+        std::cout << "Longest Word:";
+        for (auto s : ans)
+        {
+            std::cout << " " << s;
+        }
+        std::cout << std::endl;
     }
     return 0;
 }

@@ -662,6 +662,35 @@ int resetAllBitsInRange(int n, int l, int r)
     return n & (~reset);
 }
 
+// https://www.naukri.com/code360/problems/find-unique_625159
+int findUnique(int *arr, int size)
+{
+    int ans = 0;
+    for (int i = 0; i < size; i++)
+    {
+        ans ^= arr[i];
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/number-of-balanced-binary-trees_1062690
+// count nodes from height of avl
+int countBalancedBinaryTree(int n)
+{
+    const int MOD = 1e9 + 7;
+    long *dp = (long *)malloc(sizeof(int) * n);
+    memset(dp, 0, sizeof(int) * n);
+    dp[0] = 1;
+    dp[1] = 1;
+    for (int i = 2; i <= n; i++)
+    {
+        int a = dp[i - 1] * dp[i - 1] % MOD;
+        int b = 2 * dp[i - 1] * dp[i - 2] % MOD;
+        dp[i] = (a + b) % MOD;
+    }
+    return dp[n];
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
