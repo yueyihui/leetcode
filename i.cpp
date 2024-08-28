@@ -962,16 +962,16 @@ int knapsack(vector<int> weight, vector<int> value, int n, int W)
     vector<vector<int>> dp(n + 1, vector<int>(W + 1, 0));
     for (int i = 1; i <= n; i++)
     {
-        for (int j = 1; j <= W; j++)
+        for (int w = 1; w <= W; w++)
         {
-            if (weight[i - 1] <= j)
+            if (weight[i - 1] <= w)
             {
-                dp[i][j] =
-                    max(value[i - 1] + dp[i - 1][j - weight[i - 1]], dp[i - 1][j]);
+                dp[i][w] =
+                    max(value[i - 1] + dp[i - 1][w - weight[i - 1]], dp[i - 1][w]);
             }
             else
             {
-                dp[i][j] = dp[i - 1][j];
+                dp[i][w] = dp[i - 1][w];
             }
         }
     }
@@ -1707,6 +1707,29 @@ class Minimum_Swaps_To_Convert_Into_BST
             ans++;
         }
         return ans;
+    }
+};
+
+// https://www.naukri.com/code360/problems/binary-tree-cost_3116811
+class Binary_Tree_Cost
+{
+  private:
+    int postorder(TreeNode<int> *root, long &v)
+    {
+        if (root == NULL)
+            return 0;
+        int l = postorder(root->left, v);
+        int r = postorder(root->right, v);
+        v += abs(l - r);
+        return root->data + l + r;
+    }
+
+  public:
+    long binaryTreeCost(TreeNode<int> *root)
+    {
+        long cnt = 0;
+        postorder(root, cnt);
+        return cnt;
     }
 };
 

@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -691,6 +692,17 @@ int countBalancedBinaryTree(int n)
     return dp[n];
 }
 
+// https://www.naukri.com/code360/problems/locked-binary-tree_4874663
+int locking(int n, int k, int par[], int lock[])
+{
+    int index = k;
+    while (index != -1 && lock[index] != 1)
+    {
+        index = par[index];
+    }
+    return index == -1 ? 1 : !lock[index];
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -841,6 +853,33 @@ int main(int argc, char *argv[])
     }
     {
         printf("Reset in Range:%#x\n", resetAllBitsInRange(23, 4, 2));
+    }
+    {
+        double norm = 1500;
+        double x1[3] = {10, 10, 10};
+        double y1[3] = {norm, norm - 500, norm + 500};
+
+        double norm1 = 20500;
+        double x2[3] = {100, 100, 100};
+        double y2[3] = {norm1, norm1 - norm1 * 0.08, norm1 + norm1 * 0.08};
+
+        double k[3] = {0};
+        double b[3] = {0};
+
+        for (int i = 0; i < 3; i++)
+        {
+            k[i] = (y2[i] - y1[i]) / (x2[i] - x1[i]);
+            b[i] = y1[i] - k[i] * x1[i];
+        }
+        for (int i = 10; i <= 100; i += 10)
+        {
+            printf("%.0lf ", floor(floor(k[0] * i + b[0]) * 0.7));
+            for (int j = 1; j < 3; j++)
+            {
+                printf("%.0lf ", floor(k[j] * i + b[j]));
+            }
+            printf("\n");
+        }
     }
     return 0;
 }
