@@ -35,6 +35,20 @@ class BinaryTreeNode
     }
 };
 
+class Node
+{
+  public:
+    int data;
+    Node *next;
+    Node *child;
+    Node(int data)
+    {
+        this->data = data;
+        this->next = NULL;
+        this->child = NULL;
+    }
+};
+
 // https://www.naukri.com/code360/problems/count-special-nodes-in-generic-tree_630522
 class Count_Special_Nodes_In_Generic_Tree
 {
@@ -180,6 +194,308 @@ bool checkgraph(vector<vector<int>> edges, int n, int m)
     }
     return true;
 }
+
+// https://www.naukri.com/code360/problems/invert-a-binary-tree_1281382
+class Invert_Binary_Tree
+{
+  private:
+    bool storeParents(TreeNode<int> *root, stack<TreeNode<int> *> &parents, TreeNode<int> *leaf)
+    {
+        parents.push(root);
+
+        if (!root->left and !root->right)
+        {
+            if (root->data == leaf->data)
+                return true;
+            else
+                parents.pop();
+            return false;
+        }
+
+        if (root->left)
+        {
+            if (storeParents(root->left, parents, leaf))
+                return true;
+        }
+
+        if (root->right)
+        {
+            if (storeParents(root->right, parents, leaf))
+                return true;
+        }
+
+        parents.pop();
+        return false;
+    }
+
+  public:
+    TreeNode<int> *invertBinaryTree(TreeNode<int> *root, TreeNode<int> *leaf)
+    {
+        if (!root)
+            return NULL;
+
+        stack<TreeNode<int> *> parents;
+        storeParents(root, parents, leaf);
+
+        TreeNode<int> *head = parents.top();
+        parents.pop();
+
+        TreeNode<int> *par = head;
+        while (!parents.empty())
+        {
+            auto p = parents.top();
+            parents.pop();
+
+            if (p->right == head)
+            {
+                p->right = p->left;
+                p->left = NULL;
+            }
+            else
+            {
+                p->left = NULL;
+            }
+
+            head->left = p;
+            head = p;
+        }
+
+        return par;
+    }
+};
+
+class DSU
+{
+  private:
+    int *parent;
+    int *rank;
+
+  public:
+    DSU(int n)
+    {
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            parent[i] = i;
+            rank[i] = 0;
+        }
+    }
+    int find(int v)
+    {
+        if (v == parent[v])
+            return v;
+        return parent[v] = find(parent[v]);
+    }
+    void _union(int a, int b)
+    {
+        a = find(a);
+        b = find(b);
+        if (a != b)
+        {
+            if (a < b)
+                swap(a, b);
+            parent[b] = a;
+            rank[a]++;
+        }
+    }
+};
+
+// https://www.naukri.com/code360/problems/minimum-spanning-tree_631769
+int minimumSpanningTree(vector<vector<int>> &edges, int n)
+{
+    sort(edges.begin(), edges.end(),
+         [](vector<int> &a, vector<int> &b) -> bool
+         { return a[2] < b[2]; });
+    DSU dsu(n);
+    int ans = 0;
+    for (auto edge : edges)
+    {
+        int x = edge[0];
+        int y = edge[1];
+        int w = edge[2];
+        if (dsu.find(x) != dsu.find(y))
+        {
+            dsu._union(x, y);
+            ans += w;
+        }
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/flatten-linked-list_893175
+Node *flattenLL(Node *head)
+{
+    if (head == NULL)
+        return head;
+    Node *tail = NULL;
+    queue<Node *> q;
+    q.push(head);
+    while (q.empty() == false)
+    {
+        Node *temp = q.front();
+        q.pop();
+        if (tail)
+        {
+            tail->next = temp;
+        }
+        while (temp)
+        {
+            tail = temp;
+            if (temp->child)
+            {
+                q.push(temp->child);
+                temp->child = NULL;
+            }
+            temp = temp->next;
+        }
+    }
+    return head;
+}
+
+// https://www.naukri.com/code360/problems/flatten-linked-list_893175
+Node *flattenLL1(Node *head)
+{
+    if (!head)
+        return nullptr;
+    std::queue<Node *> q;
+    Node *current = head;
+    while (current)
+    {
+        if (current->child)
+        {
+            q.push(current->child);
+            current->child = nullptr;
+        }
+        if (!current->next && !q.empty())
+        {
+            current->next = q.front();
+            q.pop();
+        }
+        current = current->next;
+    }
+    return head;
+}
+
+// https://www.naukri.com/code360/problems/insertion-in-circular-linked-list_4609562
+Node *insert(int k, int val, Node *head)
+{
+    Node *last = head->next;
+    while (last->next != head)
+    {
+        last = last->next;
+    }
+    if (k == 0)
+    {
+        Node *temp = new Node(val);
+        temp->next = head;
+        last->next = temp;
+        return temp;
+    }
+    else
+    {
+        Node *pre = last;
+        Node *n = head;
+        for (int i = 0; i < k; i++)
+        {
+            pre = n;
+            n = n->next;
+        }
+        Node *temp = new Node(val);
+        pre->next = temp;
+        temp->next = n;
+        return head;
+    }
+}
+
+// https://www.naukri.com/code360/problems/reverse-a-sublist-of-linked-list_1092613
+Node *reverseSublist(Node *head, int x, int y)
+{
+    Node dummy(0);
+    dummy.next = head;
+    Node *prev = &dummy;
+    for (int i = 1; i < x; i++)
+    {
+        prev = prev->next;
+    }
+    Node *a = prev->next;
+    Node *b = a->next;
+    for (int i = 0; i < y - x; i++)
+    {
+        a->next = b->next;
+        b->next = prev->next;
+        prev->next = b;
+        b = a->next;
+    }
+    return dummy.next;
+}
+
+class MaxStack
+{
+  private:
+    stack<int> st;
+    int maxEle;
+
+  public:
+    int getMax() { return maxEle; }
+    void pop()
+    {
+        if (st.empty())
+            return;
+        int t = st.top();
+        st.pop();
+        if (t > maxEle)
+        {
+            maxEle = 2 * maxEle - t;
+        }
+    }
+    void push(int x)
+    {
+        if (st.empty())
+        {
+            maxEle = x;
+            st.push(x);
+            return;
+        }
+        if (x > maxEle)
+        {
+            st.push(2 * x - maxEle);
+            maxEle = x;
+        }
+        else
+            st.push(x);
+    }
+    bool empty() { return st.empty(); }
+};
+
+// https://www.naukri.com/code360/problems/king-nodes-in-binary-tree_2191536
+class King_Nodes_In_Binary_Tree
+{
+  private:
+    void preorder(BinaryTreeNode<int> *root, MaxStack &st, int &nodes)
+    {
+        if (root == NULL)
+            return;
+
+        if (st.empty() || root->data >= st.getMax())
+        {
+            nodes++;
+        }
+        st.push(root->data);
+        preorder(root->left, st, nodes);
+        preorder(root->right, st, nodes);
+        st.pop();
+    }
+
+  public:
+    int CountKingNodes(BinaryTreeNode<int> *root)
+    {
+        MaxStack st;
+        int nodes = 0;
+        preorder(root, st, nodes);
+        return nodes;
+    }
+};
 
 int main(int argc, char *argv[])
 {

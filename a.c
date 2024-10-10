@@ -1,4 +1,6 @@
 #include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -703,6 +705,46 @@ int locking(int n, int k, int par[], int lock[])
     return index == -1 ? 1 : !lock[index];
 }
 
+static inline uint32_t
+_reg_mask(uint32_t hi, uint32_t lo)
+{
+    uint32_t width = hi - lo + 1;
+    return (width == 32) ? UINT32_C(~0) : ((1ul << width) - 1);
+}
+
+static inline uint32_t
+_reg_get(uint32_t d, uint32_t hi, uint32_t lo)
+{
+    return (d >> lo) & _reg_mask(hi, lo);
+}
+
+// https://www.naukri.com/code360/problems/ninja-and-sorted-list_2663294
+bool ninjaAndSortedList(int n, int val, int arr[])
+{
+    int l = 0, r = n - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (arr[mid] > val)
+        {
+            if (arr[l] > val)
+                l = mid + 1;
+            else
+                r = mid - 1;
+        }
+        else if (arr[mid] < val)
+        {
+            if (arr[l] < val && arr[l] > arr[mid])
+                r = mid - 1;
+            else
+                l = mid + 1;
+        }
+        else
+            return true;
+    }
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {0, -3, 0, -1, 1, 0, -1, 2, 1, -1, -4, 4, 1, 1, 1, 0, 2, -2, 3, -2, 4, 2};
@@ -873,13 +915,19 @@ int main(int argc, char *argv[])
         }
         for (int i = 10; i <= 100; i += 10)
         {
-            printf("%.0lf ", floor(floor(k[0] * i + b[0]) * 0.7));
+            printf("%.0lf", floor(floor(k[0] * i + b[0]) * 0.7));
             for (int j = 1; j < 3; j++)
-            {
-                printf("%.0lf ", floor(k[j] * i + b[j]));
-            }
+                printf(", %.0lf", floor(k[j] * i + b[j]));
             printf("\n");
         }
+    }
+    {
+        unsigned int val = 0x12B00177;
+        printf("%#x\n", _reg_get(val, 27, 20));
+    }
+    {
+        int arr[] = {9, 9, 9, 1, 0, 2, 3, 6, 6};
+        printf("%d\n", ninjaAndSortedList(sizeof(arr) / sizeof(int), 6, arr));
     }
     return 0;
 }
