@@ -1,48 +1,107 @@
 #include <bits/stdc++.h>
 
-//https://www.codingninjas.com/studio/problems/circular-queue_1170058?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=queue&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=NOT_ATTEMPTED
+// https://www.naukri.com/code360/problems/circular-queue_1170058
 class CircularQueue
 {
-    private:
-        int *buf;
-        int front;
-        int rear;
-        int capability;
-        bool isEmpty() { return rear == -1 && front == -1; }
-        bool isFull() { return front == 0 && rear == edge() || front == rear + 1; }
-        bool isLastOne() { return isEmpty() == false && front == rear; }
-        int edge() { return capability - 1; }
+  private:
+    int *buffer;
+    int front;
+    int rear;
+    int capability;
 
-      public:
-        CircularQueue(int n) {
-            front = rear = -1;
-            buf = (int *)malloc(n * sizeof(int));
-            capability = n;
-        }
-        bool enqueue(int value)
+  public:
+    CircularQueue(int n)
+    {
+        buffer = (int *)malloc(n * sizeof(int));
+        memset(buffer, 0, n * sizeof(int));
+        capability = n;
+        front = -1;
+        rear = -1;
+    }
+
+    bool enqueue(int value)
+    {
+        if ((rear + 1) % capability == front)
         {
-            if (isFull())
-                return false;
-            if (isEmpty())
-                front = 0;
-            if (rear == edge())
-                rear = 0;
-            else
-                rear++;
-            buf[rear] = value;
-            return true;
+            return false;
         }
-        int dequeue()
+        else if (front == -1)
         {
-            if (isEmpty())
-                return -1;
-            int rv = buf[front];
-            if (isLastOne())
-                front = rear = -1;
-            else if (front == edge())
-                front = 0;
-            else
-                front++;
-            return rv;
+            front = 0;
+            rear = 0;
         }
+        else
+        {
+            rear = (rear + 1) % capability;
+        }
+        buffer[rear] = value;
+        return true;
+    }
+
+    int dequeue()
+    {
+        if (front == -1)
+        {
+            return -1;
+        }
+        else
+        {
+            int v = buffer[front];
+            if (front == rear)
+            {
+                front = -1;
+                rear = -1;
+            }
+            else
+            {
+                front = (front + 1) % capability;
+            }
+            return v;
+        }
+    }
+};
+
+class CircularQueue2
+{
+  private:
+    int *buffer;
+    int front;
+    int rear;
+    int capability;
+
+  public:
+    CircularQueue2(int n)
+    {
+        n = n + 1;
+        buffer = (int *)malloc(n * sizeof(int));
+        memset(buffer, 0, n * sizeof(int));
+        capability = n;
+        front = 0;
+        rear = 0;
+    }
+
+    bool enqueue(int value)
+    {
+        if ((rear + 1) % capability == front)
+        {
+            return false;
+        }
+        buffer[rear] = value;
+        rear = (rear + 1) % capability;
+        return true;
+    }
+
+    int dequeue()
+    {
+        if (front == rear)
+        {
+            return -1;
+        }
+        else
+        {
+            int v = buffer[front];
+            front = (front + 1) % capability;
+            return v;
+        }
+    }
 };

@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <uthash.h>
+#include <limits.h>
+
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+struct ListNode {
+	int val;
+	struct ListNode *next;
+};
 
 struct HashTable
 {
@@ -522,6 +531,35 @@ int maxSubsequence(int arr[], int size)
     return max;
 }
 
+// https://www.naukri.com/code360/problems/maximum-subarray_893296
+int *maximumsumSubarray(int arr[], int n)
+{
+    int *vec = (int *)malloc(sizeof(int) * n);
+    memset(vec, 0, n);
+    int sum = INT_MIN, this_sum = 0;
+    int l = 0, r = 0, begin = 0;
+    for (int i = 0; i < n; i++)
+    {
+        this_sum += arr[i];
+        if (this_sum > sum)
+        {
+            sum = this_sum;
+            l = begin;
+            r = i;
+        }
+        if (this_sum < 0)
+        {
+            this_sum = 0;
+            begin = i + 1;
+        }
+    }
+    for (int i = l; i <= r; i++)
+    {
+        vec[i] = arr[l++];
+    }
+    return vec;
+}
+
 int *goodIndices(int *nums, int numsSize, int k, int *returnSize)
 {
     int *left = (int *)malloc(numsSize * sizeof(int));
@@ -585,6 +623,150 @@ int searchInsert(int arr[], int n, int m)
             r = mid - 1;
     }
     return l;
+}
+
+// https://www.naukri.com/code360/problems/code-interesting-alphabets_53421
+int print_pattern(int N)
+{
+    for (int i = N - 1; i >= 0; i--)
+    {
+        for (int j = i; j < N; j++)
+        {
+            printf("%c", 'A' + j);
+        }
+        printf("\n");
+    }
+}
+
+// https://www.naukri.com/code360/problems/compare-versions_1062582
+int compareVersions(char a[], char b[])
+{
+    int n = strlen(a);
+    int m = strlen(b);
+    for (int i = 0, j = 0; i < n || j < m; i++, j++)
+    {
+        long long numA = 0;
+        long long numB = 0;
+        while (i < n && a[i] != '.')
+        {
+            numA = numA * 10 + (a[i] - '0');
+            i++;
+        }
+        while (j < m && b[j] != '.')
+        {
+            numB = numB * 10 + (b[j] - '0');
+            j++;
+        }
+        if (numA > numB)
+            return 1;
+        else if (numA < numB)
+            return -1;
+    }
+    return 0;
+}
+
+// https://www.naukri.com/code360/problems/number-pattern-1_893187
+void printPattern(int n)
+{
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 0; j < i; j++)
+        {
+            printf("1");
+        }
+        printf("\n");
+    }
+}
+
+int lower_bound(int *vec, int l, int r)
+{
+    while (l < r)
+    {
+        int mid = l + (r - l) / 2;
+        if (vec[mid] == 1)
+            r = mid;
+        else if (vec[mid] == 0)
+            l = mid + 1;
+    }
+    return vec[r] == 1 ? r : -1;
+}
+
+// https://www.naukri.com/code360/problems/row-with-maximum-1-s_1112656
+int rowWithMax1s(int **matrix, int n, int m)
+{
+    int prev = m;
+    int row = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int index = lower_bound(matrix[i], 0, m - 1);
+        if (index != -1 && index < prev)
+        {
+            prev = index;
+            row = i;
+        }
+    }
+    return prev == m ? -1 : row;
+}
+
+// https://www.naukri.com/code360/problems/ninja-and-subarrays_2674106
+int sumOfSmallestAndSecondSmallest(int n, int arr[])
+{
+    int sum = INT_MIN;
+    for (int i = 1; i < n; i++)
+    {
+        sum = MAX(sum, arr[i] + arr[i - 1]);
+    }
+    return sum;
+}
+
+//https://www.naukri.com/code360/problems/add-two-numbers-as-linked-lists_1170520
+//https://leetcode.com/problems/add-two-numbers/
+struct ListNode *addTwoNumbers(struct ListNode *l1, struct ListNode *l2)
+{
+	struct ListNode dummy = { 0, NULL };
+	struct ListNode *tail = &dummy;
+	int carry = 0;
+	while (l1 != NULL && l2 != NULL) {
+		int sum = l1->val + l2->val + carry;
+		struct ListNode *_new = (struct ListNode *)malloc(sizeof(struct ListNode));
+		_new->val = sum % 10;
+		carry = sum / 10;
+		tail->next = _new;
+		tail = tail->next;
+		tail->next = NULL;
+		l1 = l1->next;
+		l2 = l2->next;
+	}
+	while (l1 != NULL) {
+		int sum = l1->val + carry;
+		struct ListNode *_new = (struct ListNode *)malloc(sizeof(struct ListNode));
+		_new->val = sum % 10;
+		carry = sum / 10;
+		tail->next = _new;
+		tail = tail->next;
+		tail->next = NULL;
+		l1 = l1->next;
+	}
+	while (l2 != NULL) {
+		int sum = l2->val + carry;
+		struct ListNode *_new = (struct ListNode *)malloc(sizeof(struct ListNode));
+		_new->val = sum % 10;
+		carry = sum / 10;
+		tail->next = _new;
+		tail = tail->next;
+		tail->next = NULL;
+		l2 = l2->next;
+	}
+	while (carry != 0) {
+		int sum = carry;
+		struct ListNode *_new = (struct ListNode *)malloc(sizeof(struct ListNode));
+		_new->val = sum % 10;
+		carry = sum / 10;
+		tail->next = _new;
+		tail = tail->next;
+		tail->next = NULL;
+	}
+	return dummy.next;
 }
 
 int main(int argc, char *argv[])

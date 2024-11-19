@@ -5,6 +5,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct TreeNode
+{
+    int data;
+    struct TreeNode *left;
+    struct TreeNode *right;
+
+} TreeNode;
+
+typedef struct Node
+{
+    int data;
+    struct Node *next;
+} Node;
+
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 char *longestCommonPrefix(char **strs, int strsSize)
 {
     int max = 0;
@@ -705,6 +722,11 @@ int locking(int n, int k, int par[], int lock[])
     return index == -1 ? 1 : !lock[index];
 }
 
+#define U(X) (X##U)
+#define GENMASK(h, l)                \
+    (((~U(0)) - (U(1) << (l)) + 1) & \
+     (~U(0) >> (32 - 1 - (h))))
+
 static inline uint32_t
 _reg_mask(uint32_t hi, uint32_t lo)
 {
@@ -743,6 +765,375 @@ bool ninjaAndSortedList(int n, int val, int arr[])
             return true;
     }
     return false;
+}
+
+// https://www.naukri.com/code360/problems/reset-all-bits_973004
+int resetAllExceptMSB(int n)
+{
+    if (n == 0)
+        return 0;
+    unsigned int ans = (1 << 15);
+    while ((ans & n) == 0)
+    {
+        ans >>= 1;
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/position-of-right-most-set-bit_893048
+int getRightMostSetBit(int n)
+{
+    if (n == 0)
+        return 0;
+    int i = 1;
+    int flag = 1;
+    while ((flag & n) == 0)
+    {
+        i++;
+        flag <<= 1;
+    }
+    return i;
+}
+
+// https://www.naukri.com/code360/problems/flip-given-bits_973114
+int flipSomeBits(int num, int arr[], int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        num ^= (1 << (arr[i] - 1));
+    }
+    return num;
+}
+
+// https://www.naukri.com/code360/problems/number-of-mismatching-bits_920394
+int numberOfMismatchingBits(int first, int second)
+{
+    int mask = 1, count = 0;
+    for (int i = 0; i < 32; i++)
+    {
+        int a = mask & first;
+        int b = mask & second;
+        if ((a ^ b) != 0)
+        {
+            count++;
+        }
+        mask <<= 1;
+    }
+    return count;
+}
+
+// https://www.naukri.com/code360/problems/count-set-bits_1112627
+int countSetBits(int n)
+{
+    int ans = 0;
+    for (int i = 1; i <= n; i++)
+        ans += __builtin_popcount(i);
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/flip-bits_1063248
+int flipBits(int *arr, int n)
+{
+    int count = 0, sum = 0, ans = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == 1)
+        {
+            arr[i] = -1;
+            count++;
+        }
+        else
+            arr[i] = 1;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        sum += arr[i];
+        ans = MAX(ans, sum);
+        if (sum < 0)
+            sum = 0;
+    }
+    return ans + count;
+}
+
+// https://www.naukri.com/code360/problems/longest-switching-subarray_799356
+int switchingSubarray(int arr[], int n)
+{
+    if (n == 0 || n == 1)
+        return n;
+    int cur = 2;
+    int ans = 2;
+    int even = arr[0];
+    int odd = arr[1];
+    for (int i = 2; i < n; i++)
+    {
+        if (i % 2 == 0)
+        {
+            if (arr[i] == even)
+                cur++;
+            else
+            {
+                cur = 2;
+                even = arr[i];
+            }
+        }
+        else
+        {
+            if (arr[i] == odd)
+                cur++;
+            else
+            {
+                cur = 2;
+                odd = arr[i];
+            }
+        }
+        ans = MAX(ans, cur);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/minimum-cost-path_4296
+int minCostPath(int **input, int n, int m)
+{
+    int dp[n][m];
+    dp[0][0] = input[0][0];
+
+    for (int j = 1; j < m; j++)
+    {
+        dp[0][j] = dp[0][j - 1] + input[0][j];
+    }
+
+    for (int i = 1; i < n; i++)
+    {
+        dp[i][0] = dp[i - 1][0] + input[i][0];
+    }
+
+    for (int i = 1; i < n; i++)
+    {
+        for (int j = 1; j < m; j++)
+        {
+            int a = dp[i - 1][j];
+            int b = dp[i][j - 1];
+            int c = dp[i - 1][j - 1];
+            if (a < b)
+                b = a;
+            if (b < c)
+                c = b;
+            dp[i][j] = input[i][j] + c;
+        }
+    }
+
+    return dp[n - 1][m - 1];
+}
+
+// https://www.naukri.com/code360/problems/trapping-rainwater_630519
+long long getTrappedWater(long long *arr, int n)
+{
+    long long leftMax[n];
+    leftMax[0] = arr[0];
+
+    long long rightMax[n];
+    rightMax[n - 1] = arr[n - 1];
+
+    for (int i = 1; i < n; i++)
+        leftMax[i] = MAX(leftMax[i - 1], arr[i]);
+
+    for (int i = n - 2; i >= 0; i--)
+        rightMax[i] = MAX(rightMax[i + 1], arr[i]);
+
+    long long ans = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int height = MIN(leftMax[i], rightMax[i]);
+        ans += height - arr[i];
+    }
+
+    return ans;
+}
+
+void reverse(char input[], int l, int r)
+{
+    while (l < r)
+    {
+        int temp = input[l];
+        input[l] = input[r];
+        input[r] = temp;
+        l++;
+        r--;
+    }
+}
+
+// https://www.naukri.com/code360/problems/reverse-string-word-wise_624402
+void reverseStringWordWise(char input[])
+{
+    int len = strlen(input);
+    reverse(input, 0, len - 1);
+    int l = 0, r = 0;
+    while (r < len)
+    {
+        if (input[r] == ' ')
+        {
+            reverse(input, l, r - 1);
+            l = r + 1;
+        }
+        r++;
+    }
+    reverse(input, l, r - 1);
+}
+
+// https://www.naukri.com/code360/problems/delete-alternate-nodes_624615
+void deleteAlternateNodes(Node *head)
+{
+    while (head != NULL && head->next != NULL)
+    {
+        Node *n = head->next;
+        head->next = n->next;
+        head = head->next;
+        n->next = NULL;
+    }
+}
+
+// https://www.naukri.com/code360/problems/star-pattern_624933
+void printStart(int N)
+{
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 0; j < N - i; j++)
+            printf(" ");
+        for (int j = 0; j < 2 * i - 1; j++)
+            printf("*");
+        printf("\n");
+    }
+}
+
+// https://www.naukri.com/code360/problems/give-me-triangle_893275
+void ninjaPuzzle(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < i; j++)
+            printf(" ");
+        for (int j = 0; j < n - i; j++)
+            printf("*");
+        printf("\n");
+    }
+}
+
+// https://www.naukri.com/code360/problems/is-subsequence_892991
+bool isSubSequence(char *str1, char *str2)
+{
+    int i = 0, j = 0;
+    while (str2[j] != '\0')
+    {
+        if (str1[i] == str2[j])
+            i++;
+        j++;
+    }
+    return str1[i] == '\0' ? true : false;
+}
+
+// https://www.naukri.com/code360/problems/loot-houses_630510
+int maxMoneyLooted(int houses[], int n)
+{
+    int dp[n];
+    dp[0] = houses[0];
+    dp[1] = MAX(houses[0], houses[1]);
+    for (int i = 2; i < n; i++)
+    {
+        dp[i] = MAX(dp[i - 1], houses[i] + dp[i - 2]);
+    }
+    return dp[n - 1];
+}
+
+// https://www.naukri.com/code360/problems/highest-occurring-character_624400
+char highestOccurringChar(char input[])
+{
+    char result = 0;
+    long long highest = 0;
+    long long freq[26] = {0};
+    int n = strlen(input);
+    for (int i = 0; i < n; i++)
+    {
+        freq[input[i] - 'a']++;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        if (freq[input[i] - 'a'] > highest)
+        {
+            result = input[i];
+            highest = freq[input[i] - 'a'];
+        }
+    }
+    return result;
+}
+
+// https://www.naukri.com/code360/problems/check-permutation_624575
+bool isPermutation(char input1[], char input2[])
+{
+    long long freq1[26] = {0};
+    long long freq2[26] = {0};
+    int n1 = strlen(input1);
+    int n2 = strlen(input2);
+    if (n1 != n2)
+        return false;
+
+    for (int i = 0; i < n1; i++)
+        freq1[input1[i] - 'a']++;
+
+    for (int i = 0; i < n2; i++)
+        freq2[input2[i] - 'a']++;
+
+    for (int i = 0; i < 26; i++)
+        if (freq1[i] != freq2[i])
+            return false;
+
+    return true;
+}
+
+// https://www.naukri.com/code360/problems/binary-to-decimal_624649
+int binary_to_decimal(int N)
+{
+    int n = 0, result = 0;
+    while (N > 0)
+    {
+        int i = N % 10;
+        result += i * pow(2, n);
+        n++;
+        N /= 10;
+    }
+    return result;
+}
+
+// https://www.naukri.com/code360/problems/nth-node-from-end_920751
+Node *nthNodeFromEnd(Node *head, int n)
+{
+    Node *q = head, *p = head;
+    for (int i = 0; i < n - 1; i++)
+        p = p->next;
+    while (p->next != NULL)
+    {
+        q = q->next;
+        p = p->next;
+    }
+    return q;
+}
+
+// https://www.naukri.com/code360/problems/move-zeros-to-left_1094877
+void moveZerosToLeft(int *arr, int n)
+{
+    int w = n;
+    int cnt = 0;
+    for (int i = n - 1; i >= 0; i--)
+    {
+        if (arr[i] != 0)
+        {
+            w--;
+            arr[w] = arr[i];
+        }
+        else if (arr[i] == 0)
+            cnt++;
+    }
+    for (int i = 0; i < cnt; i++)
+        arr[i] = 0;
 }
 
 int main(int argc, char *argv[])
@@ -923,11 +1314,22 @@ int main(int argc, char *argv[])
     }
     {
         unsigned int val = 0x12B00177;
-        printf("%#x\n", _reg_get(val, 27, 20));
+        printf("_reg_mask:%#x\n", _reg_get(val, 27, 20));
+        printf("GENMASK:%#x\n", (val & GENMASK(27, 20)) >> 20);
     }
     {
         int arr[] = {9, 9, 9, 1, 0, 2, 3, 6, 6};
         printf("%d\n", ninjaAndSortedList(sizeof(arr) / sizeof(int), 6, arr));
+    }
+    {
+        printf("Count Set Bits:%d\n", countSetBits(2));
+    }
+    {
+        int arr[] = {1, 0, 0, 1, 0};
+        printf("Flip Bits:%d\n", flipBits(arr, sizeof(arr) / sizeof(int)));
+    }
+    {
+        printf("Binary to decimal: %d\n", binary_to_decimal(1100));
     }
     return 0;
 }

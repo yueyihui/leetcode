@@ -1199,60 +1199,57 @@ class Merge_K_Sorted_Arrays
 class MinStack
 {
   private:
-    stack<int> s;
+    stack<int> st;
     int min;
 
   public:
     MinStack() {}
 
-    void push(int num)
+    void push(int x)
     {
-        if (s.empty())
+        if (st.empty())
         {
-            min = num;
-            s.push(num);
+            min = x;
+            st.push(x);
         }
-        else if (num < min)
+        else if (x < min)
         {
-            s.push(2 * num - min);
-            min = num;
+            st.push(2 * x - min);
+            min = x;
         }
         else
         {
-            s.push(num);
+            st.push(x);
         }
     }
 
-    int pop()
+    void pop()
     {
-        if (s.empty())
-            return -1;
-        if (s.top() < min)
+        if (st.empty())
+            return;
+        if (st.top() < min)
         {
             int t = top();
-            min = 2 * min - s.top();
-            s.pop();
-            return t;
+            min = 2 * min - t;
+            st.pop();
         }
         else
         {
-            int t = top();
-            s.pop();
-            return t;
+            st.pop();
         }
     }
 
     int top()
     {
-        if (s.empty())
+        if (st.empty())
             return -1;
         else
-            return s.top() < min ? min : s.top();
+            return st.top() < min ? min : st.top();
     }
 
     int getMin()
     {
-        if (s.empty())
+        if (st.empty())
             return -1;
         else
             return min;

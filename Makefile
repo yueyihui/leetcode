@@ -3,7 +3,7 @@ CC := gcc
 CXX := g++
 
 # Define the compiler flags
-CFLAGS += -g -O0 -I./uthash/include
+CFLAGS += -g -O0 -I./uthash/include -std=c11
 CXXFLAGS += -g -O0
 
 # Define the linker flags
@@ -43,7 +43,7 @@ $(CXX_TARGETS): %: %.o
 
 # Clean up the build files
 clean:
-	rm -f $(OBJS) $(TARGETS)
+	@rm -f $(OBJS) $(TARGETS)
 
 # Phony targets
 .PHONY: all clean

@@ -83,12 +83,20 @@ class BinaryTreeNode
     BinaryTreeNode<T> *left;
     BinaryTreeNode<T> *right;
     BinaryTreeNode<T> *parent;
+    bool bubble;
+    int height;
+    BinaryTreeNode()
+    {
+        this->bubble = true;
+    }
     BinaryTreeNode(T data)
     {
         this->data = data;
+        this->bubble = false;
         left = NULL;
         right = NULL;
         parent = NULL;
+        height = 0;
     }
     static BinaryTreeNode<T> *buildTree(vector<int> &arr, int i)
     {
@@ -151,6 +159,34 @@ class BinaryTreeNode
             this->left->preorder();
         if (this->right != NULL)
             this->right->preorder();
+    }
+    void printOnLevel()
+    {
+        queue<BinaryTreeNode<int> *> q;
+        q.push(this);
+        while (q.empty() == false)
+        {
+            BinaryTreeNode<int> *temp = q.front();
+            q.pop();
+            if (temp->bubble)
+            {
+                printf("-1 ");
+                continue;
+            }
+            else
+                printf("%d ", temp->data);
+
+            if (temp->left)
+                q.push(temp->left);
+            else
+                q.push(new BinaryTreeNode<int>());
+
+            if (temp->right)
+                q.push(temp->right);
+            else
+                q.push(new BinaryTreeNode<int>());
+        }
+        printf("\n");
     }
 };
 
@@ -395,6 +431,29 @@ class ThreeSum
         return rv;
     }
 };
+
+// https://www.naukri.com/code360/problems/pythagorean-triplets_797917
+bool triplets(vector<int> &arr)
+{
+    int n = arr.size();
+    sort(arr.begin(), arr.end(), greater<int>());
+    for (int i = 0; i < n; i++)
+    {
+        int target = arr[i] * arr[i];
+        int l = i + 1, r = n - 1;
+        while (l < r)
+        {
+            int sum = arr[l] * arr[l] + arr[r] * arr[r];
+            if (sum == target)
+                return true;
+            else if (sum < target)
+                r--;
+            else
+                l++;
+        }
+    }
+    return false;
+}
 
 //https://www.codingninjas.com/studio/problems/longest-unique-substring_630418?interviewProblemRedirection=true&count=25&page=2&search=&sort_entity=order&sort_order=ASC&leftPanelTabValue=PROBLEM&customSource=studio_nav&attempt_status=NOT_ATTEMPTED&company%5B%5D=Apple
 int uniqueSubstrings(string str)
@@ -2786,6 +2845,95 @@ BinaryTreeNode<int> *deleteNode(BinaryTreeNode<int> *root, int key)
     root->data = succ->data;
     return root;
 }
+
+// https://www.naukri.com/code360/problems/avl-delete_982930
+class Delete_node_from_AVL_tree
+{
+  private:
+    int height(BinaryTreeNode<int> *root)
+    {
+        if (root == NULL)
+            return 0;
+        return root->height;
+    }
+
+    BinaryTreeNode<int> *minChild(BinaryTreeNode<int> *cur)
+    {
+        while (cur != NULL && cur->left != NULL)
+            cur = cur->left;
+        return cur;
+    }
+
+    BinaryTreeNode<int> *leftRotate(BinaryTreeNode<int> *z)
+    {
+        BinaryTreeNode<int> *y = z->right;
+        BinaryTreeNode<int> *T2 = y->left;
+        y->left = z;
+        z->right = T2;
+        return y;
+    }
+
+    BinaryTreeNode<int> *rightRotate(BinaryTreeNode<int> *z)
+    {
+        BinaryTreeNode<int> *y = z->left;
+        BinaryTreeNode<int> *T3 = y->right;
+        y->right = z;
+        z->left = T3;
+        return y;
+    }
+
+  public:
+    BinaryTreeNode<int> *deleteNode(BinaryTreeNode<int> *root, int data)
+    {
+        if (root == NULL)
+            return NULL;
+        else if (root->data > data)
+            root->left = deleteNode(root->left, data);
+        else if (root->data < data)
+            root->right = deleteNode(root->right, data);
+        else
+        {
+            if (root->left == NULL)
+                return root->right;
+            else if (root->right == NULL)
+                return root->left;
+            else
+            {
+                BinaryTreeNode<int> *succ = minChild(root->right);
+                root->data = succ->data;
+                root->right = deleteNode(root->right, succ->data);
+            }
+        }
+
+        root->height = max(height(root->left), height(root->right)) + 1;
+        int blance = height(root->left) - height(root->right);
+
+        // left left
+        if (blance > 1 && data < root->left->data)
+        {
+            return rightRotate(root);
+        }
+        // left right
+        else if (blance > 1 && data > root->left->data)
+        {
+            root->left = leftRotate(root->left);
+            return rightRotate(root);
+        }
+        // right right
+        else if (blance < -1 && data > root->right->data)
+        {
+            return leftRotate(root);
+        }
+        // right left
+        else if (blance < -1 && data < root->right->data)
+        {
+            root->right = rightRotate(root->right);
+            return leftRotate(root);
+        }
+
+        return root;
+    }
+};
 
 // https://www.naukri.com/code360/problems/closest-element-in-bst_920449
 class Closest_BST_Value

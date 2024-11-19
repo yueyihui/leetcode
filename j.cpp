@@ -497,7 +497,652 @@ class King_Nodes_In_Binary_Tree
     }
 };
 
+// https://www.naukri.com/code360/problems/number-of-islands_985348
+class Number_of_Islands
+{
+  private:
+    void bfs(vector<vector<int>> &grid, int n, int m, vector<vector<bool>> &visited,
+             int row, int col)
+    {
+        visited[row][col] = true;
+        queue<pair<int, int>> q;
+        q.push({row, col});
+        while (q.empty() == false)
+        {
+            pair<int, int> temp = q.front();
+            q.pop();
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    int row = i + temp.first;
+                    int col = j + temp.second;
+                    if (row >= 0 && row < n && col >= 0 && col < m &&
+                        visited[row][col] == false && grid[row][col] == 1)
+                    {
+                        visited[row][col] = true;
+                        q.push({row, col});
+                    }
+                }
+            }
+        }
+    }
+
+  public:
+    int numberOfIslands(vector<vector<int>> &grid, int n, int m)
+    {
+        int ans = 0;
+        vector<vector<bool>> visited(n, vector<bool>(m, false));
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (visited[i][j] == false && grid[i][j] == 1)
+                {
+                    ans++;
+                    bfs(grid, n, m, visited, i, j);
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+// https://www.naukri.com/code360/problems/largest-island_840701
+vector<int> numberOfIslandII(int n, int m, vector<vector<int>> &queries, int q)
+{
+    int cnt = 0;
+    vector<int> ans;
+    DSU dsu(n * m);
+    vector<vector<bool>> visited(n, vector<bool>(m, false));
+    for (int i = 0; i < q; i++)
+    {
+        int row = queries[i][0];
+        int col = queries[i][1];
+        visited[row][col] = true;
+        cnt++;
+        int dr[4] = {-1, 0, 1, 0};
+        int dc[4] = {0, -1, 0, 1};
+        for (int j = 0; j < 4; j++)
+        {
+            int _row = row + dr[j];
+            int _col = col + dc[j];
+            if (_row >= 0 && _row < n && _col >= 0 && _col < m)
+            {
+                if (visited[_row][_col])
+                {
+                    int nodeNo = m * row + col;
+                    int _nodeNo = m * _row + _col;
+                    if (dsu.find(nodeNo) != dsu.find(_nodeNo))
+                    {
+                        dsu._union(nodeNo, _nodeNo);
+                        cnt--;
+                    }
+                }
+            }
+        }
+        ans.push_back(cnt);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/count-islands_3651444
+class Count_Islands
+{
+  private:
+    bool bfs(vector<vector<int>> &grid, int n, int m, vector<vector<bool>> &visited,
+             int row, int col)
+    {
+        bool isLand = true;
+        visited[row][col] = true;
+        queue<pair<int, int>> q;
+        q.push({row, col});
+        while (q.empty() == false)
+        {
+            pair<int, int> temp = q.front();
+            q.pop();
+            int dr[4] = {-1, 0, 1, 0};
+            int dc[4] = {0, -1, 0, 1};
+            for (int i = 0; i < 4; i++)
+            {
+                int row = temp.first + dr[i];
+                int col = temp.second + dc[i];
+                if (row >= 0 && row < n && col >= 0 && col < m && grid[row][col] == 0 &&
+                    visited[row][col] == false)
+                {
+                    visited[row][col] = true;
+                    q.push({row, col});
+                }
+                else if (row < 0 || row >= n || col < 0 || col >= m)
+                    isLand = false;
+            }
+        }
+        return isLand;
+    }
+
+  public:
+    int countIslands(vector<vector<int>> &grid)
+    {
+        int cnt = 0;
+        int n = grid.size();
+        int m = grid[0].size();
+        vector<vector<bool>> visited(n, vector<bool>(m, false));
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (grid[i][j] == 0 && visited[i][j] == false)
+                {
+                    if (bfs(grid, n, m, visited, i, j))
+                        cnt++;
+                }
+            }
+        }
+        return cnt;
+    }
+};
+
+// https://www.naukri.com/code360/problems/maximum-in-subarrays-of-length-k_630474
+void printSubarrayMax(int *arr, int n, int k)
+{
+    if (n == 0 || k == 0)
+        return;
+    priority_queue<pair<int, int>> q;
+    for (int i = 0; i < k; i++)
+    {
+        q.push({arr[i], i});
+    }
+    cout << q.top().first << " ";
+    for (int i = k; i < n; i++)
+    {
+        q.push({arr[i], i});
+        while (q.empty() == false && q.top().second <= i - k)
+        {
+            q.pop();
+        }
+        cout << q.top().first << " ";
+    }
+}
+
+// https://www.naukri.com/code360/problems/sliding-maximum_701652
+vector<int> maxSlidingWindow(vector<int> &arr, int n, int k)
+{
+    deque<int> dq;
+    vector<int> vec;
+    for (int i = 0; i < n; i++)
+    {
+        if (dq.empty() == false && dq.front() <= i - k)
+            dq.pop_front();
+        while (dq.empty() == false && arr[i] > arr[dq.back()])
+            dq.pop_back();
+        dq.push_back(i);
+        if (dq.empty() == false && (i + 1) >= k)
+            vec.push_back(arr[dq.front()]);
+    }
+    return vec;
+}
+
+// https://www.naukri.com/code360/problems/k-th-largest-sum-contiguous-subarray_920398
+int getKthLargest(vector<int> &arr, int k)
+{
+    priority_queue<int> q;
+    int n = arr.size();
+    for (int i = 0; i < n; i++)
+    {
+        int sum = 0;
+        for (int j = i; j < n; j++)
+        {
+            sum += arr[j];
+            q.push(sum);
+        }
+    }
+    for (int i = 0; i < k - 1; i++)
+    {
+        q.pop();
+    }
+    return q.top();
+}
+
+// https://www.naukri.com/code360/problems/longest-subset-zero-sum_920321
+// https://www.geeksforgeeks.org/find-the-largest-subarray-with-0-sum/
+int LongestSubsetWithZeroSum(vector<int> arr)
+{
+    int n = arr.size();
+    int len = 0, sum = 0;
+    unordered_map<int, int> map;
+    for (int i = 0; i < n; i++)
+    {
+        sum += arr[i];
+        if (sum == 0)
+            len = max(len, i + 1);
+
+        auto it = map.find(sum);
+        if (it != map.end())
+            len = max(len, i - it->second);
+        else
+            map.insert({sum, i});
+    }
+    return len;
+}
+
+// https://www.naukri.com/code360/problems/print-binary-tree_1266040
+class Print_Binary_Tree
+{
+  private:
+    int height(TreeNode<int> *root)
+    {
+        if (root == NULL)
+            return 0;
+        int a = height(root->left);
+        int b = height(root->right);
+        return a > b ? a + 1 : b + 1;
+    }
+    void _printTree(TreeNode<int> *root, vector<vector<string>> &print, int row,
+                    int l, int r)
+    {
+        if (root == NULL)
+            return;
+        int mid = l + (r - l) / 2;
+        print[row][mid] = to_string(root->data);
+        _printTree(root->left, print, row + 1, l, mid - 1);
+        _printTree(root->right, print, row + 1, mid + 1, r);
+    }
+
+  public:
+    vector<vector<string>> printTree(TreeNode<int> *root)
+    {
+        int h = height(root);
+        int w = pow(2, h) - 1;
+        vector<vector<string>> print(h, vector<string>(w, ""));
+        _printTree(root, print, 0, 0, w - 1);
+        return print;
+    }
+};
+
+// https://www.naukri.com/code360/problems/binary-tree-cameras_1231013
+class Binary_Tree_Cameras
+{
+  private:
+    enum
+    {
+        NONE,
+        INSTALLED,
+        BREAK,
+
+    };
+
+    int dfs(TreeNode<int> *root, int &cnt)
+    {
+        if (root == NULL)
+            return BREAK;
+        int a = dfs(root->left, cnt);
+        int b = dfs(root->right, cnt);
+        if (a == NONE || b == NONE)
+        {
+            cnt++;
+            return INSTALLED;
+        }
+        else if (a == INSTALLED || b == INSTALLED)
+            return BREAK;
+        else
+            return NONE;
+    }
+
+  public:
+    int getMinCamera(TreeNode<int> *root)
+    {
+        int cnt = 0;
+        if (dfs(root, cnt) == NONE)
+        {
+            cnt++;
+        }
+        return cnt;
+    }
+};
+
+// https://www.naukri.com/code360/problems/binary-tree-to-a-circular-doubly-linked-list_920535
+class Binary_Tree_To_Circular_Doubly_Linked_List
+{
+  private:
+    void inorder(TreeNode<int> *root, vector<TreeNode<int> *> &vec)
+    {
+        if (root == NULL)
+            return;
+        inorder(root->left, vec);
+        vec.push_back(root);
+        inorder(root->right, vec);
+    }
+
+  public:
+    TreeNode<int> *binaryTreeToCircularDLL(TreeNode<int> *root)
+    {
+        vector<TreeNode<int> *> vec;
+        inorder(root, vec);
+        int n = vec.size();
+        TreeNode<int> *prev = vec[0];
+        for (int i = 1; i < n; i++)
+        {
+            vec[i]->left = prev;
+            prev->right = vec[i];
+            prev = vec[i];
+        }
+        prev->right = vec[0];
+        vec[0]->left = prev;
+        prev = vec[0];
+        return prev;
+    }
+};
+
+// https://www.naukri.com/code360/problems/second-minimum-node-in-a-binary-tree_1376617
+class Second_Minimum_Node_In_Binary_Tree
+{
+  private:
+    void preorder(TreeNode<int> *root, int &min, int &second)
+    {
+        if (root == NULL)
+            return;
+        if (root->data < min)
+        {
+            second = min;
+            min = root->data;
+        }
+        else if (min < root->data && root->data < second)
+        {
+            second = root->data;
+        }
+        preorder(root->left, min, second);
+        preorder(root->right, min, second);
+    }
+
+  public:
+    int secondMinimumNode(TreeNode<int> *root)
+    {
+        if (root == NULL)
+            return -1;
+        int min = INT_MAX, second = INT_MAX;
+        preorder(root, min, second);
+        if (second == INT_MAX)
+            return -1;
+        return second;
+    }
+};
+
+// https://www.naukri.com/code360/problems/maximum-tree_1266104
+class Maximum_Binary_Tree
+{
+  private:
+    int findIndex(vector<int> tree, int l, int r)
+    {
+        int maxi = INT_MIN;
+        int idx = -1;
+        for (int i = l; i <= r; i++)
+        {
+            if (tree[i] > maxi)
+            {
+                maxi = tree[i];
+                idx = i;
+            }
+        }
+        return idx;
+    }
+
+    BinaryTreeNode<int> *preorder(vector<int> tree, int l, int r)
+    {
+        if (l > r)
+        {
+            return NULL;
+        }
+        int idx = findIndex(tree, l, r);
+        BinaryTreeNode<int> *node = new BinaryTreeNode<int>(tree[idx]);
+        node->left = preorder(tree, l, idx - 1);
+        node->right = preorder(tree, idx + 1, r);
+        return node;
+    }
+
+  public:
+    BinaryTreeNode<int> *constructMaximumBinaryTree(vector<int> &tree, int n)
+    {
+        return preorder(tree, 0, n - 1);
+    }
+};
+
+// https://www.naukri.com/code360/problems/construct-binary-tree-from-inorder-and-postorder-traversal_1266106
+class Construct_Binary_Tree_from_Inorder_Postorder
+{
+  private:
+    int findIndex(vector<int> &vec, int val)
+    {
+        for (int i = 0; i < vec.size(); i++)
+            if (vec[i] == val)
+                return i;
+        return -1;
+    }
+
+    TreeNode<int> *build(vector<int> &postOrder, int post_l, int post_r,
+                         vector<int> &inOrder, int in_l, int in_r)
+    {
+        if (post_l > post_r || in_l > in_r)
+            return NULL;
+        int val = postOrder[post_r];
+        TreeNode<int> *root = new TreeNode<int>(val);
+        int idx = findIndex(inOrder, val);
+        int left_num = idx - in_l;
+        root->left =
+            build(postOrder, post_l, post_l + left_num - 1, inOrder, in_l, idx - 1);
+        root->right =
+            build(postOrder, post_l + left_num, post_r - 1, inOrder, idx + 1, in_r);
+        return root;
+    }
+
+  public:
+    TreeNode<int> *getTreeFromPostorderAndInorder(vector<int> &postOrder,
+                                                  vector<int> &inOrder)
+    {
+        if (inOrder.size() != postOrder.size() || inOrder.size() == 0)
+        {
+            return nullptr;
+        }
+
+        return build(postOrder, 0, postOrder.size() - 1, inOrder, 0,
+                     inOrder.size() - 1);
+    }
+};
+
+// https://www.naukri.com/code360/problems/sort-using-stack_2542082
+// https://www.geeksforgeeks.org/sort-stack-using-temporary-stack/
+// two stack
+vector<int> sortArray(vector<int> &arr)
+{
+    stack<int> st;
+    while (arr.empty() == false)
+    {
+        int b = arr.back();
+        arr.pop_back();
+        while (st.empty() == false && st.top() < b)
+        {
+            arr.push_back(st.top());
+            st.pop();
+        }
+        st.push(b);
+    }
+    while (st.empty() == false)
+    {
+        arr.push_back(st.top());
+        st.pop();
+    }
+    return arr;
+}
+
+// https://www.naukri.com/code360/problems/colour-the-graph_13022
+class Colour_The_Graph
+{
+  private:
+    bool bfs(vector<vector<int>> &adj, vector<int> &color, int v)
+    {
+        color[v] = 1;
+        queue<int> q;
+        q.push(v);
+        while (q.empty() == false)
+        {
+            int v = q.front();
+            q.pop();
+            for (int i = 0; i < adj[v].size(); i++)
+            {
+                int node = adj[v][i];
+                if (color[node] == 0)
+                {
+                    color[node] = -color[v];
+                    q.push(node);
+                }
+                else if (color[node] == color[v])
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    bool doColor(vector<vector<int>> &adj, int n, int m)
+    {
+        vector<int> color(n + 1, 0);
+        for (int i = 1; i <= n; i++)
+        {
+            if (color[i] == 0)
+            {
+                if (bfs(adj, color, i) == false)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+};
+
+// https://www.naukri.com/code360/problems/compress-the-string_526
+string getCompressedString(string &input)
+{
+    string res;
+    int cnt = 1;
+    int q = 0, p = 1;
+    int n = input.length();
+    while (p < n)
+    {
+        if (input[q] != input[p])
+        {
+            res.push_back(input[q]);
+            q = p;
+            if (cnt > 1)
+            {
+                res += to_string(cnt);
+                cnt = 1;
+            }
+        }
+        else
+            cnt++;
+        p++;
+    }
+    res.push_back(input[q]);
+    if (cnt > 1)
+    {
+        res += to_string(cnt);
+    }
+    return res;
+}
+
+// https://www.naukri.com/code360/problems/number-pattern_893203
+vector<vector<int>> numberPattern(int n)
+{
+    vector<vector<int>> ans;
+    int num = 1;
+    for (int i = n; i > 0; i--)
+    {
+        vector<int> temp;
+        for (int j = 0; j < i - 1; j++)
+        {
+            temp.push_back(-1);
+        }
+        for (int k = 0; k <= n - i; k++)
+        {
+            if (num > 9)
+                num = 1;
+            temp.push_back(num++);
+        }
+        ans.push_back(temp);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/next-greater-element_799354
+vector<int> nextGreater(vector<int> &arr, int n)
+{
+    vector<int> ans(n, -1);
+    stack<int> st;
+    for (int i = n - 1; i >= 0; i--)
+    {
+        while (st.empty() == false && st.top() <= arr[i])
+        {
+            st.pop();
+        }
+        if (st.empty() == false)
+            ans[i] = st.top();
+        st.push(arr[i]);
+    }
+    return ans;
+}
+
+// https://www.naukri.com/code360/problems/stock-span_5243295
+vector<int> findStockSpans(vector<int> &prices)
+{
+    int n = prices.size();
+    vector<int> span(n, 1);
+    stack<int> st;
+    for (int i = 0; i < n; i++)
+    {
+        int _span = span[i];
+        while (st.empty() == false && prices[i] > prices[st.top()])
+        {
+            int t = st.top();
+            st.pop();
+            _span += span[t];
+        }
+        span[i] = _span;
+        st.push(i);
+    }
+    return span;
+}
+
+//https://www.naukri.com/code360/problems/modify-linked-list_1095632
+Node *modifyLL(Node *head)
+{
+	deque<Node *> dq;
+	while (head != NULL) {
+		Node *n = head->next;
+		head->next = NULL;
+		dq.push_back(head);
+		head = n;
+	}
+	Node temp(0);
+	head = &temp;
+	while (dq.size() >= 2) {
+		Node *a[2] = { NULL };
+		a[0] = dq.front();
+		dq.pop_front();
+		a[1] = dq.back();
+		dq.pop_back();
+		for (int i = 0; i < 2; i++) {
+			head->next = a[i];
+			head = head->next;
+		}
+	}
+	if (dq.empty() == false) {
+		Node *a = dq.front();
+		dq.pop_front();
+		head->next = a;
+	}
+	return temp.next;
+}
+
 int main(int argc, char *argv[])
 {
-    return 0;
+	return 0;
 }

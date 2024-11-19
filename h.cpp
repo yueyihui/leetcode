@@ -1465,6 +1465,21 @@ pair<int, int> twoSum(vector<int> &arr, int n, int target)
     return ans;
 }
 
+//https://leetcode.com/problems/two-sum/description/
+vector<int> twoSum(vector<int> &nums, int target)
+{
+	unordered_map<int, int> map;
+	for (int i = 0; i < nums.size(); i++) {
+		int diff = target - nums[i];
+		auto it = map.find(diff);
+		if (it != map.end())
+			return { it->second, i };
+		else
+			map.insert({ nums[i], i });
+	}
+	return {};
+}
+
 // https://www.naukri.com/code360/problems/detect-cycle-in-an-undirected-graph_758967
 class Detect_Cycle_In_Undirected_Graph
 {
