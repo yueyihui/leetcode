@@ -49,6 +49,15 @@ class Node
     }
 };
 
+struct ListNode
+{
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
 // https://www.naukri.com/code360/problems/count-special-nodes-in-generic-tree_630522
 class Count_Special_Nodes_In_Generic_Tree
 {
@@ -1111,6 +1120,84 @@ vector<int> findStockSpans(vector<int> &prices)
     return span;
 }
 
+//https://www.naukri.com/code360/problems/painter-s-partition-problem_1089557
+class Painter_Partition_Problem {
+    private:
+	bool isPossible(vector<int> &boards, int k, int mid)
+	{
+		int painter = 1, sum = 0;
+		for (int i = 0; i < boards.size(); i++) {
+			if (sum + boards[i] <= mid) {
+				sum += boards[i];
+
+			} else {
+				painter++;
+				if (painter > k || boards[i] > mid) {
+					return false;
+				}
+				sum = boards[i];
+			}
+		}
+		return true;
+	}
+
+    public:
+	int findLargestMinDistance(vector<int> &boards, int k)
+	{
+		int sum = 0;
+		for (int i = 0; i < boards.size(); i++) {
+			sum += boards[i];
+		}
+		int ans = 0;
+		int l = 0, r = sum;
+		while (l <= r) {
+			int mid = l + (r - l) / 2;
+			if (isPossible(boards, k, mid)) {
+				ans = mid;
+				r = mid - 1;
+
+			} else {
+				l = mid + 1;
+			}
+		}
+		return ans;
+	}
+};
+
+// https://www.naukri.com/code360/problems/tree-ordering_3119013
+// https://leetcode.com/problems/flip-binary-tree-to-match-preorder-traversal/
+class Tree_ordering
+{
+  private:
+    bool preorder(TreeNode<int> *root, vector<int> &A, int &i, vector<int> &flip)
+    {
+        if (root == NULL)
+        {
+            i--;
+            return true;
+        }
+        if (root->data != A[i])
+            return false;
+        if (root->left && root->left->data != A[i + 1])
+        {
+            swap(root->left, root->right);
+            flip.push_back(root->data);
+        }
+        return preorder(root->left, A, ++i, flip) &&
+               preorder(root->right, A, ++i, flip);
+    }
+
+  public:
+    vector<int> treeOrdering(TreeNode<int> *root, vector<int> A)
+    {
+        int i = 0;
+        vector<int> flip;
+        if (preorder(root, A, i, flip) == false)
+            return {-1};
+        return flip;
+    }
+};
+
 //https://www.naukri.com/code360/problems/modify-linked-list_1095632
 Node *modifyLL(Node *head)
 {
@@ -1142,7 +1229,278 @@ Node *modifyLL(Node *head)
 	return temp.next;
 }
 
+// https://www.naukri.com/code360/problems/unique-subsets_3625236
+class Subsets_II
+{
+  private:
+    void solve(vector<int> &arr, int i, vector<vector<int>> &vv, vector<int> &v)
+    {
+        if (i == arr.size())
+        {
+            vv.push_back(v);
+            return;
+        }
+
+        v.push_back(arr[i]);
+        solve(arr, i + 1, vv, v);
+        v.pop_back();
+        while (i + 1 < arr.size() && arr[i] == arr[i + 1])
+        {
+            i++;
+        }
+        solve(arr, i + 1, vv, v);
+    }
+
+  public:
+    vector<vector<int>> uniqueSubsets(int n, vector<int> &arr)
+    {
+        sort(arr.begin(), arr.end());
+        vector<vector<int>> vv;
+        vector<int> v;
+        solve(arr, 0, vv, v);
+        sort(vv.begin(), vv.end());
+        return vv;
+    }
+};
+
+// https://leetcode.com/problems/convert-to-base-2/
+// int to bin base -2
+string baseNeg2(int n)
+{
+	if (n == 0)
+		return "0";
+	int base = -2;
+	string result;
+	while (n != 0) {
+		int rem = n % base;
+		n = n / base;
+		if (rem < 0) {
+			rem += -base;
+			n += 1;
+		}
+		result = to_string(rem) + result;
+	}
+	return result;
+}
+
+//https://leetcode.com/problems/longest-substring-without-repeating-characters/
+int lengthOfLongestSubstring(string s)
+{
+	int n = s.length();
+	if (n == 0)
+		return 0;
+	int r = 0;
+	int len = INT_MIN;
+	string temp;
+	while (r < n) {
+		char c = s[r];
+		auto pos = temp.find(c);
+		if (pos == string::npos) {
+			temp.push_back(c);
+			len = max(len, (int)temp.length());
+			r++;
+
+		} else {
+			temp.erase(0, pos + 1);
+		}
+	}
+	return len;
+}
+
+// https://leetcode.com/problems/sort-list/
+class Sort_List
+{
+  private:
+    ListNode *split(ListNode *head)
+    {
+        ListNode *fast = head, *slow = head, *prev = NULL;
+        while (fast)
+        {
+            fast = fast->next;
+            if (fast)
+            {
+                fast = fast->next;
+                prev = slow;
+                slow = slow->next;
+            }
+        }
+        if (prev != NULL)
+            prev->next = NULL;
+        return slow;
+    }
+    ListNode *merge(ListNode *a, ListNode *b)
+    {
+        if (a == NULL)
+            return b;
+        if (b == NULL)
+            return a;
+        if (a->val < b->val)
+        {
+            a->next = merge(a->next, b);
+            return a;
+        }
+        else
+        {
+            b->next = merge(a, b->next);
+            return b;
+        }
+    }
+
+  public:
+    ListNode *sortList(ListNode *head)
+    {
+        if (head == NULL || head->next == NULL)
+            return head;
+        ListNode *second = split(head);
+        return merge(sortList(head), sortList(second));
+    }
+};
+
+// https://www.naukri.com/code360/problems/three-sum_6922132
+// Three Sum
+vector<vector<int>> triplet(int n, vector<int> &arr)
+{
+    vector<vector<int>> vv;
+    sort(arr.begin(), arr.end());
+    for (int i = 0; i < n; i++)
+    {
+        if (i >= 1 && arr[i - 1] == arr[i])
+            continue;
+        int q = i + 1, p = n - 1;
+        while (q < p)
+        {
+            int sum = arr[i] + arr[q] + arr[p];
+            if (sum == 0)
+            {
+                vector<int> v({arr[i], arr[q], arr[p]});
+                vv.push_back(v);
+                do
+                {
+                    q++;
+
+                } while (q < p && arr[q - 1] == arr[q]);
+                do
+                {
+                    p--;
+
+                } while (q < p && arr[p + 1] == arr[p]);
+            }
+            else if (sum < 0)
+            {
+                q++;
+            }
+            else if (sum > 0)
+            {
+                p--;
+            }
+        }
+    }
+    return vv;
+}
+
+// https://www.naukri.com/code360/problems/binary-tree-multiplication_2675976
+class Mirror_Node_Multiply
+{
+  private:
+    const int MOD = 1e9 + 7;
+
+    int dfs(TreeNode<int> *root1, TreeNode<int> *root2)
+    {
+        if (root1 == NULL && root2 == NULL)
+            return 0;
+        int a = root1->data * root2->data;
+        int b = dfs(root1->left, root2->right);
+        int c = dfs(root1->right, root2->left);
+        return ((a + b) % MOD + c) % MOD;
+    }
+
+  public:
+    int mirrorMultiplication(TreeNode<int> *root)
+    {
+        if (root == NULL)
+            return 0;
+        return ((root->data * root->data) % MOD + dfs(root->left, root->right)) % MOD;
+    }
+};
+
+// https://www.naukri.com/code360/problems/ternarytotree_1102306
+class Convert_ternary_expression_to_binary_tree
+{
+  private:
+    BinaryTreeNode<char> *preorder(string &str, int &i)
+    {
+        if (i >= str.length())
+            return NULL;
+        BinaryTreeNode<char> *root = new BinaryTreeNode<char>(str[i++]);
+        if (i < str.length() && str[i] == '?')
+        {
+            root->left = preorder(str, ++i);
+
+            if (i < str.length() && str[i] == ':')
+                root->right = preorder(str, ++i);
+        }
+        return root;
+    }
+
+  public:
+    BinaryTreeNode<char> *toBinaryTree(string &str)
+    {
+        int i = 0;
+        return preorder(str, i);
+    }
+};
+
+// https://www.naukri.com/code360/problems/pair-with-diff-k_5393
+// k-diff pairs
+int getPairsWithDifferenceK(int *arr, int n, int k)
+{
+    unordered_map<int, int> m;
+    int cnt = 0;
+    for (int i = 0; i < n; i++)
+    {
+        m[arr[i]]++;
+    }
+    for (auto kv = m.begin(); kv != m.end(); kv++)
+    {
+        if (k == 0)
+        {
+            if (kv->second > 1)
+                cnt += kv->second * (kv->second - 1) / 2;
+        }
+        else
+        {
+            auto it = m.find(kv->first + k);
+            if (it != m.end())
+                cnt += it->second * kv->second;
+        }
+    }
+    return cnt;
+}
+
+// https://leetcode.com/problems/k-diff-pairs-in-an-array/submissions/1480767609/
+// unique k-diff pairs
+int findPairs(vector<int> &nums, int k)
+{
+    unordered_map<int, int> m;
+    int cnt = 0;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        m[nums[i]]++;
+    }
+    for (auto i : m)
+    {
+        if (k == 0)
+        {
+            if (i.second > 1)
+                cnt++;
+        }
+        else if (m.find(i.first + k) != m.end())
+            cnt++;
+    }
+    return cnt;
+}
+
 int main(int argc, char *argv[])
 {
-	return 0;
+    return 0;
 }

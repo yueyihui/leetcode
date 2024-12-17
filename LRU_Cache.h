@@ -46,3 +46,46 @@ class LRUCache
         map.insert({key, {value, time.begin()}});
     }
 };
+
+class LRUCache2
+{
+  private:
+    list<int> timeline;
+    unordered_map<int, pair<int, list<int>::iterator>> cache;
+    int capability;
+
+  public:
+    LRUCache2(int capacity) { capability = capacity; }
+
+    int get(int key)
+    {
+        auto it = cache.find(key);
+        if (it == cache.end())
+            return -1;
+        timeline.erase(it->second.second);
+        it->second.second = timeline.insert(timeline.end(), key);
+        return it->second.first;
+    }
+
+    void put(int key, int value)
+    {
+        auto it = cache.find(key);
+        if (it == cache.end())
+        {
+            if (cache.size() == capability)
+            {
+                int least = timeline.front();
+                timeline.pop_front();
+                cache.erase(least);
+            }
+            list<int>::iterator point = timeline.insert(timeline.end(), key);
+            cache.insert({key, {value, point}});
+        }
+        else
+        {
+            it->second.first = value;
+            timeline.erase(it->second.second);
+            it->second.second = timeline.insert(timeline.end(), key);
+        }
+    }
+};

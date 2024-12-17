@@ -1047,6 +1047,38 @@ vector<int> bottomView(TreeNode<int> *root)
     return ans;
 }
 
+// https://leetcode.com/problems/binary-tree-level-order-traversal-ii/
+vector<vector<int>> levelOrderBottom(TreeNode<int> *root)
+{
+    if (root == NULL)
+        return {};
+    vector<vector<int>> vv;
+    queue<TreeNode<int> *> q;
+    q.push(root);
+    while (q.empty() == false)
+    {
+        int n = q.size();
+        vector<int> v;
+        for (int i = 0; i < n; i++)
+        {
+            auto temp = q.front();
+            q.pop();
+            v.push_back(temp->data);
+            if (temp->left)
+                q.push(temp->left);
+            if (temp->right)
+                q.push(temp->right);
+        }
+        vv.push_back(v);
+    }
+
+    for (int i = 0, j = vv.size() - 1; i < j; i++, j--)
+    {
+        swap(vv[i], vv[j]);
+    }
+    return vv;
+}
+
 // https://www.naukri.com/code360/problems/binary-tree-leaves-to-doubly-linked-list_983643
 class Binary_Tree_Leaves_to_dll
 {
@@ -1213,6 +1245,55 @@ int distinctSubsequences(string S)
     return dp[n];
 }
 
+// https://leetcode.com/problems/distinct-subsequences-ii/
+// hard
+int distinctSubseqII(string s)
+{
+    const int MOD = 1e9 + 7;
+    int n = s.length();
+    vector<int> last(256, -1);
+    last[s[0]] = 1;
+    int all = 1, mine = 1;
+    for (int i = 1; i < n; i++)
+    {
+        mine = all + 1;
+        if (last[s[i]] == -1)
+        {
+            all = (all + mine) % MOD;
+        }
+        else
+            all = (all + (mine - last[s[i]] + MOD) % MOD) % MOD;
+        last[s[i]] = mine;
+    }
+    return all;
+}
+
+// https://www.naukri.com/code360/problems/distinct-subsequences_981277
+// https://leetcode.com/problems/distinct-subsequences/
+// hard
+int numDistinct(string s, string t)
+{
+    int MOD = 1e9 + 7;
+    int n = s.length();
+    int m = t.length();
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+    for (int i = 0; i <= n; i++)
+    {
+        dp[i][0] = 1;
+    }
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= m; j++)
+        {
+            if (s[i - 1] == t[j - 1])
+                dp[i][j] = (dp[i - 1][j - 1] + dp[i - 1][j]) % MOD;
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+    return dp[n][m];
+}
+
 // https://www.naukri.com/code360/problems/distinct-subsets-count_764603
 int countDistinctArrays(vector<int> &arr)
 {
@@ -1227,27 +1308,6 @@ int countDistinctArrays(vector<int> &arr)
         ans = (ans * (it.second + 1)) % mod;
     }
     return ans - 1;
-}
-
-// https://www.naukri.com/code360/problems/distinct-subsequences_981277
-int numDistinct(string S, string T)
-{
-    int n = T.length();
-    int m = S.length();
-    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
-    for (int j = 0; j <= m; j++)
-        dp[0][j] = 1;
-    for (int i = 1; i <= m; i++)
-    {
-        for (int j = 1; j <= n; j++)
-        {
-            if (S[i - 1] == T[j - 1])
-                dp[j][i] = dp[j - 1][i - 1] + dp[j][i - 1];
-            else
-                dp[j][i] = dp[j][i - 1];
-        }
-    }
-    return dp[n][m];
 }
 
 // https://www.naukri.com/code360/problems/edit-distance_630420
@@ -1590,6 +1650,49 @@ vector<int> cousinsOfNode(TreeNode<int> *root, int node)
     sort(ans.begin(), ans.end());
     return ans;
 }
+
+// https://www.naukri.com/code360/problems/h_920474
+class Merge_Two_BSTs
+{
+    void inorder(TreeNode<int> *root, vector<int> &vec)
+    {
+        if (root == NULL)
+            return;
+        inorder(root->left, vec);
+        vec.push_back(root->data);
+        inorder(root->right, vec);
+    }
+
+    vector<int> mergeBST(TreeNode<int> *root1, TreeNode<int> *root2)
+    {
+        vector<int> ans;
+        vector<int> v1, v2;
+        inorder(root1, v1);
+        inorder(root2, v2);
+        int i = 0, j = 0;
+        int n = v1.size(), m = v2.size();
+        while (i < n && j < m)
+        {
+            if (v1[i] < v2[j])
+            {
+                ans.push_back(v1[i++]);
+            }
+            else
+            {
+                ans.push_back(v2[j++]);
+            }
+        }
+        while (i < n)
+        {
+            ans.push_back(v1[i++]);
+        }
+        while (j < m)
+        {
+            ans.push_back(v2[j++]);
+        }
+        return ans;
+    }
+};
 
 int main(int argc, char *argv[])
 {

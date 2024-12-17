@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct ListNode
+{
+    int val;
+    struct ListNode *next;
+};
+
 struct stack
 {
     int *mem;
@@ -188,6 +194,72 @@ void heapSort(int arr[], int N)
     {
         swap(&arr[0], &arr[i]);
         heapify(arr, i, 0);
+    }
+}
+
+// https://leetcode.com/problems/remove-duplicates-from-sorted-list/description/
+struct ListNode *deleteDuplicates(struct ListNode *head)
+{
+    struct ListNode *cur = head;
+    while (cur)
+    {
+        if (cur->next != NULL && cur->next->val == cur->val)
+            cur->next = cur->next->next;
+        else
+            cur = cur->next;
+    }
+    return head;
+}
+
+// https://leetcode.com/problems/search-a-2d-matrix/
+bool searchMatrix(int **matrix, int matrixSize, int matrixColSize, int target)
+{
+    int len = matrixSize * matrixColSize;
+    int l = 0, r = len - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (matrix[mid / matrixColSize][mid % matrixColSize] > target)
+            r = mid - 1;
+        else if (matrix[mid / matrixColSize][mid % matrixColSize] < target)
+            l = mid + 1;
+        else
+            return true;
+    }
+    return false;
+}
+
+// https://leetcode.com/problems/set-matrix-zeroes/
+void setZeroes(int **matrix, int matrixSize, int *matrixColSize)
+{
+    bool mark[matrixSize][*matrixColSize];
+
+    for (int i = 0; i < matrixSize; i++)
+    {
+        for (int j = 0; j < *matrixColSize; j++)
+        {
+            if (matrix[i][j] == 0)
+                mark[i][j] = true;
+            else
+                mark[i][j] = false;
+        }
+    }
+    for (int i = 0; i < matrixSize; i++)
+    {
+        for (int j = 0; j < *matrixColSize; j++)
+        {
+            if (mark[i][j] == true)
+            {
+                for (int row = 0; row < matrixSize; row++)
+                {
+                    matrix[row][j] = 0;
+                }
+                for (int col = 0; col < *matrixColSize; col++)
+                {
+                    matrix[i][col] = 0;
+                }
+            }
+        }
     }
 }
 

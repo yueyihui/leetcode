@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 typedef struct TreeNode
 {
@@ -70,19 +71,18 @@ void shellSort(int arr[], int n)
     }
 }
 
+//https://www.naukri.com/code360/problems/insertion-sort_3155179
 void insertSort(int arr[], int n)
 {
-    for (int i = 1; i < n; i++)
-    {
-        int j = i;
-        int tmp = arr[j];
-        while (j >= 1 && arr[j - 1] > tmp)
-        {
-            arr[j] = arr[j - 1];
-            j -= 1;
-        }
-        arr[j] = tmp;
-    }
+	for (int i = 1; i < n; i++) {
+		int j = i;
+		int tmp = arr[j];
+		while (j >= 1 && arr[j - 1] > tmp) {
+			arr[j] = arr[j - 1];
+			j -= 1;
+		}
+		arr[j] = tmp;
+	}
 }
 
 int removeDuplicates(int *nums, int numsSize)
@@ -1103,6 +1103,12 @@ int binary_to_decimal(int N)
     return result;
 }
 
+/*
+ *https://www.naukri.com/code360/problems/convert-to-base-2_1462446
+ *https://leetcode.com/problems/convert-to-base-2/
+ *string baseNeg2(int n) {}
+ */
+
 // https://www.naukri.com/code360/problems/nth-node-from-end_920751
 Node *nthNodeFromEnd(Node *head, int n)
 {
@@ -1134,6 +1140,99 @@ void moveZerosToLeft(int *arr, int n)
     }
     for (int i = 0; i < cnt; i++)
         arr[i] = 0;
+}
+
+// https://leetcode.com/problems/powx-n/
+double myPow(double x, int n)
+{
+    if (n == 0)
+        return 1.0;
+    if (n == 1)
+        return x;
+    long long N = n;
+    if (n < 0)
+    {
+        x = 1 / x;
+        N = -N;
+    }
+    if (n % 2 == 0)
+        return myPow(x * x, N / 2);
+    else
+        return myPow(x * x, N / 2) * x;
+}
+
+//https://leetcode.com/problems/reverse-integer/description/
+//https://www.naukri.com/code360/problems/reverse-integer_1263846
+int reverseInteger(int n)
+{
+	int ans = 0;
+	while (n != 0) {
+		int digit = n % 10;
+		n = n / 10;
+		if (ans > INT_MAX / 10 || ans < INT_MIN / 10)
+			return -1;
+		ans = ans * 10 + digit;
+	}
+	return ans;
+}
+
+void printBinary(int n)
+{
+	int size = sizeof(n) * 8;
+
+	for (int i = size - 1; i >= 0; i--) {
+		int bit = (n >> i) & 1;
+		printf("%d", bit);
+	}
+	printf("\n");
+}
+
+// https://www.naukri.com/code360/problems/print-spiral_547
+void spiralPrint(int nRows, int mCols, int input[][mCols])
+{
+	int print[nRows * mCols];
+	memset(print, 0, nRows * mCols * sizeof(int));
+
+	int w = 0;
+	int left = 0, right = mCols - 1;
+	int top = 0, bottom = nRows - 1;
+	while (left <= right && top <= bottom) {
+		for (int i = left; i <= right; i++) {
+			print[w++] = input[top][i];
+		}
+		top++;
+
+		for (int i = top; i <= bottom; i++) {
+			print[w++] = input[i][right];
+		}
+		right--;
+
+		for (int i = right; i >= left && top <= bottom; i--) {
+			print[w++] = input[bottom][i];
+		}
+		bottom--;
+
+		for (int i = bottom; i >= top && left <= right; i--) {
+			print[w++] = input[i][left];
+		}
+		left++;
+	}
+	for (int i = 0; i < w; i++) {
+		printf("%d ", print[i]);
+	}
+}
+
+// https://www.naukri.com/code360/problems/reverse-of-a-number_624652
+int reverse_number(int num)
+{
+    int reverse = 0;
+    while (num > 0)
+    {
+        reverse *= 10;
+        reverse += num % 10;
+        num /= 10;
+    }
+    return reverse;
 }
 
 int main(int argc, char *argv[])

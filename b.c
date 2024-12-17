@@ -8,10 +8,10 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-struct ListNode {
+typedef struct ListNode {
 	int val;
 	struct ListNode *next;
-};
+} ListNode;
 
 struct HashTable
 {
@@ -226,15 +226,21 @@ int *getProductArrayExceptSelf(int *arr, int n)
     return ans;
 }
 
-int lengthOfLastWord(char *s)
+// https://leetcode.com/problems/length-of-last-word/
+int lengthOfLastWord(char s[], int n)
 {
-    int len = strlen(s);
-    char *p = s + len;
-    while (*p != ' ')
+    int i = n - 1;
+    while (s[i] == ' ')
     {
-        p--;
+        i--;
     }
-    return len + s - 1 - p;
+
+    int j = i;
+    while (j >= 0 && s[j] != ' ')
+    {
+        j--;
+    }
+    return i - j;
 }
 
 char *longestCommonPrefix(char **strs, int strsSize)
@@ -626,7 +632,7 @@ int searchInsert(int arr[], int n, int m)
 }
 
 // https://www.naukri.com/code360/problems/code-interesting-alphabets_53421
-int print_pattern(int N)
+void print_pattern(int N)
 {
     for (int i = N - 1; i >= 0; i--)
     {
@@ -636,6 +642,32 @@ int print_pattern(int N)
         }
         printf("\n");
     }
+}
+
+//https://www.naukri.com/code360/problems/number-pattern-3_624655
+void number_pattern_3(int n)
+{
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j <= i; j++) {
+			if (j == 0 || j == i)
+				printf("1");
+			else
+				printf("2");
+		}
+		printf("\n");
+	}
+}
+
+//https://www.naukri.com/code360/problems/number-pattern_624932
+void number_pattern(int n)
+{
+	for (int i = 1; i <= n; i++) {
+		int num = i;
+		for (int j = 0; j < i; j++) {
+			printf("%d", num++);
+		}
+		printf("\n");
+	}
 }
 
 // https://www.naukri.com/code360/problems/compare-versions_1062582
@@ -769,6 +801,135 @@ struct ListNode *addTwoNumbers(struct ListNode *l1, struct ListNode *l2)
 	return dummy.next;
 }
 
+// https://www.naukri.com/code360/problems/sum-of-two-arrays_893186
+int *addTwoArrays(int *a, int n, int *b, int m)
+{
+    int len = n + m;
+    int temp[len];
+    memset(temp, 0, len * sizeof(int));
+
+    int i = n - 1, j = m - 1;
+    int w = n + m - 1;
+    int carry = 0;
+    while (i >= 0 && j >= 0)
+    {
+        int sum = a[i--] + b[j--] + carry;
+        temp[w--] = sum % 10;
+        carry = sum / 10;
+    }
+    while (i >= 0)
+    {
+        int sum = a[i--] + carry;
+        temp[w--] = sum % 10;
+        carry = sum / 10;
+    }
+    while (j >= 0)
+    {
+        int sum = b[j--] + carry;
+        temp[w--] = sum % 10;
+        carry = sum / 10;
+    }
+    while (carry > 0)
+    {
+        int sum = carry;
+        temp[w--] = sum % 10;
+        carry = sum / 10;
+    }
+    len = n + m - w - 1;
+    int *ans = (int *)malloc(len * sizeof(int));
+    memset(ans, 0, len * sizeof(int));
+    for (int i = 0; i < len; i++)
+    {
+        w++;
+        ans[i] = temp[w];
+    }
+    return ans;
+}
+
+//https://www.naukri.com/code360/problems/intersection-of-2-arrays_1082149
+int *findArrayIntersection(int *arr1, int n, int *arr2, int m)
+{
+	int temp[n + m];
+	int w = 0;
+	int i = 0, j = 0;
+	while (i < n && j < m) {
+		if (arr1[i] < arr2[j])
+			i++;
+		else if (arr1[i] > arr2[j])
+			j++;
+		else {
+			temp[w++] = arr1[i];
+			i++;
+			j++;
+		}
+	}
+	int *ans = (int *)malloc(w * sizeof(int));
+	memset(ans, 0, w * sizeof(int));
+	for (int i = 0; i < w; i++)
+		ans[i] = temp[i];
+	return ans;
+}
+
+// https://leetcode.com/problems/rotate-list/
+struct ListNode *rotateRight(struct ListNode *head, int k)
+{
+    if (head == NULL || head->next == NULL)
+        return head;
+    int len = 0;
+    struct ListNode *a = head, *b = head;
+    while (a != NULL)
+    {
+        a = a->next;
+        len++;
+    }
+    if (k >= len)
+        k = k % len;
+    if (k == 0)
+        return head;
+    a = head;
+    for (int i = 0; i < k; i++)
+    {
+        b = b->next;
+    }
+    while (b->next != NULL)
+    {
+        a = a->next;
+        b = b->next;
+    }
+    struct ListNode *_head = a->next;
+    a->next = NULL;
+    b->next = head;
+    return _head;
+}
+
+// https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/
+int getDecimalValue(ListNode *head)
+{
+	int result = 0;
+	while (head != NULL) {
+		result <<= 1;
+		result |= head->val;
+		head = head->next;
+	}
+	return result;
+}
+
+//https://leetcode.com/problems/remove-element/
+int removeElement(int *nums, int numsSize, int val)
+{
+	int w = -1;
+	int cnt = 0;
+	for (int i = 0; i < numsSize; i++) {
+		if (nums[i] != val) {
+			w++;
+			nums[w] = nums[i];
+		} else {
+			cnt++;
+		}
+	}
+	return numsSize - cnt;
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -811,8 +972,8 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
-    char w[] = "Hello World";
-    printf("lengthOfLastWord:%d\n", lengthOfLastWord(w));
+    char w[] = "Hello World   ";
+    printf("lengthOfLastWord:%d\n", lengthOfLastWord(w, strlen(w)));
 
     char *a = "Helabc";
     char *b = "Hell ddddd";
