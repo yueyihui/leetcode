@@ -945,13 +945,14 @@ string removeDuplicates(string str, int n)
 }
 
 //https://www.naukri.com/code360/problems/duplicate-subtrees_920530
+//https://leetcode.com/problems/find-duplicate-subtrees/
 class DuplicateSubtrees
 {
   private:
     string subtree(TreeNode<int> *root, unordered_map<string, int> &mp, vector<int> &ans)
     {
         if (root == NULL)
-            return "-1";
+            return "";
         string strL = subtree(root->left, mp, ans);
         string strR = subtree(root->right, mp, ans);
         string temp = to_string(root->data) + "," + strL + "," + strR;
@@ -1463,20 +1464,20 @@ class Count_exactly_K_Different_Characters
 // https://www.naukri.com/code360/problems/longest-repeating-substring_980523
 int longestRepeatingSubstring(string &str, int k)
 {
-    int countArray[26] = {0};
-    int left = 0;
-    int ans = 0;
-    int maxCount = INT_MIN;
-    for (int right = 0; right < str.size(); right++)
+    vector<int> dp(256, 0);
+    int n = str.length();
+    int maxCount = INT_MIN, ans = INT_MIN;
+    for (int l = 0, r = 0; r < n; r++)
     {
-        countArray[str[right] - 'A']++;
-        maxCount = max(maxCount, countArray[str[right] - 'A']);
-        if (right - left + 1 - maxCount > k)
+        dp[str[r]]++;
+        maxCount = max(maxCount, dp[str[r]]);
+        while (maxCount + k < r - l + 1)
         {
-            countArray[str[left] - 'A']--;
-            left++;
+            dp[str[l]]--;
+            l++;
+            maxCount = max(maxCount, dp[str[l]]);
         }
-        ans = max(ans, right - left + 1);
+        ans = max(ans, r - l + 1);
     }
     return ans;
 }

@@ -959,6 +959,7 @@ class Construct_Binary_Tree_from_Inorder_Postorder
 
 // https://www.naukri.com/code360/problems/sort-using-stack_2542082
 // https://www.geeksforgeeks.org/sort-stack-using-temporary-stack/
+// https://www.naukri.com/code360/problems/sorting-the-stack-recursively_1868989
 // two stack
 vector<int> sortArray(vector<int> &arr)
 {
@@ -1450,6 +1451,40 @@ class Convert_ternary_expression_to_binary_tree
     }
 };
 
+// https://www.naukri.com/code360/problems/binary-tree-from-bracket_1118117
+class Binary_Tree_From_Bracket
+{
+  private:
+    BinaryTreeNode<int> *solve(string &str, int &i)
+    {
+        if (i >= str.length() || str[i] == ')')
+        {
+            return NULL;
+        }
+        BinaryTreeNode<int> *root = new BinaryTreeNode<int>(str[i++] - '0');
+        if (i < str.length() && str[i] == '(')
+        {
+            i++;
+            root->left = solve(str, i);
+            i++;
+        }
+        if (i < str.length() && str[i] == '(')
+        {
+            i++;
+            root->right = solve(str, i);
+            i++;
+        }
+        return root;
+    }
+
+  public:
+    BinaryTreeNode<int> *treeFromBracket(string &str)
+    {
+        int i = 0;
+        return solve(str, i);
+    }
+};
+
 // https://www.naukri.com/code360/problems/pair-with-diff-k_5393
 // k-diff pairs
 int getPairsWithDifferenceK(int *arr, int n, int k)
@@ -1498,6 +1533,360 @@ int findPairs(vector<int> &nums, int k)
             cnt++;
     }
     return cnt;
+}
+
+// https://www.naukri.com/code360/problems/anagram-pairs_626517
+bool isAnagram(string str1, string str2)
+{
+    int n = str1.length();
+    int m = str2.length();
+    if (n != m)
+        return false;
+
+    int isAnagram = 0;
+    for (int i = 0; i < n; i++)
+    {
+        isAnagram ^= str1[i] ^ str2[i];
+    }
+    return !isAnagram;
+}
+
+// https://leetcode.com/problems/kth-smallest-element-in-a-bst/
+class Kth_Smallest_Element_BST
+{
+  private:
+    void preorder(TreeNode<int> *root, vector<int> &v)
+    {
+        if (root == NULL)
+            return;
+        preorder(root->left, v);
+        v.push_back(root->data);
+        preorder(root->right, v);
+    }
+
+  public:
+    int kthSmallest(TreeNode<int> *root, int k)
+    {
+        vector<int> v;
+        preorder(root, v);
+        return v[k - 1];
+    }
+};
+
+// https://www.naukri.com/code360/problems/zig-zag-traversal_1062662
+vector<int> zigZagTraversal(BinaryTreeNode<int> *root)
+{
+    if (root == NULL)
+        return {};
+    int level = 0;
+    vector<int> ans;
+    deque<BinaryTreeNode<int> *> q;
+    q.push_back(root);
+    while (q.empty() == false)
+    {
+        int n = q.size();
+        while (n > 0)
+        {
+            if (level % 2 == 0)
+            {
+                auto temp = q.front();
+                q.pop_front();
+                ans.push_back(temp->data);
+                if (temp->left)
+                    q.push_back(temp->left);
+                if (temp->right)
+                    q.push_back(temp->right);
+            }
+            else
+            {
+                auto temp = q.back();
+                q.pop_back();
+                ans.push_back(temp->data);
+                if (temp->right)
+                    q.push_front(temp->right);
+                if (temp->left)
+                    q.push_front(temp->left);
+            }
+            n--;
+        }
+        level++;
+    }
+    return ans;
+}
+
+// https://leetcode.com/problems/unique-binary-search-trees-ii/description/
+class Unique_Binary_Search_Trees_II
+{
+  private:
+    vector<TreeNode<int> *> buildTree(int start, int end)
+    {
+        vector<TreeNode<int> *> ans;
+        if (start > end)
+        {
+            ans.push_back(NULL);
+            return ans;
+        }
+        for (int i = start; i <= end; i++)
+        {
+            vector<TreeNode<int> *> left = buildTree(start, i - 1);
+            vector<TreeNode<int> *> right = buildTree(i + 1, end);
+            for (int j = 0; j < left.size(); j++)
+            {
+                for (int k = 0; k < right.size(); k++)
+                {
+                    TreeNode<int> *root = new TreeNode<int>(i);
+                    root->left = left[j];
+                    root->right = right[k];
+                    ans.push_back(root);
+                }
+            }
+        }
+        return ans;
+    }
+
+  public:
+    vector<TreeNode<int> *> generateTrees(int n) { return buildTree(1, n); }
+};
+
+// https://www.naukri.com/code360/problems/max-product-subset_1170054
+long long int maxProductSubset(vector<int> &arr, int n)
+{
+    if (n == 1)
+        return arr[0];
+    const long long int MOD = 1e9 + 7;
+    bool hasPostive = false;
+    long long int ans = 1;
+    int neg = 0;
+    sort(arr.begin(), arr.end());
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] < 0)
+        {
+            neg++;
+        }
+        else if (arr[i] > 0)
+        {
+            ans = (ans * (long long int)arr[i]) % MOD;
+            hasPostive = true;
+        }
+    }
+    if (neg == 1 && hasPostive == false)
+        return 0;
+    if (neg % 2 != 0)
+        neg--;
+    for (int i = 0; i < neg; i++)
+    {
+        ans = (ans * (long long int)arr[i]) % MOD;
+    }
+    return ans;
+}
+
+// https://leetcode.com/problems/validate-binary-tree-nodes/description/
+class Validate_Binary_Tree_Nodes
+{
+  private:
+    class DSU
+    {
+      private:
+        int *parent;
+        int *rank;
+
+      public:
+        DSU(int n)
+        {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++)
+            {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+        int find(int x)
+        {
+            if (parent[x] == x)
+                return x;
+            return parent[x] = find(parent[x]);
+        }
+        void _union(int x, int y)
+        {
+            x = find(x);
+            y = find(y);
+            if (x != y)
+            {
+                if (rank[x] < rank[y])
+                    swap(x, y);
+
+                parent[y] = x;
+                if (rank[x] == rank[y])
+                    rank[x]++;
+            }
+        }
+    };
+
+  public:
+    bool validateBinaryTreeNodes(int n, vector<int> &leftChild, vector<int> &rightChild)
+    {
+        vector<bool> visited(n, false);
+        DSU d(n);
+        for (int i = 0; i < n; i++)
+        {
+            if (leftChild[i] != -1)
+            {
+                if (visited[leftChild[i]] != false)
+                    return false;
+                visited[leftChild[i]] = true;
+                if (d.find(i) != d.find(leftChild[i]))
+                    d._union(i, leftChild[i]);
+                else
+                    return false;
+            }
+            if (rightChild[i] != -1)
+            {
+                if (visited[rightChild[i]] != false)
+                    return false;
+                visited[rightChild[i]] = true;
+                if (d.find(i) != d.find(rightChild[i]))
+                    d._union(i, rightChild[i]);
+                else
+                    return false;
+            }
+        }
+        int cnt = 0;
+        for (int i = 0; i < n; i++)
+        {
+            if (i == d.find(i))
+            {
+                cnt++;
+            }
+        }
+        return cnt == 1;
+    }
+};
+
+// https://leetcode.com/problems/binary-search-tree-iterator/
+class BSTIterator
+{
+  private:
+    stack<TreeNode<int> *> st;
+    void partialInorder(TreeNode<int> *root)
+    {
+        while (root != NULL)
+        {
+            st.push(root);
+            root = root->left;
+        }
+    }
+
+  public:
+    BSTIterator(TreeNode<int> *root) { partialInorder(root); }
+
+    int next()
+    {
+        TreeNode<int> *top = st.top();
+        st.pop();
+        partialInorder(top->right);
+        return top->data;
+    }
+
+    bool hasNext() { return st.empty() == false; }
+};
+
+// https://leetcode.com/problems/linked-list-in-binary-tree/description/
+class Linked_List_in_Binary_Tree
+{
+  private:
+    bool solve(ListNode *head, TreeNode<int> *root)
+    {
+        if (root == NULL && head != NULL)
+            return false;
+        if (head == NULL)
+            return true;
+        if (head->val != root->data)
+            return false;
+        else
+            return solve(head->next, root->left) ||
+                   solve(head->next, root->right);
+    }
+
+  public:
+    bool isSubPath(ListNode *head, TreeNode<int> *root)
+    {
+        if (root == NULL || head == NULL)
+            return false;
+        return solve(head, root) || isSubPath(head, root->left) ||
+               isSubPath(head, root->right);
+    }
+};
+
+// https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/description/
+class Maximum_Sum_BST_in_Binary_Tree
+{
+  private:
+    class NodeValue
+    {
+      public:
+        int minNode, maxNode, sum;
+        NodeValue(int minNode, int maxNode)
+        {
+            this->minNode = minNode;
+            this->maxNode = maxNode;
+            this->sum = 0;
+        }
+
+        NodeValue(int minNode, int maxNode, int maxSum)
+        {
+            this->minNode = minNode;
+            this->maxNode = maxNode;
+            this->sum = maxSum;
+        }
+    };
+
+    int maxSum;
+    NodeValue maxSumBSTHelper(TreeNode<int> *root)
+    {
+        if (!root)
+            return NodeValue(INT_MAX, INT_MIN);
+
+        auto left = maxSumBSTHelper(root->left);
+        auto right = maxSumBSTHelper(root->right);
+
+        if (left.maxNode < root->data && root->data < right.minNode)
+        {
+            maxSum = max(maxSum, root->data + left.sum + right.sum);
+            return NodeValue(min(root->data, left.minNode),
+                             max(root->data, right.maxNode),
+                             root->data + left.sum + right.sum);
+        }
+        return NodeValue(INT_MIN, INT_MAX);
+    }
+
+  public:
+    int maxSumBST(TreeNode<int> *root)
+    {
+        maxSum = 0;
+        maxSumBSTHelper(root);
+        return max(maxSum, 0);
+    }
+};
+
+// https://leetcode.com/problems/longest-common-prefix/
+string longestCommonPrefix(vector<string> &strs)
+{
+    int longest = INT_MAX;
+    for (int i = 0, j = 1; j < strs.size(); i++, j++)
+    {
+        int n = strs[i].length();
+        int m = strs[j].length();
+        int prefix = 0;
+        while (prefix < n && prefix < m &&
+               strs[i][prefix] == strs[j][prefix])
+        {
+            prefix++;
+        }
+        longest = min(longest, prefix);
+    }
+    return strs[0].substr(0, longest);
 }
 
 int main(int argc, char *argv[])

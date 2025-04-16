@@ -916,6 +916,62 @@ class KMP
     }
 };
 
+// https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/
+class FirstOccurInString
+{
+  private:
+    void longestPrefixSuffix(string &prefix, vector<int> &lps)
+    {
+        lps[0] = 0;
+        int i = 1, len = 0;
+        while (i < prefix.length())
+        {
+            if (prefix[i] == prefix[len])
+            {
+                len++;
+                lps[i] = len;
+                i++;
+            }
+            else if (len == 0)
+            {
+                lps[i] = 0;
+                i++;
+            }
+            else
+                len = lps[len - 1];
+        }
+    }
+
+  public:
+    int strStr(string haystack, string needle)
+    {
+        int n = haystack.length();
+        int m = needle.length();
+        vector<int> lps(m, 0);
+        longestPrefixSuffix(needle, lps);
+        int i = 0, j = 0;
+        while (i < n)
+        {
+            if (haystack[i] == needle[j])
+            {
+                i++;
+                j++;
+                if (j == m)
+                {
+                    return i - m;
+                }
+            }
+            else if (j == 0)
+            {
+                i++;
+            }
+            else
+                j = lps[j - 1];
+        }
+        return -1;
+    }
+};
+
 // https://www.naukri.com/code360/problems/two-substrings_920397
 // Overlapping ABBA, by KMP
 bool findOverlap(string &s)

@@ -263,6 +263,21 @@ void setZeroes(int **matrix, int matrixSize, int *matrixColSize)
     }
 }
 
+// https://leetcode.com/problems/palindrome-number/
+bool isPalindrome(int x)
+{
+    if (x < 0 || x > 0 && x % 10 == 0)
+        return false;
+    int reverse = 0;
+    while (reverse < x)
+    {
+        reverse *= 10;
+        reverse += x % 10;
+        x /= 10;
+    }
+    return x == reverse || x == reverse / 10;
+}
+
 int main(int argc, char *argv[])
 {
     struct TreeNode r3;

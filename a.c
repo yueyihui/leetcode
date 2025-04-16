@@ -400,6 +400,32 @@ long reverseBits1(long n)
     return result;
 }
 
+// https://leetcode.com/problems/reverse-bits/
+uint32_t reverseBits2(uint32_t n)
+{
+    uint32_t ans = 0;
+    for (int i = 0; i <= 31; i++)
+    {
+        uint32_t temp = (n >> i) & 1;
+        temp <<= (31 - i);
+        ans |= temp;
+    }
+    return ans;
+}
+
+// https://leetcode.com/problems/number-of-1-bits/
+int hammingWeight1(int n)
+{
+    int cnt = 0;
+    while (n > 0)
+    {
+        if ((n & 1) == 1)
+            cnt++;
+        n >>= 1;
+    }
+    return cnt;
+}
+
 int majorityElement(int *nums, int numsSize)
 {
     //shellsort
@@ -1233,6 +1259,28 @@ int reverse_number(int num)
         num /= 10;
     }
     return reverse;
+}
+
+// https://www.naukri.com/code360/problems/trim-spaces_625037
+void trimSpaces(char input[])
+{
+    char *a = input, *b = input;
+    while (*b != '\0')
+    {
+        if (*b == ' ')
+        {
+            b++;
+            continue;
+        }
+        *a = *b;
+        a++;
+        b++;
+    }
+    while (*a != '\0')
+    {
+        *a = '\0';
+        a++;
+    }
 }
 
 int main(int argc, char *argv[])

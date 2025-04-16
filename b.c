@@ -127,18 +127,21 @@ int findDuplicate(int *arr, int n)
     return dup + 1;
 }
 
-void rotate(int *nums, int numsSize, int k)
+// https://leetcode.com/problems/rotate-array/
+void rotate(int *nums, int n, int k)
 {
-    int tmp = nums[0];
-    for (int i = 0; i < k; i++)
+    k = k % n;
+    int rotated[n];
+    memset(rotated, 0, n * sizeof(int));
+
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < numsSize; j++)
-        {
-            int n = nums[j];
-            nums[j] = tmp;
-            tmp = n;
-        }
-        nums[0] = tmp;
+        rotated[(i + k) % n] = nums[i];
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        nums[i] = rotated[i];
     }
 }
 
@@ -670,6 +673,46 @@ void number_pattern(int n)
 	}
 }
 
+// https://www.naukri.com/code360/problems/test-problem_955
+void number_pattern_2(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+        {
+            printf(" ");
+        }
+        int num = i + 1;
+        for (int k = 0; k < i + 1; k++)
+        {
+            printf("%d", num++);
+        }
+        printf("\n");
+    }
+}
+
+// https://www.naukri.com/code360/problems/pattern-triangle-of-numbers_22940
+void number_pattern_1(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+        {
+            printf(" ");
+        }
+        int num = i + 1;
+        for (int k = 0; k < i; k++)
+        {
+            printf("%d", num++);
+        }
+        for (int k = 0; k <= i; k++)
+        {
+            printf("%d", num--);
+        }
+        printf("\n");
+    }
+}
+
 // https://www.naukri.com/code360/problems/compare-versions_1062582
 int compareVersions(char a[], char b[])
 {
@@ -930,6 +973,94 @@ int removeElement(int *nums, int numsSize, int val)
 	return numsSize - cnt;
 }
 
+// https://www.naukri.com/code360/problems/occurrence-of-x-in-a-sorted-array_630456
+// binary search
+int count(int *arr, int n, int x)
+{
+    int left = -1, right = -1;
+    int l = 0, r = n - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (arr[mid] < x)
+        {
+            l = mid + 1;
+        }
+        else if (arr[mid] > x)
+            r = mid - 1;
+        else
+        {
+            left = mid;
+            r = mid - 1;
+        }
+    }
+    if (left == -1)
+        return 0;
+    l = 0, r = n - 1;
+    while (l <= r)
+    {
+        int mid = l + (r - l) / 2;
+        if (arr[mid] < x)
+        {
+            l = mid + 1;
+        }
+        else if (arr[mid] > x)
+            r = mid - 1;
+        else
+        {
+            right = mid;
+            l = mid + 1;
+        }
+    }
+    if (right == -1)
+        return 0;
+    return right - left + 1;
+}
+
+// https://www.naukri.com/code360/problems/unique-binary-search-trees_1266110
+long long int numTrees(int n)
+{
+    long long int dp[n + 1];
+    memset(dp, 0, (n + 1) * sizeof(long long int));
+    dp[0] = dp[1] = 1;
+    for (int i = 2; i <= n; i++)
+    {
+        // j is left nodes, i is tree nodes include root
+        for (int j = 0; j < i; j++)
+        {
+            // j is left subtree nodes
+            // i-1-j is i-root-left == right nodes
+            dp[i] += dp[j] * dp[i - 1 - j];
+        }
+    }
+    return dp[n];
+}
+
+// https://leetcode.com/problems/edit-distance/
+int minDistance(char *word1, char *word2)
+{
+    int n = strlen(word1);
+    int m = strlen(word2);
+    int dp[n + 1][m + 1];
+    for (int i = 0; i <= n; i++)
+        dp[i][0] = i;
+    for (int j = 0; j <= m; j++)
+        dp[0][j] = j;
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= m; j++)
+        {
+            if (word1[i - 1] == word2[j - 1])
+            {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+            else
+                dp[i][j] = MIN(MIN(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) + 1;
+        }
+    }
+    return dp[n][m];
+}
+
 int main(int argc, char *argv[])
 {
     int nums[] = {2, 3, 1, 2, 4, 3};
@@ -941,7 +1072,7 @@ int main(int argc, char *argv[])
     int dup[] = {5, 1, 2, 4, 3, 4, 3, 5};
     printf("removeDuplicates:%d\n", removeDuplicates(dup, sizeof(dup) / sizeof(int)));
 
-    int r[] = {1, 2, 3, 4, 5};
+    int r[] = {1, 2, 3, 4, 5, 6, 7};
     rotate(r, sizeof(r) / sizeof(int), 3);
     for (int i = 0; i < sizeof(r) / sizeof(int); i++)
     {

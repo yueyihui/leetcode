@@ -919,66 +919,38 @@ class FirstLastPos
 };
 
 //https://www.codingninjas.com/studio/problems/next-greater-element_670312?leftPanelTabValue=SUBMISSION&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=ATTEMPTED
-class NextGreaterElement
+vector<int> nextGreaterElement(vector<int> &arr, int n)
 {
-  private:
-    int upper_bound(vector<int> &arr, int l, int r, int x)
-    {
-        if (l > r)
-            return -1;
-        if (l == r)
-        {
-            if (arr[l] > x)
-                return l;
-            else
-                return -1;
-        }
+	vector<int> rv(n, -1);
+	stack<int> st;
+	for (int i = n - 1; i >= 0; i--) {
+		while (st.empty() == false && st.top() <= arr[i]) {
+			st.pop();
+		}
+		if (st.empty() == false) {
+			rv[i] = st.top();
+		}
+		st.push(arr[i]);
+	}
+	return rv;
+}
 
-        int mid = l + (r - l) / 2;
-        l = upper_bound(arr, l, mid - 1, x);
-        if (l != -1)
-            return l;
-        else if (arr[mid] > x)
-            return mid;
-        else
-            return upper_bound(arr, mid + 1, r, x);
-    }
-
-  public:
-    vector<int> nextGreaterElement(vector<int> &arr, int n)
-    {
-        vector<int> rv(n, -1);
-        stack<int> st;
-        for (int i = n - 1; i >= 0; i--)
-        {
-            while (st.empty() == false && st.top() <= arr[i])
-            {
-                st.pop();
-            }
-            if (st.empty() == false)
-            {
-                rv[i] = st.top();
-            }
-            st.push(arr[i]);
-        }
-        return rv;
-    }
-
-    //Time Limit Exceeded
-    vector<int> nextGreaterElement2(vector<int> &arr, int n)
-    {
-        vector<int> rv;
-        for (int i = 0; i < n; i++)
-        {
-            int j = upper_bound(arr, i + 1, n - 1, arr[i]);
-            if (j != -1)
-                rv.push_back(arr[j]);
-            else
-                rv.push_back(j);
-        }
-        return rv;
-    }
-};
+//https://leetcode.com/problems/next-greater-element-ii/
+//Given a circular integer array nums
+vector<int> nextGreaterElements(vector<int> &nums)
+{
+	int n = nums.size();
+	vector<int> ans(n, -1);
+	stack<int> st;
+	for (int i = 2 * n - 1; i >= 0; i--) {
+		while (st.empty() == false && st.top() <= nums[i % n])
+			st.pop();
+		if (i < n && st.empty() == false)
+			ans[i] = st.top();
+		st.push(nums[i % n]);
+	}
+	return ans;
+}
 
 //https://www.codingninjas.com/studio/problems/search-in-rotated-sorted-array_1082554?interviewProblemRedirection=true&leftPanelTabValue=PROBLEM&count=25&search=&sort_entity=order&sort_order=ASC&customSource=studio_nav&attempt_status=COMPLETED&page=3
 class Search_In_Rotated_Sorted_Array
@@ -1833,8 +1805,7 @@ int main(int argc, char *argv[])
     }
     {
         vector<int> arr = {1, 4, 9, 2, 9, 10, 6};
-        NextGreaterElement nge;
-        vector<int> rv = nge.nextGreaterElement(arr, arr.size());
+        vector<int> rv = nextGreaterElement(arr, arr.size());
         std::cout << "Next Greater Element:";
         for (auto i : rv)
         {
